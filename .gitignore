@@ -1,0 +1,106 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Shining Star United — Git Ignore
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Environment files (contain secrets) ────────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+backend/.env
+backend/.env.production
+backend/.env.local
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# ── Credentials and secrets ────────────────────────────────────────────────────
+CREDENTIALS.md
+PRODUCTION-CREDENTIALS.md
+credentials.txt
+secrets.txt
+*.pem
+*.key
+*.crt
+
+# ── Python ─────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+venv/
+.venv/
+ENV/
+env/
+backend/venv/
+backend/.venv/
+
+# ── Testing ────────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# ── Databases ──────────────────────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+backend/dev.db
+backend/*.db
+
+# ── Uploads (user-generated content) ───────────────────────────────────────────
+uploads/
+backend/uploads/
+!backend/uploads/.gitkeep
+
+# ── Node / Frontend ────────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── IDEs and editors ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# ── Docker ─────────────────────────────────────────────────────────────────────
+*.log
+
+# ── OS ─────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

@@ -1,0 +1,79 @@
+═══════════════════════════════════════════════════════════════════
+RENDER DEPLOYMENT - ENVIRONMENT VARIABLES
+Copy and paste these exact values when deploying
+═══════════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BACKEND ENVIRONMENT VARIABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DATABASE_URL
+<PASTE YOUR INTERNAL DATABASE URL HERE FROM RENDER POSTGRESQL>
+
+SECRET_KEY
+a1efb23b956ed760244fbd9be48a0bcca8970f3bd124241fb9fd99ce467d3722
+
+ALGORITHM
+HS256
+
+ACCESS_TOKEN_EXPIRE_MINUTES
+1440
+
+UPLOAD_DIR
+/app/uploads
+
+CORS_ORIGINS
+["*"]
+
+SMTP_HOST
+smtp.gmail.com
+
+SMTP_PORT
+587
+
+SMTP_TLS
+true
+
+SMTP_USER
+sarlongki360@gmail.com
+
+SMTP_PASSWORD
+lckmvihohphjilqa
+
+SMTP_FROM
+sarlongki360@gmail.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FRONTEND ENVIRONMENT VARIABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VITE_API_BASE_URL
+<PASTE YOUR BACKEND URL HERE>/api/v1
+
+Example: https://ssu-backend.onrender.com/api/v1
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AFTER FRONTEND IS DEPLOYED - UPDATE BACKEND CORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Go back to backend → Environment → Update CORS_ORIGINS to:
+
+CORS_ORIGINS
+["https://YOUR-FRONTEND-URL.onrender.com"]
+
+Example: ["https://ssu-frontend.onrender.com"]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CREATE ADMIN COMMAND (Run in Backend Shell)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+python -m scripts.create_admin --email admin@shiningstarunited.com --password Shiningstar@1234
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADMIN CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Email: admin@shiningstarunited.com
+Password: Shiningstar@1234
+
+═══════════════════════════════════════════════════════════════════
