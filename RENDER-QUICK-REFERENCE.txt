@@ -1,0 +1,108 @@
+═══════════════════════════════════════════════════════════════════
+RENDER DEPLOYMENT - QUICK REFERENCE CARD
+═══════════════════════════════════════════════════════════════════
+
+📍 YOUR GITHUB REPO
+https://github.com/Kiso23/shiningstar
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1: CREATE DATABASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+New + → PostgreSQL
+
+Name: ssu-database
+Database: ssu_tournament
+User: ssu
+Region: Singapore
+Plan: Free
+
+⚠️ COPY: Internal Database URL
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2: DEPLOY BACKEND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+New + → Web Service → Connect GitHub → Kiso23/shiningstar
+
+Name: ssu-backend
+Region: Singapore
+Branch: main
+Root Directory: backend
+Runtime: Docker
+Plan: Free
+
+ENVIRONMENT VARIABLES (add all):
+┌─────────────────────────────────┬──────────────────────────────────┐
+│ DATABASE_URL                    │ <PASTE INTERNAL DB URL>          │
+│ SECRET_KEY                      │ a1efb23b956ed760244fbd9be48a0... │
+│ ALGORITHM                       │ HS256                            │
+│ ACCESS_TOKEN_EXPIRE_MINUTES     │ 1440                             │
+│ UPLOAD_DIR                      │ /app/uploads                     │
+│ CORS_ORIGINS                    │ ["*"]                            │
+│ SMTP_HOST                       │ smtp.gmail.com                   │
+│ SMTP_PORT                       │ 587                              │
+│ SMTP_TLS                        │ true                             │
+│ SMTP_USER                       │ sarlongki360@gmail.com           │
+│ SMTP_PASSWORD                   │ lckmvihohphjilqa                 │
+│ SMTP_FROM                       │ sarlongki360@gmail.com           │
+└─────────────────────────────────┴──────────────────────────────────┘
+
+⚠️ COPY: Backend URL (e.g., https://ssu-backend.onrender.com)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3: DEPLOY FRONTEND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+New + → Static Site → Kiso23/shiningstar
+
+Name: ssu-frontend
+Branch: main
+Root Directory: frontend
+Build Command: npm install && npm run build
+Publish Directory: dist
+
+ENVIRONMENT VARIABLE:
+┌─────────────────────────────────┬──────────────────────────────────┐
+│ VITE_API_BASE_URL               │ <BACKEND URL>/api/v1             │
+└─────────────────────────────────┴──────────────────────────────────┘
+
+Example: https://ssu-backend.onrender.com/api/v1
+
+⚠️ COPY: Frontend URL (e.g., https://ssu-frontend.onrender.com)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 4: UPDATE CORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend → Environment → Edit CORS_ORIGINS
+
+Change from: ["*"]
+Change to: ["https://YOUR-FRONTEND-URL.onrender.com"]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 5: CREATE ADMIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend → Shell → Run:
+
+python -m scripts.create_admin --email admin@shiningstarunited.com --password Shiningstar@1234
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADMIN CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Email: admin@shiningstarunited.com
+Password: Shiningstar@1234
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR LIVE URLS (fill in after deployment)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Frontend: _________________________________________________
+
+Backend: _________________________________________________
+
+Admin: _________________________________________________/admin/login
+
+═══════════════════════════════════════════════════════════════════
