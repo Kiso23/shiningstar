@@ -26,7 +26,19 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     return TokenResponse(access_token=access_token)
 
 
-@router.post("/setup", tags=["setup"])
+@router.post("/test-email", tags=["setup"])
+async def test_email():
+    """Test endpoint to verify SMTP is working on production."""
+    import os
+    from app.config import settings
+    return {
+        "smtp_host": settings.SMTP_HOST,
+        "smtp_port": settings.SMTP_PORT,
+        "smtp_user": settings.SMTP_USER,
+        "smtp_from": settings.SMTP_FROM,
+        "smtp_tls": settings.SMTP_TLS,
+        "smtp_password_set": bool(settings.SMTP_PASSWORD),
+    }
 async def setup_admin(db: AsyncSession = Depends(get_db)):
     """
     One-time setup endpoint to create the admin account.
