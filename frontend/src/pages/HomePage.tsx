@@ -138,7 +138,7 @@ export default function HomePage() {
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               className="relative px-8 py-6 rounded-3xl shadow-2xl shadow-red-900/50 overflow-hidden"
               style={{
-                background: 'repeating-linear-gradient(135deg, #c41e3a 0px, #c41e3a 10px, #1a0a0a 10px, #1a0a0a 20px, #f5f5f5 20px, #f5f5f5 22px, #1a0a0a 22px, #1a0a0a 32px)',
+                background: 'repeating-linear-gradient(0deg, #c41e3a 0px, #c41e3a 10px, #1a0a0a 10px, #1a0a0a 20px, #f5f5f5 20px, #f5f5f5 22px, #1a0a0a 22px, #1a0a0a 32px)',
               }}
             >
               {/* Semi-transparent overlay for text readability */}
