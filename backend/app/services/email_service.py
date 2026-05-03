@@ -1,15 +1,13 @@
 """
-Email notification service using Python's built-in smtplib.
-Sends HTML emails for registration confirmation and status updates.
-Gracefully skips sending if SMTP is not configured.
+Email notification service.
+Uses Brevo (formerly Sendinblue) HTTP API - works on Render free tier.
+Falls back gracefully if not configured.
 """
 import asyncio
 import logging
-import os
-import smtplib
-import ssl
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import json
+import urllib.request
+import urllib.error
 from functools import partial
 from typing import Optional
 
@@ -21,17 +19,17 @@ TOURNAMENT_NAME = "Shining Star United Football Tournament 2025"
 SUPPORT_EMAIL = settings.SMTP_FROM
 
 # ── Load club logo as base64 for inline email embedding ───────────────────────
+import os
 _LOGO_B64: str = ""
 _LOGO_B64_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../utils/logo_b64.txt")
 try:
     with open(_LOGO_B64_PATH) as f:
         _LOGO_B64 = f.read().strip()
 except Exception:
-    pass  # Falls back to emoji if file not found
+    pass
 
 
 def _logo_html(size: int = 80) -> str:
-    """Return an inline <img> tag with the club logo, or a text fallback."""
     if _LOGO_B64:
         return (
             f'<img src="data:image/png;base64,{_LOGO_B64}" '
@@ -42,18 +40,44 @@ def _logo_html(size: int = 80) -> str:
     return '<div style="font-size:40px;text-align:center;margin-bottom:8px;">⚽</div>'
 
 
-def _build_email(to: str, subject: str, html: str, text: str) -> MIMEMultipart:
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = f"{TOURNAMENT_NAME} <{settings.SMTP_FROM}>"
-    msg["To"] = to
-    msg.attach(MIMEText(text, "plain"))
-    msg.attach(MIMEText(html, "html"))
-    return msg
+def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
+    """Send email via Brevo HTTP API - works on Render free tier."""
+    api_key = os.getenv("BREVO_API_KEY", "")
+    if not api_key:
+        logger.warning("BREVO_API_KEY not set, skipping email")
+        return
+
+    from_email = settings.SMTP_FROM or "noreply@shiningstarunited.com"
+    from_name = "Shining Star United"
+
+    payload = {
+        "sender": {"name": from_name, "email": from_email},
+        "to": [{"email": to}],
+        "subject": subject,
+        "htmlContent": html,
+        "textContent": text,
+    }
+
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        "https://api.brevo.com/v3/smtp/email",
+        data=data,
+        headers={
+            "accept": "application/json",
+            "api-key": api_key,
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+
+    with urllib.request.urlopen(req, timeout=30) as response:
+        result = response.read()
+        logger.info("✅ Email sent via Brevo to %s: %s", to, subject)
 
 
-def _send_sync(msg: MIMEMultipart, to: str) -> None:
-    """Synchronous SMTP send — runs in a thread pool."""
+def _send_via_smtp(to: str, msg) -> None:
+    """Fallback SMTP send."""
+    import smtplib, ssl
     context = ssl.create_default_context()
     with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.ehlo()
@@ -63,24 +87,34 @@ def _send_sync(msg: MIMEMultipart, to: str) -> None:
         if settings.SMTP_USER and settings.SMTP_PASSWORD:
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
         server.sendmail(settings.SMTP_FROM, to, msg.as_string())
-    logger.info("Email sent to %s: %s", to, msg["Subject"])
+    logger.info("✅ Email sent via SMTP to %s", to)
 
 
-async def _send(msg: MIMEMultipart, to: str) -> None:
-    """Send email asynchronously without blocking the event loop."""
-    if not settings.SMTP_HOST:
-        logger.info("📧 Email would be sent to %s: %s (SMTP not configured)", to, msg["Subject"])
-        return
+async def _send(to: str, subject: str, html: str, text: str) -> None:
+    """Send email - tries Brevo API first, falls back to SMTP."""
     loop = asyncio.get_event_loop()
     try:
-        await loop.run_in_executor(None, partial(_send_sync, msg, to))
-        logger.info("✅ Email sent successfully to %s", to)
-    except Exception as exc:
-        # Never crash the request because of email failure
-        logger.error("❌ Failed to send email to %s: %s", to, str(exc))
-        # Re-raise to see full traceback in logs
-        import traceback
-        logger.error(traceback.format_exc())
+        await loop.run_in_executor(
+            None, partial(_send_via_brevo, to, subject, html, text)
+        )
+    except Exception as brevo_exc:
+        logger.warning("Brevo failed: %s, trying SMTP...", brevo_exc)
+        # Try SMTP as fallback
+        if settings.SMTP_HOST:
+            try:
+                from email.mime.multipart import MIMEMultipart
+                from email.mime.text import MIMEText
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = subject
+                msg["From"] = f"{TOURNAMENT_NAME} <{settings.SMTP_FROM}>"
+                msg["To"] = to
+                msg.attach(MIMEText(text, "plain"))
+                msg.attach(MIMEText(html, "html"))
+                await loop.run_in_executor(None, partial(_send_via_smtp, to, msg))
+            except Exception as smtp_exc:
+                logger.error("❌ Both Brevo and SMTP failed. Brevo: %s, SMTP: %s", brevo_exc, smtp_exc)
+        else:
+            logger.error("❌ Email failed: %s", brevo_exc)
 
 
 # ── Email templates ────────────────────────────────────────────────────────────
@@ -217,7 +251,7 @@ Please save your Registration ID: {registration_id}
     """.strip()
 
     msg = _build_email(to_email, subject, _base_html(html_content), text_content)
-    await _send(msg, to_email)
+    await _send(to_email, subject, _base_html(html_content), text_content)
 
 
 async def send_status_update(
@@ -299,4 +333,4 @@ Team Name       : {team_name}
     """.strip()
 
     msg = _build_email(to_email, subject, _base_html(html_content), text_content)
-    await _send(msg, to_email)
+    await _send(to_email, subject, _base_html(html_content), text_content)
