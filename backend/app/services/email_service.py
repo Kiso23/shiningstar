@@ -6,20 +6,17 @@ Falls back gracefully if not configured.
 import asyncio
 import logging
 import json
+import os
 import urllib.request
-import urllib.error
 from functools import partial
-from typing import Optional
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 TOURNAMENT_NAME = "Shining Star United Football Tournament 2025"
-SUPPORT_EMAIL = settings.SMTP_FROM
 
-# ── Load club logo as base64 for inline email embedding ───────────────────────
-import os
+# ── Load club logo as base64 ───────────────────────────────────────────────────
 _LOGO_B64: str = ""
 _LOGO_B64_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../utils/logo_b64.txt")
 try:
@@ -34,24 +31,55 @@ def _logo_html(size: int = 80) -> str:
         return (
             f'<img src="data:image/png;base64,{_LOGO_B64}" '
             f'width="{size}" height="{size}" '
-            f'alt="Shining Star United Hamren" '
+            f'alt="Shining Star United" '
             f'style="border-radius:50%;display:block;margin:0 auto 8px;" />'
         )
     return '<div style="font-size:40px;text-align:center;margin-bottom:8px;">⚽</div>'
+
+
+def _base_html(content: str) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><title>{TOURNAMENT_NAME}</title></head>
+<body style="margin:0;padding:0;background:#0f0f0f;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f0f;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0"
+             style="background:#1a1a1a;border-radius:16px;overflow:hidden;border:1px solid #2a2a2a;max-width:600px;width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#1a2744,#0f1a33);padding:28px 40px 24px;text-align:center;border-bottom:3px solid #ea580c;">
+            {_logo_html(90)}
+            <h1 style="margin:0;color:#fff;font-size:20px;font-weight:800;">Shining Star United</h1>
+            <p style="margin:4px 0 0;color:rgba(255,255,255,0.6);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
+              Hamren · Football Tournament 2025
+            </p>
+          </td>
+        </tr>
+        <tr><td style="padding:36px 40px;">{content}</td></tr>
+        <tr>
+          <td style="padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;">
+            <p style="margin:0;color:#555;font-size:12px;">© 2025 Shining Star United · Hamren · All rights reserved</p>
+            <p style="margin:4px 0 0;color:#555;font-size:12px;">This is an automated email. Please do not reply.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
 
 
 def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
     """Send email via Brevo HTTP API - works on Render free tier."""
     api_key = os.getenv("BREVO_API_KEY", "")
     if not api_key:
-        logger.warning("BREVO_API_KEY not set, skipping email")
+        logger.warning("BREVO_API_KEY not set, skipping email to %s", to)
         return
 
     from_email = settings.SMTP_FROM or "noreply@shiningstarunited.com"
-    from_name = "Shining Star United"
 
     payload = {
-        "sender": {"name": from_name, "email": from_email},
+        "sender": {"name": "Shining Star United", "email": from_email},
         "to": [{"email": to}],
         "subject": subject,
         "htmlContent": html,
@@ -71,105 +99,17 @@ def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
     )
 
     with urllib.request.urlopen(req, timeout=30) as response:
-        result = response.read()
+        response.read()
         logger.info("✅ Email sent via Brevo to %s: %s", to, subject)
 
 
-def _send_via_smtp(to: str, msg) -> None:
-    """Fallback SMTP send."""
-    import smtplib, ssl
-    context = ssl.create_default_context()
-    with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-        server.ehlo()
-        if settings.SMTP_TLS:
-            server.starttls(context=context)
-            server.ehlo()
-        if settings.SMTP_USER and settings.SMTP_PASSWORD:
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-        server.sendmail(settings.SMTP_FROM, to, msg.as_string())
-    logger.info("✅ Email sent via SMTP to %s", to)
-
-
 async def _send(to: str, subject: str, html: str, text: str) -> None:
-    """Send email - tries Brevo API first, falls back to SMTP."""
+    """Send email via Brevo API."""
     loop = asyncio.get_event_loop()
     try:
-        await loop.run_in_executor(
-            None, partial(_send_via_brevo, to, subject, html, text)
-        )
-    except Exception as brevo_exc:
-        logger.warning("Brevo failed: %s, trying SMTP...", brevo_exc)
-        # Try SMTP as fallback
-        if settings.SMTP_HOST:
-            try:
-                from email.mime.multipart import MIMEMultipart
-                from email.mime.text import MIMEText
-                msg = MIMEMultipart("alternative")
-                msg["Subject"] = subject
-                msg["From"] = f"{TOURNAMENT_NAME} <{settings.SMTP_FROM}>"
-                msg["To"] = to
-                msg.attach(MIMEText(text, "plain"))
-                msg.attach(MIMEText(html, "html"))
-                await loop.run_in_executor(None, partial(_send_via_smtp, to, msg))
-            except Exception as smtp_exc:
-                logger.error("❌ Both Brevo and SMTP failed. Brevo: %s, SMTP: %s", brevo_exc, smtp_exc)
-        else:
-            logger.error("❌ Email failed: %s", brevo_exc)
-
-
-# ── Email templates ────────────────────────────────────────────────────────────
-
-def _base_html(content: str) -> str:
-    return f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{TOURNAMENT_NAME}</title>
-</head>
-<body style="margin:0;padding:0;background:#0f0f0f;font-family:'Segoe UI',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f0f;padding:40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0"
-               style="background:#1a1a1a;border-radius:16px;overflow:hidden;border:1px solid #2a2a2a;max-width:600px;width:100%;">
-          <!-- Header -->
-          <tr>
-            <td style="background:linear-gradient(135deg,#1a2744,#0f1a33);padding:28px 40px 24px;text-align:center;border-bottom:3px solid #ea580c;">
-              {_logo_html(90)}
-              <h1 style="margin:0;color:#fff;font-size:20px;font-weight:800;letter-spacing:-0.5px;">
-                Shining Star United
-              </h1>
-              <p style="margin:4px 0 0;color:rgba(255,255,255,0.6);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
-                Hamren · Football Tournament 2025
-              </p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding:36px 40px;">
-              {content}
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;">
-              <p style="margin:0;color:#555;font-size:12px;">
-                © 2025 Shining Star United · Hamren · All rights reserved
-              </p>
-              <p style="margin:4px 0 0;color:#555;font-size:12px;">
-                This is an automated email. Please do not reply.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-"""
+        await loop.run_in_executor(None, partial(_send_via_brevo, to, subject, html, text))
+    except Exception as exc:
+        logger.error("❌ Email failed to %s: %s", to, exc)
 
 
 async def send_registration_confirmation(
@@ -179,7 +119,6 @@ async def send_registration_confirmation(
     registration_id: str,
     player_count: int,
 ) -> None:
-    """Send registration confirmation email after team registers."""
     subject = f"✅ Registration Received — {team_name} | {TOURNAMENT_NAME}"
 
     html_content = f"""
@@ -187,14 +126,11 @@ async def send_registration_confirmation(
       <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
         Hi <strong style="color:#fff;">{manager_name}</strong>, your team has been successfully registered.
       </p>
-
       <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #2a2a2a;">
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="padding:6px 0;color:#888;font-size:13px;width:140px;">Registration ID</td>
-            <td style="padding:6px 0;color:#f97316;font-size:13px;font-family:monospace;font-weight:700;">
-              {registration_id}
-            </td>
+            <td style="padding:6px 0;color:#f97316;font-size:13px;font-family:monospace;font-weight:700;">{registration_id}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;color:#888;font-size:13px;">Team Name</td>
@@ -207,30 +143,23 @@ async def send_registration_confirmation(
           <tr>
             <td style="padding:6px 0;color:#888;font-size:13px;">Status</td>
             <td style="padding:6px 0;">
-              <span style="background:#854d0e;color:#fbbf24;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">
-                Pending Review
-              </span>
+              <span style="background:#854d0e;color:#fbbf24;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Pending Review</span>
             </td>
           </tr>
         </table>
       </div>
-
       <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
         <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
           <strong>What happens next?</strong><br/>
           Our admin team will review your payment screenshot (₹801 registration fee) and approve your registration within 24 hours.
-          You will receive another email once your registration status is updated.
         </p>
       </div>
-
       <p style="margin:0;color:#666;font-size:12px;">
-        Please save your Registration ID <strong style="color:#f97316;">{registration_id}</strong>
-        for future reference.
+        Please save your Registration ID <strong style="color:#f97316;">{registration_id}</strong> for future reference.
       </p>
     """
 
-    text_content = f"""
-Registration Received — {TOURNAMENT_NAME}
+    text_content = f"""Registration Received — {TOURNAMENT_NAME}
 
 Hi {manager_name},
 
@@ -241,16 +170,10 @@ Team Name       : {team_name}
 Players         : {player_count}
 Status          : Pending Review
 
-What happens next?
-Our admin team will review your payment screenshot and approve your registration within 24 hours.
-You will receive another email once your registration status is updated.
+Our admin team will review your payment and approve within 24 hours.
 
-Please save your Registration ID: {registration_id}
+© 2025 Shining Star United"""
 
-© 2025 Shining Star United
-    """.strip()
-
-    msg = _build_email(to_email, subject, _base_html(html_content), text_content)
     await _send(to_email, subject, _base_html(html_content), text_content)
 
 
@@ -261,7 +184,6 @@ async def send_status_update(
     registration_id: str,
     new_status: str,
 ) -> None:
-    """Send email when admin approves or rejects a registration."""
     if new_status == "approved":
         subject = f"🎉 Registration Approved — {team_name} | {TOURNAMENT_NAME}"
         status_badge = '<span style="background:#14532d;color:#4ade80;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Approved</span>'
@@ -274,8 +196,7 @@ async def send_status_update(
           </p>
           <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
             <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
-              Please arrive at the venue on time. Bring this email and your Registration ID as proof of registration.
-              Good luck! ⚽
+              Please arrive at the venue on time. Bring this email and your Registration ID as proof. Good luck! ⚽
             </p>
           </div>
         """
@@ -291,11 +212,11 @@ async def send_status_update(
           </p>
           <div style="background:#2a1c1c;border:1px solid #4a2d2d;border-radius:12px;padding:16px;margin-bottom:24px;">
             <p style="margin:0;color:#fca5a5;font-size:13px;line-height:1.6;">
-              If you believe this is an error or need clarification, please contact the tournament organiser.
+              If you believe this is an error, please contact the tournament organiser.
             </p>
           </div>
         """
-        text_status = "REJECTED — Your registration was not approved. Please contact the organiser for details."
+        text_status = "REJECTED — Your registration was not approved. Please contact the organiser."
 
     html_content = f"""
       {status_message}
@@ -303,9 +224,7 @@ async def send_status_update(
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="padding:6px 0;color:#888;font-size:13px;width:140px;">Registration ID</td>
-            <td style="padding:6px 0;color:#f97316;font-size:13px;font-family:monospace;font-weight:700;">
-              {registration_id}
-            </td>
+            <td style="padding:6px 0;color:#f97316;font-size:13px;font-family:monospace;font-weight:700;">{registration_id}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;color:#888;font-size:13px;">Team Name</td>
@@ -319,8 +238,7 @@ async def send_status_update(
       </div>
     """
 
-    text_content = f"""
-Registration Status Update — {TOURNAMENT_NAME}
+    text_content = f"""Registration Status Update — {TOURNAMENT_NAME}
 
 Hi {manager_name},
 
@@ -329,8 +247,6 @@ Hi {manager_name},
 Registration ID : {registration_id}
 Team Name       : {team_name}
 
-© 2025 Shining Star United
-    """.strip()
+© 2025 Shining Star United"""
 
-    msg = _build_email(to_email, subject, _base_html(html_content), text_content)
     await _send(to_email, subject, _base_html(html_content), text_content)
