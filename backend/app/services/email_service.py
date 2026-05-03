@@ -71,7 +71,7 @@ def _base_html(content: str) -> str:
 
 def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
     """Send email via Brevo HTTP API - works on Render free tier."""
-    api_key = os.getenv("BREVO_API_KEY", "").strip()  # strip removes \n and spaces
+    api_key = os.getenv("BREVO_API_KEY", "").strip()  # strip newlines/spaces
     if not api_key:
         logger.warning("BREVO_API_KEY not set, skipping email to %s", to)
         return
