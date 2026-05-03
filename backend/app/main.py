@@ -1,6 +1,10 @@
+import logging
 import os
 from contextlib import asynccontextmanager
 from typing import Any
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError

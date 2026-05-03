@@ -74,9 +74,13 @@ async def _send(msg: MIMEMultipart, to: str) -> None:
     loop = asyncio.get_event_loop()
     try:
         await loop.run_in_executor(None, partial(_send_sync, msg, to))
+        logger.info("✅ Email sent successfully to %s", to)
     except Exception as exc:
         # Never crash the request because of email failure
-        logger.error("Failed to send email to %s: %s", to, exc)
+        logger.error("❌ Failed to send email to %s: %s", to, str(exc))
+        # Re-raise to see full traceback in logs
+        import traceback
+        logger.error(traceback.format_exc())
 
 
 # ── Email templates ────────────────────────────────────────────────────────────
