@@ -68,7 +68,9 @@ export default function HomePage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
   return (
-    <div className="min-h-screen bg-gray-950 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-900 overflow-x-hidden">
+      {/* Stripe pattern overlay */}
+      <div className="fixed inset-0 bg-stripe-pattern opacity-20 pointer-events-none z-0" />
       {/* ── Navbar ── */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
@@ -136,14 +138,13 @@ export default function HomePage() {
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               className="relative px-8 py-6 rounded-3xl shadow-2xl shadow-red-900/50 overflow-hidden"
               style={{
-                background: 'repeating-linear-gradient(0deg, #c41e3a 0px, #c41e3a 10px, #1a0a0a 10px, #1a0a0a 20px, #f5f5f5 20px, #f5f5f5 22px, #1a0a0a 22px, #1a0a0a 32px)',
+                background: 'repeating-linear-gradient(0deg, #c41e3a 0px, #c41e3a 12px, #1a0a0a 12px, #1a0a0a 24px, #f5f5f5 24px, #f5f5f5 26px, #1a0a0a 26px, #1a0a0a 38px)',
               }}
             >
-              {/* Semi-transparent overlay for text readability */}
-              <div className="absolute inset-0 bg-black/30 rounded-3xl" />
+              <div className="absolute inset-0 bg-black/25 rounded-3xl" />
               <motion.div
                 className="relative z-10 text-3xl sm:text-5xl md:text-6xl font-black text-white text-center tracking-tight leading-tight drop-shadow-2xl"
-                style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8), 0 0 40px rgba(196,30,58,0.8)' }}
+                style={{ textShadow: '0 4px 20px rgba(0,0,0,0.9), 0 0 40px rgba(196,30,58,0.8)' }}
               >
                 KARDOM LAPEN KURVANGTHU
                 <br />
