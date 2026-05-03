@@ -134,24 +134,23 @@ export default function HomePage() {
             className="mb-8"
           >
             <motion.div
-              animate={{ 
-                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative px-8 py-6 rounded-3xl shadow-2xl shadow-red-900/50 overflow-hidden"
+              style={{
+                background: 'repeating-linear-gradient(135deg, #c41e3a 0px, #c41e3a 10px, #1a0a0a 10px, #1a0a0a 20px, #f5f5f5 20px, #f5f5f5 22px, #1a0a0a 22px, #1a0a0a 32px)',
               }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
-              className="relative px-8 py-6 rounded-3xl bg-gradient-to-r from-orange-600 via-yellow-500 to-orange-600 bg-[length:200%_100%] shadow-2xl shadow-orange-500/50"
             >
+              {/* Semi-transparent overlay for text readability */}
+              <div className="absolute inset-0 bg-black/30 rounded-3xl" />
               <motion.div
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="text-3xl sm:text-5xl md:text-6xl font-black text-white text-center tracking-tight leading-tight drop-shadow-2xl"
-                style={{ textShadow: '0 4px 20px rgba(0,0,0,0.5), 0 0 40px rgba(249,115,22,0.6)' }}
+                className="relative z-10 text-3xl sm:text-5xl md:text-6xl font-black text-white text-center tracking-tight leading-tight drop-shadow-2xl"
+                style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8), 0 0 40px rgba(196,30,58,0.8)' }}
               >
                 KARDOM LAPEN KURVANGTHU
                 <br />
                 ANGTON APHAN TA
               </motion.div>
-              {/* Glow effect */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-400/20 via-yellow-400/20 to-orange-400/20 blur-xl -z-10" />
             </motion.div>
           </motion.div>
 
