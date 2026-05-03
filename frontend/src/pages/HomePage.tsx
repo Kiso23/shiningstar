@@ -68,9 +68,7 @@ export default function HomePage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
   return (
-    <div className="min-h-screen bg-gray-900 overflow-x-hidden">
-      {/* Stripe pattern overlay */}
-      <div className="fixed inset-0 bg-stripe-pattern opacity-20 pointer-events-none z-0" />
+    <div className="min-h-screen bg-gray-950 overflow-x-hidden">
       {/* ── Navbar ── */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
