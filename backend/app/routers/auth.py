@@ -31,6 +31,7 @@ async def test_email():
     """Test endpoint to verify SMTP is working on production."""
     import os
     from app.config import settings
+    api_key = os.getenv("BREVO_API_KEY", "")
     return {
         "smtp_host": settings.SMTP_HOST,
         "smtp_port": settings.SMTP_PORT,
@@ -38,6 +39,10 @@ async def test_email():
         "smtp_from": settings.SMTP_FROM,
         "smtp_tls": settings.SMTP_TLS,
         "smtp_password_set": bool(settings.SMTP_PASSWORD),
+        "brevo_key_length": len(api_key),
+        "brevo_key_prefix": api_key[:20] if api_key else "NOT SET",
+        "brevo_key_has_newline": "\n" in api_key,
+        "brevo_key_stripped_length": len(api_key.strip()),
     }
 async def setup_admin(db: AsyncSession = Depends(get_db)):
     """
