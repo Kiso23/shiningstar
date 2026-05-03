@@ -69,6 +69,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-950 overflow-x-hidden">
+      {/* Stripe pattern overlay */}
+      <div className="fixed inset-0 bg-stripe-pattern opacity-[0.04] pointer-events-none z-0" />
       {/* ── Navbar ── */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
