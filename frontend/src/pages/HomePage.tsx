@@ -141,7 +141,7 @@ export default function HomePage() {
                 background: 'repeating-linear-gradient(0deg, #c41e3a 0px, #c41e3a 12px, #1a0a0a 12px, #1a0a0a 24px, #f5f5f5 24px, #f5f5f5 26px, #1a0a0a 26px, #1a0a0a 38px)',
               }}
             >
-              <div className="absolute inset-0 bg-black/25 rounded-3xl" />
+              <div className="absolute inset-0 rounded-3xl" />
               <motion.div
                 className="relative z-10 text-3xl sm:text-5xl md:text-6xl font-black text-white text-center tracking-tight leading-tight drop-shadow-2xl"
                 style={{ textShadow: '0 4px 20px rgba(0,0,0,0.9), 0 0 40px rgba(196,30,58,0.8)' }}
