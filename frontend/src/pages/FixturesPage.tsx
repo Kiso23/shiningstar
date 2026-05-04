@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Calendar, MapPin, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Calendar, MapPin, AlertCircle, RefreshCw } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../api/matches'
+import PageLoader from '../components/shared/PageLoader'
 
 const ROUND_ORDER = [
   'Round of 32',
@@ -76,7 +77,7 @@ export default function FixturesPage() {
       <div className="max-w-5xl mx-auto px-6 py-8">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+            <PageLoader text="Loading fixtures..." />
           </div>
         ) : error ? (
           <motion.div

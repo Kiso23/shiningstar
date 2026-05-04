@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Trophy, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Trophy, AlertCircle, RefreshCw } from 'lucide-react'
 import { getStandings, type StandingResponse } from '../api/standings'
+import PageLoader from '../components/shared/PageLoader'
 
 const RANK_STYLES: Record<number, { bg: string; text: string; badge: string }> = {
   1: { bg: 'bg-yellow-500/10 border-yellow-500/20', text: 'text-yellow-400', badge: '🥇' },
@@ -63,10 +64,8 @@ export default function LeaderboardPage() {
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {loading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="glass-card h-14 animate-pulse" />
-            ))}
+          <div className="flex items-center justify-center h-64">
+            <PageLoader text="Loading standings..." />
           </div>
         ) : error ? (
           <motion.div

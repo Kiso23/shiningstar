@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, RefreshCw, Loader2, AlertCircle, Radio } from 'lucide-react'
+import { ArrowLeft, RefreshCw, AlertCircle, Radio } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../api/matches'
+import PageLoader from '../components/shared/PageLoader'
 
 const AUTO_REFRESH_INTERVAL = 30_000 // 30 seconds
 
@@ -97,7 +98,7 @@ export default function LivePage() {
       <div className="max-w-3xl mx-auto px-6 py-8">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+            <PageLoader text="Loading live matches..." />
           </div>
         ) : error ? (
           <motion.div
