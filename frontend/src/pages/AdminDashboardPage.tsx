@@ -1,22 +1,24 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, LogOut, X, ClipboardList, Calendar, Radio, BarChart2 } from 'lucide-react'
+import { Star, LogOut, X, ClipboardList, Calendar, Radio, BarChart2, Settings } from 'lucide-react'
 import RegistrationTable from '../components/admin/RegistrationTable'
 import RegistrationDetail from '../components/admin/RegistrationDetail'
 import ExportButton from '../components/admin/ExportButton'
 import FixturesTab from '../components/admin/FixturesTab'
 import LiveScoresTab from '../components/admin/LiveScoresTab'
 import AnalyticsTab from '../components/admin/AnalyticsTab'
+import SettingsTab from '../components/admin/SettingsTab'
 import { useAdminAuth } from '../hooks/useAdminAuth'
 import type { TeamResponse } from '../api/registrations'
 
-type Tab = 'registrations' | 'fixtures' | 'live' | 'analytics'
+type Tab = 'registrations' | 'fixtures' | 'live' | 'analytics' | 'settings'
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'registrations', label: 'Registrations', icon: <ClipboardList className="w-4 h-4" /> },
   { id: 'fixtures', label: 'Fixtures', icon: <Calendar className="w-4 h-4" /> },
   { id: 'live', label: 'Live Scores', icon: <Radio className="w-4 h-4" /> },
   { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="w-4 h-4" /> },
+  { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
 ]
 
 export default function AdminDashboardPage() {
@@ -163,6 +165,12 @@ export default function AdminDashboardPage() {
         {activeTab === 'analytics' && (
           <div className="overflow-y-auto h-full p-4 sm:p-6">
             <AnalyticsTab />
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="overflow-y-auto h-full p-4 sm:p-6">
+            <SettingsTab />
           </div>
         )}
       </div>

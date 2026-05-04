@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
+import { getTournamentDate } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 
 const TOURNAMENT = {
@@ -19,7 +20,6 @@ const TOURNAMENT = {
   // Tournament start date for countdown
   startDate: new Date('2025-06-15T08:00:00'),
 }
-
 const PRIZES = [
   { place: '🥇 Winner', amount: '₹8,000', color: 'from-yellow-500/20 to-yellow-600/10 border-yellow-500/30' },
   { place: '🥈 Runner-Up', amount: '₹4,000', color: 'from-gray-400/20 to-gray-500/10 border-gray-400/30' },
@@ -34,32 +34,36 @@ const STEPS = [
   { n: '04', title: 'Get Approved', desc: 'Admin verifies and confirms your spot.' },
 ]
 
-// Countdown hook
-function useCountdown(target: Date) {
-  const calc = () => {
-    const diff = target.getTime() - Date.now()
-    if (diff <= 0) return { days: 0, hrs: 0, mins: 0, secs: 0 }
-    return {
-      days: Math.floor(diff / 86400000),
-      hrs: Math.floor((diff % 86400000) / 3600000),
-      mins: Math.floor((diff % 3600000) / 60000),
-      secs: Math.floor((diff % 60000) / 1000),
-    }
-  }
-  const [time, setTime] = useState(calc)
-  useEffect(() => {
-    const t = setInterval(() => setTime(calc()), 1000)
-    return () => clearInterval(t)
-  }, [])
-  return time
-}
-
 export default function HomePage() {
   const navigate = useNavigate()
-  const countdown = useCountdown(TOURNAMENT.startDate)
+  const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
+
+  // Fetch countdown date from backend
+  useEffect(() => {
+    getTournamentDate().then((d) => {
+      setTargetDate(new Date(d.tournament_start))
+    }).catch(() => {}) // fallback to default
+  }, [])
+
+  // Live countdown
+  const [countdown, setCountdown] = useState({ days: 0, hrs: 0, mins: 0, secs: 0 })
+  useEffect(() => {
+    const calc = () => {
+      const diff = targetDate.getTime() - Date.now()
+      if (diff <= 0) return { days: 0, hrs: 0, mins: 0, secs: 0 }
+      return {
+        days: Math.floor(diff / 86400000),
+        hrs: Math.floor((diff % 86400000) / 3600000),
+        mins: Math.floor((diff % 3600000) / 60000),
+        secs: Math.floor((diff % 60000) / 1000),
+      }
+    }
+    setCountdown(calc())
+    const t = setInterval(() => setCountdown(calc()), 1000)
+    return () => clearInterval(t)
+  }, [targetDate])
 
   useEffect(() => { trackVisit('home') }, [])
-
   return (
     <div className="min-h-screen bg-[#0a0e1a] overflow-x-hidden text-white">
 
