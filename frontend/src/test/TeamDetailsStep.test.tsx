@@ -63,6 +63,7 @@ describe('TeamDetailsStep', () => {
 
   it('calls createTeam and onNext on valid submission', async () => {
     vi.mocked(createTeam).mockResolvedValue({
+      id: '00000000-0000-0000-0000-000000000001',
       registration_id: 'SSU-20250101-ABC123',
       team_name: 'Lions FC',
       manager_name: 'John',
