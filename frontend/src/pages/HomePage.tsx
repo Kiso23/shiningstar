@@ -95,6 +95,14 @@ export default function HomePage() {
         >
           Register Now
         </motion.button>
+        <div className="hidden sm:flex items-center gap-2">
+          <button onClick={() => navigate('/fixtures')} className="text-gray-400 hover:text-white text-sm transition-colors px-2">Fixtures</button>
+          <button onClick={() => navigate('/leaderboard')} className="text-gray-400 hover:text-white text-sm transition-colors px-2">Leaderboard</button>
+          <button onClick={() => navigate('/live')} className="flex items-center gap-1 text-green-400 hover:text-green-300 text-sm transition-colors px-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Live
+          </button>
+        </div>
       </motion.nav>
 
       {/* ── Hero Section ── */}

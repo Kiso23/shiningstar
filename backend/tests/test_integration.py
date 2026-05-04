@@ -349,3 +349,195 @@ async def test_export_csv(client, auth_headers):
     assert resp.status_code == 200
     assert "text/csv" in resp.headers["content-type"]
     assert "Export FC" in resp.text
+
+# ── Tournament Management Tests ───────────────────────────────────────────────
+
+from app.models.match import Match
+from app.models.standing import Standing
+import uuid
+from datetime import datetime, timezone
+
+
+@pytest.fixture
+async def two_teams(client, auth_headers):
+    """Create two approved teams and return their IDs."""
+    team_ids = []
+    for i in range(2):
+        resp = await client.post("/api/v1/registrations", json={
+            "team_name": f"Team {i+1}",
+            "manager_name": f"Manager {i+1}",
+            "contact_phone": f"987654321{i}",
+            "contact_email": f"team{i+1}@test.com",
+            "player_count": 7,
+        })
+        assert resp.status_code == 201
+        reg_id = resp.json()["registration_id"]
+
+        # Approve the team
+        await client.patch(
+            f"/api/v1/admin/registrations/{reg_id}/status",
+            json={"status": "approved"},
+            headers=auth_headers,
+        )
+
+        # Get team UUID
+        detail = await client.get(
+            f"/api/v1/admin/registrations/{reg_id}",
+            headers=auth_headers,
+        )
+        team_ids.append(detail.json()["id"])
+
+    return team_ids
+
+
+@pytest.mark.asyncio
+async def test_full_match_lifecycle(client, auth_headers, two_teams):
+    """Full lifecycle: create fixture → update score (live) → mark completed → verify standings."""
+    team_a_id, team_b_id = two_teams
+
+    # Step 1: Create fixture
+    resp = await client.post("/api/v1/matches", json={
+        "team_a_id": team_a_id,
+        "team_b_id": team_b_id,
+        "scheduled_at": "2025-06-15T10:00:00",
+        "venue": "Rongbong Ronghang Playground",
+        "round": "Quarter-Final",
+    }, headers=auth_headers)
+    assert resp.status_code == 201
+    match_id = resp.json()["id"]
+    assert resp.json()["status"] == "scheduled"
+
+    # Step 2: Update score (set to live)
+    resp = await client.patch(f"/api/v1/matches/{match_id}/score", json={
+        "team_a_score": 2,
+        "team_b_score": 1,
+        "status": "live",
+    }, headers=auth_headers)
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "live"
+    assert resp.json()["team_a_score"] == 2
+
+    # Step 3: Mark completed
+    resp = await client.patch(f"/api/v1/matches/{match_id}/score", json={
+        "team_a_score": 2,
+        "team_b_score": 1,
+        "status": "completed",
+    }, headers=auth_headers)
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "completed"
+
+    # Step 4: Verify standings
+    resp = await client.get("/api/v1/standings")
+    assert resp.status_code == 200
+    standings = resp.json()
+    assert len(standings) == 2
+
+    # Team A won 2-1: 3 points, 1 win
+    team_a_standing = next(s for s in standings if s["team_id"] == team_a_id)
+    assert team_a_standing["points"] == 3
+    assert team_a_standing["wins"] == 1
+    assert team_a_standing["losses"] == 0
+    assert team_a_standing["goals_scored"] == 2
+    assert team_a_standing["goals_conceded"] == 1
+    assert team_a_standing["goal_difference"] == 1
+
+    # Team B lost 1-2: 0 points, 1 loss
+    team_b_standing = next(s for s in standings if s["team_id"] == team_b_id)
+    assert team_b_standing["points"] == 0
+    assert team_b_standing["wins"] == 0
+    assert team_b_standing["losses"] == 1
+    assert team_b_standing["goals_scored"] == 1
+    assert team_b_standing["goals_conceded"] == 2
+    assert team_b_standing["goal_difference"] == -1
+
+
+@pytest.mark.asyncio
+async def test_public_matches_endpoint_no_auth(client, auth_headers, two_teams):
+    """Public endpoints return 200 without auth headers."""
+    team_a_id, team_b_id = two_teams
+
+    # Create a fixture
+    await client.post("/api/v1/matches", json={
+        "team_a_id": team_a_id,
+        "team_b_id": team_b_id,
+        "scheduled_at": "2025-06-15T10:00:00",
+        "venue": "Test Venue",
+        "round": "Semi-Final",
+    }, headers=auth_headers)
+
+    # Access without auth
+    resp = await client.get("/api/v1/matches")
+    assert resp.status_code == 200
+
+    resp = await client.get("/api/v1/standings")
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_same_team_fixture_rejected(client, auth_headers, two_teams):
+    """Creating a fixture with the same team for both slots returns 422."""
+    team_a_id = two_teams[0]
+    resp = await client.post("/api/v1/matches", json={
+        "team_a_id": team_a_id,
+        "team_b_id": team_a_id,
+        "scheduled_at": "2025-06-15T10:00:00",
+        "venue": "Test Venue",
+        "round": "Final",
+    }, headers=auth_headers)
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_score_update_on_completed_match_rejected(client, auth_headers, two_teams):
+    """Score update on a completed match returns 409."""
+    team_a_id, team_b_id = two_teams
+
+    resp = await client.post("/api/v1/matches", json={
+        "team_a_id": team_a_id,
+        "team_b_id": team_b_id,
+        "scheduled_at": "2025-06-15T10:00:00",
+        "venue": "Test Venue",
+        "round": "Final",
+    }, headers=auth_headers)
+    match_id = resp.json()["id"]
+
+    # Complete the match
+    await client.patch(f"/api/v1/matches/{match_id}/score", json={
+        "team_a_score": 1,
+        "team_b_score": 0,
+        "status": "completed",
+    }, headers=auth_headers)
+
+    # Try to update score again
+    resp = await client.patch(f"/api/v1/matches/{match_id}/score", json={
+        "team_a_score": 3,
+        "team_b_score": 0,
+    }, headers=auth_headers)
+    assert resp.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_leaderboard_ordering(client, auth_headers, two_teams):
+    """Leaderboard is ordered by points descending."""
+    team_a_id, team_b_id = two_teams
+
+    resp = await client.post("/api/v1/matches", json={
+        "team_a_id": team_a_id,
+        "team_b_id": team_b_id,
+        "scheduled_at": "2025-06-15T10:00:00",
+        "venue": "Test Venue",
+        "round": "Final",
+    }, headers=auth_headers)
+    match_id = resp.json()["id"]
+
+    await client.patch(f"/api/v1/matches/{match_id}/score", json={
+        "team_a_score": 3,
+        "team_b_score": 0,
+        "status": "completed",
+    }, headers=auth_headers)
+
+    resp = await client.get("/api/v1/standings")
+    standings = resp.json()
+    # First team should have more points
+    assert standings[0]["points"] >= standings[1]["points"]
+    assert standings[0]["team_id"] == team_a_id

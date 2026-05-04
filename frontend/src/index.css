@@ -13,7 +13,16 @@
 
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    @apply bg-gray-950 text-white antialiased;
+    @apply text-white antialiased;
+    background-color: #030712;
+    background-image: repeating-linear-gradient(
+      0deg,
+      #c41e3a 0px, #c41e3a 8px,
+      #1a0a0a 8px, #1a0a0a 16px,
+      #f5f5f5 16px, #f5f5f5 18px,
+      #1a0a0a 18px, #1a0a0a 26px
+    );
+    background-attachment: fixed;
   }
 
   /* Ensure all content sits above the watermark */
