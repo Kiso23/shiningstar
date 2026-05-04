@@ -1,11 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
-import {
-  Trophy, Calendar, MapPin, Users, Star, ChevronRight,
-  Shield, Zap, Award, ArrowRight, CheckCircle
-} from 'lucide-react'
+import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 
 const TOURNAMENT = {
   name: 'Shining Star United',
@@ -19,13 +16,9 @@ const TOURNAMENT = {
   totalPrize: '₹13,000',
   maxTeams: 32,
   deadline: 'May 31, 2025',
+  // Tournament start date for countdown
+  startDate: new Date('2025-06-15T08:00:00'),
 }
-
-const FEATURES = [
-  { icon: Shield, title: 'Secure Registration', desc: 'Your data is protected with enterprise-grade security.' },
-  { icon: Zap, title: 'Instant Confirmation', desc: 'Get your registration ID immediately after submission.' },
-  { icon: Award, title: 'Prestigious Tournament', desc: 'Compete against the best teams in the region.' },
-]
 
 const PRIZES = [
   { place: '🥇 Winner', amount: '₹8,000', color: 'from-yellow-500/20 to-yellow-600/10 border-yellow-500/30' },
@@ -41,64 +34,72 @@ const STEPS = [
   { n: '04', title: 'Get Approved', desc: 'Admin verifies and confirms your spot.' },
 ]
 
-// Floating particle component
-function Particle({ x, y, delay }: { x: number; y: number; delay: number }) {
-  return (
-    <motion.div
-      className="absolute w-1 h-1 rounded-full bg-orange-400/30"
-      style={{ left: `${x}%`, top: `${y}%` }}
-      animate={{
-        y: [0, -30, 0],
-        opacity: [0.3, 0.8, 0.3],
-        scale: [1, 1.5, 1],
-      }}
-      transition={{ duration: 4 + delay, repeat: Infinity, delay, ease: 'easeInOut' }}
-    />
-  )
+// Countdown hook
+function useCountdown(target: Date) {
+  const calc = () => {
+    const diff = target.getTime() - Date.now()
+    if (diff <= 0) return { days: 0, hrs: 0, mins: 0, secs: 0 }
+    return {
+      days: Math.floor(diff / 86400000),
+      hrs: Math.floor((diff % 86400000) / 3600000),
+      mins: Math.floor((diff % 3600000) / 60000),
+      secs: Math.floor((diff % 60000) / 1000),
+    }
+  }
+  const [time, setTime] = useState(calc)
+  useEffect(() => {
+    const t = setInterval(() => setTime(calc()), 1000)
+    return () => clearInterval(t)
+  }, [])
+  return time
 }
-
-const particles = Array.from({ length: 20 }, (_, i) => ({
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  delay: Math.random() * 4,
-}))
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const heroRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const countdown = useCountdown(TOURNAMENT.startDate)
 
   useEffect(() => { trackVisit('home') }, [])
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
   return (
-    <div className="min-h-screen bg-gray-900 overflow-x-hidden">
-      {/* Stripe pattern overlay */}
-      <div className="fixed inset-0 bg-stripe-pattern opacity-20 pointer-events-none z-0" />
-      {/* ── Navbar ── */}
+    <div className="min-h-screen bg-[#0a0e1a] overflow-x-hidden text-white">
+
+      {/* ══════════════════════════════════════════════
+          NAVBAR
+      ══════════════════════════════════════════════ */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4
-                   bg-gray-950/80 backdrop-blur-xl border-b border-white/5"
+        transition={{ duration: 0.5 }}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3
+                   bg-[#0a0e1a]/90 backdrop-blur-xl border-b border-white/5"
       >
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <img
-            src="/logo.png"
-            alt="Shining Star United Hamren"
-            className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
-          />
-          <span className="font-bold text-white hidden sm:block">Shining Star United</span>
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="SSU" className="w-10 h-10 rounded-full object-cover border-2 border-orange-500" />
+          <span className="font-black text-white text-lg hidden sm:block tracking-wide">
+            SHINING STAR <span className="text-orange-500">UNITED</span>
+          </span>
         </div>
 
         {/* Nav links */}
-        <div className="flex items-center gap-1 sm:gap-3">
-          <button onClick={() => navigate('/fixtures')} className="text-gray-400 hover:text-white text-sm transition-colors px-2 py-1">Fixtures</button>
-          <button onClick={() => navigate('/leaderboard')} className="text-gray-400 hover:text-white text-sm transition-colors px-2 py-1">Leaderboard</button>
-          <button onClick={() => navigate('/live')} className="flex items-center gap-1 text-green-400 hover:text-green-300 text-sm transition-colors px-2 py-1">
+        <div className="flex items-center gap-1 sm:gap-2">
+          {[
+            { label: 'Home', path: '/' },
+            { label: 'Fixtures', path: '/fixtures' },
+            { label: 'Leaderboard', path: '/leaderboard' },
+          ].map(({ label, path }) => (
+            <button
+              key={label}
+              onClick={() => navigate(path)}
+              className="text-gray-300 hover:text-orange-400 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            >
+              {label}
+            </button>
+          ))}
+          <button
+            onClick={() => navigate('/live')}
+            className="flex items-center gap-1.5 text-green-400 hover:text-green-300 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
             Live
           </button>
@@ -109,276 +110,327 @@ export default function HomePage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/register')}
-          className="btn-primary text-sm py-2 px-4"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-5 py-2 rounded-lg transition-colors"
         >
           Register Now
         </motion.button>
       </motion.nav>
 
-      {/* ── Hero Section ── */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950" />
-        <div className="absolute inset-0 bg-hero-pattern opacity-30" />
-        <div className="absolute inset-0 bg-gradient-radial from-orange-500/10 via-transparent to-transparent" />
+      {/* ══════════════════════════════════════════════
+          HERO — full viewport, stadium feel
+      ══════════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
 
-        {/* Animated orbs */}
+        {/* Dark stadium gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#050810] via-[#0d1525] to-[#050810]" />
+
+        {/* Stadium light rays */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-1/3 w-px h-full bg-gradient-to-b from-blue-500/20 via-transparent to-transparent transform -rotate-12 blur-sm" />
+          <div className="absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-blue-400/15 via-transparent to-transparent blur-sm" />
+          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-blue-500/20 via-transparent to-transparent transform rotate-12 blur-sm" />
+        </div>
+
+        {/* Pitch lines overlay */}
+        <div className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.3) 60px, rgba(255,255,255,0.3) 61px)',
+          }}
+        />
+
+        {/* Glow orbs */}
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 6, repeat: Infinity }}
+          className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-3xl pointer-events-none"
         />
         <motion.div
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-green-500/10 blur-3xl"
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 8, repeat: Infinity, delay: 2 }}
+          className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-orange-500/10 blur-3xl pointer-events-none"
         />
 
-        {/* Particles */}
-        {particles.map((p, i) => (
-          <Particle key={i} x={p.x} y={p.y} delay={p.delay} />
-        ))}
+        {/* ── Left: Text content ── */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-24 pb-12 flex flex-col lg:flex-row items-center gap-12">
 
-        {/* Hero content */}
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-20"
-        >
-          {/* Prominent Banner Text */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1, duration: 0.8 }}
-            className="mb-8"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="relative px-8 py-6 rounded-3xl shadow-2xl shadow-red-900/50 overflow-hidden"
-              style={{
-                background: 'repeating-linear-gradient(0deg, #c41e3a 0px, #c41e3a 12px, #1a0a0a 12px, #1a0a0a 24px, #f5f5f5 24px, #f5f5f5 26px, #1a0a0a 26px, #1a0a0a 38px)',
-              }}
+          <div className="flex-1 max-w-xl">
+            {/* Welcome tag */}
+            <motion.p
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-orange-500 font-bold text-sm tracking-[0.3em] uppercase mb-4"
             >
-              <div className="absolute inset-0 rounded-3xl" />
-              <motion.div
-                className="relative z-10 text-center drop-shadow-2xl"
-                style={{ textShadow: '0 4px 20px rgba(0,0,0,0.9), 0 0 40px rgba(196,30,58,0.8)' }}
+              ★ Welcome
+            </motion.p>
+
+            {/* Main title */}
+            <motion.h1
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-black leading-none mb-6 uppercase"
+            >
+              <span className="text-white">Shining</span>
+              <br />
+              <span className="text-white">Star</span>
+              <br />
+              <span className="text-orange-500">United</span>
+            </motion.h1>
+
+            {/* Memorial banner */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mb-6 px-4 py-3 border-l-4 border-orange-500 bg-orange-500/10 rounded-r-xl"
+            >
+              <p className="text-white font-bold text-sm sm:text-base leading-relaxed">
+                1st Lt. Solomon Timung &amp; Lt. Mongolsing Hanse,
+              </p>
+              <p className="text-orange-400 font-semibold text-sm">Memorial Football Tournament</p>
+            </motion.div>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+              className="text-gray-400 text-base mb-8 leading-relaxed"
+            >
+              {TOURNAMENT.date} · {TOURNAMENT.venue}. Up to {TOURNAMENT.maxTeams} teams compete for the championship title and ₹13,000 in prizes.
+            </motion.p>
+
+            {/* CTA buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex flex-wrap gap-4"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(249,115,22,0.5)' }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/register')}
+                className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base"
               >
-                <div className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
-                  1st Lt. Solomon Timung &amp;
-                </div>
-                <div className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
-                  Lt. Mongolsing Hanse,
-                </div>
-                <div className="text-base sm:text-xl md:text-2xl font-bold text-orange-300 tracking-wide mt-1">
-                  Memorial Football Tournament
-                </div>
-              </motion.div>
+                Register Your Team
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/fixtures')}
+                className="flex items-center gap-2 border border-white/20 hover:border-orange-500/50 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base hover:bg-white/5"
+              >
+                View Fixtures
+              </motion.button>
             </motion.div>
-          </motion.div>
+          </div>
 
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm font-medium mb-8"
-          >
-            <Star className="w-3.5 h-3.5" fill="currentColor" />
-            2025 Championship Edition
-            <Star className="w-3.5 h-3.5" fill="currentColor" />
-          </motion.div>
+          {/* ── Right: Countdown + quick links ── */}
+          <div className="flex-shrink-0 w-full lg:w-80 flex flex-col gap-4">
 
-          {/* Title */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-5xl sm:text-7xl font-black text-white leading-tight mb-6"
-          >
-            <span className="gradient-text">Shining Star</span>
-            <br />
-            <span className="text-white">United</span>
-            <br />
-            <span className="text-3xl sm:text-4xl font-bold text-gray-400">Football Tournament</span>
-          </motion.h1>
-
-          {/* Info pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-wrap items-center justify-center gap-4 mb-10"
-          >
-            {[
-              { icon: Calendar, text: TOURNAMENT.date },
-              { icon: MapPin, text: TOURNAMENT.venue },
-              { icon: Trophy, text: `Prize: ₹13,000` },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-300 text-sm">
-                <Icon className="w-4 h-4 text-orange-400" />
-                {text}
-              </div>
-            ))}
-          </motion.div>
-
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(249,115,22,0.4)' }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/register')}
-              className="btn-primary text-lg px-8 py-4 rounded-2xl"
-            >
-              Register Your Team
-              <ArrowRight className="w-5 h-5" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => document.getElementById('details')?.scrollIntoView({ behavior: 'smooth' })}
-              className="btn-secondary text-lg px-8 py-4 rounded-2xl"
-            >
-              Learn More
-            </motion.button>
-          </motion.div>
-
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="mt-16 flex flex-col items-center gap-2"
-          >
-            <span className="text-xs text-gray-600 uppercase tracking-widest">Scroll to explore</span>
+            {/* Countdown */}
             <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-5 h-8 rounded-full border-2 border-white/20 flex items-start justify-center pt-1.5"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="bg-[#0d1525]/80 border border-white/10 rounded-2xl p-5 backdrop-blur-sm"
             >
-              <div className="w-1 h-2 rounded-full bg-orange-400" />
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                <p className="text-orange-500 font-bold text-xs tracking-widest uppercase">Tournament Starts In</p>
+              </div>
+              <div className="grid grid-cols-4 gap-2 text-center">
+                {[
+                  { val: countdown.days, label: 'Days' },
+                  { val: countdown.hrs, label: 'Hrs' },
+                  { val: countdown.mins, label: 'Mins' },
+                  { val: countdown.secs, label: 'Secs' },
+                ].map(({ val, label }) => (
+                  <div key={label} className="bg-[#050810] rounded-xl p-2">
+                    <p className="text-2xl font-black text-white tabular-nums">
+                      {String(val).padStart(2, '0')}
+                    </p>
+                    <p className="text-gray-500 text-xs mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-white/5 text-xs text-gray-500 text-center">
+                VS · {TOURNAMENT.maxTeams} Teams · {TOURNAMENT.venue}
+              </div>
             </motion.div>
-          </motion.div>
-        </motion.div>
+
+            {/* Quick links */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="bg-[#0d1525]/80 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm"
+            >
+              {[
+                { icon: Calendar, label: 'Match Fixtures', sub: 'View all scheduled matches', path: '/fixtures', color: 'text-blue-400' },
+                { icon: Radio, label: 'Live Scores', sub: 'Real-time match updates', path: '/live', color: 'text-green-400' },
+                { icon: Trophy, label: 'Leaderboard', sub: 'Tournament standings', path: '/leaderboard', color: 'text-yellow-400' },
+              ].map(({ icon: Icon, label, sub, path, color }, i) => (
+                <motion.button
+                  key={label}
+                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+                  onClick={() => navigate(path)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${i > 0 ? 'border-t border-white/5' : ''}`}
+                >
+                  <div className={`p-2 rounded-lg bg-white/5 ${color}`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-semibold">{label}</p>
+                    <p className="text-gray-500 text-xs">{sub}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-600 shrink-0" />
+                </motion.button>
+              ))}
+            </motion.div>
+
+          </div>
+        </div>
+
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0e1a] to-transparent pointer-events-none" />
       </section>
 
-      {/* ── Tournament Details ── */}
-      <section id="details" className="py-24 px-6">
+      {/* ══════════════════════════════════════════════
+          STATS BAR
+      ══════════════════════════════════════════════ */}
+      <section className="bg-orange-500 py-4 px-6">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-8 sm:gap-16">
+          {[
+            { val: `${TOURNAMENT.maxTeams}`, label: 'Teams' },
+            { val: '₹13,000', label: 'Prize Pool' },
+            { val: '8', label: 'Days' },
+            { val: '₹801', label: 'Entry Fee' },
+          ].map(({ val, label }) => (
+            <div key={label} className="text-center">
+              <p className="text-2xl font-black text-white">{val}</p>
+              <p className="text-orange-200 text-xs font-medium uppercase tracking-wider">{label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          TOURNAMENT DETAILS
+      ══════════════════════════════════════════════ */}
+      <section id="details" className="py-20 px-6 bg-[#0d1525]">
         <div className="max-w-6xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="mb-12"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">Tournament Details</h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Everything you need to know about the biggest football tournament of the year.
-            </p>
+            <p className="text-orange-500 font-bold text-xs tracking-[0.3em] uppercase mb-2">Tournament Info</p>
+            <h2 className="text-4xl font-black text-white uppercase">Details</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
             {[
-              { icon: Calendar, label: 'Tournament Dates', value: TOURNAMENT.date, color: 'text-blue-400' },
-              { icon: MapPin, label: 'Venue', value: TOURNAMENT.venue, color: 'text-green-400' },
-              { icon: Users, label: 'Max Teams', value: `${TOURNAMENT.maxTeams} Teams`, color: 'text-purple-400' },
-              { icon: Trophy, label: 'Registration Fee', value: '₹801 per team', color: 'text-orange-400' },
+              { icon: Calendar, label: 'Dates', value: TOURNAMENT.date, color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+              { icon: MapPin, label: 'Venue', value: TOURNAMENT.venue, color: 'bg-green-500/10 text-green-400 border-green-500/20' },
+              { icon: Users, label: 'Max Teams', value: `${TOURNAMENT.maxTeams} Teams`, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+              { icon: Trophy, label: 'Entry Fee', value: '₹801 per team', color: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
             ].map(({ icon: Icon, label, value, color }, i) => (
               <motion.div
                 key={label}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -4, scale: 1.02 }}
-                className="glass-card p-6 text-center"
+                className={`p-5 rounded-xl border ${color} flex items-start gap-4`}
               >
-                <div className={`inline-flex p-3 rounded-xl bg-white/5 mb-4 ${color}`}>
-                  <Icon className="w-6 h-6" />
+                <div className={`p-2 rounded-lg ${color}`}>
+                  <Icon className="w-5 h-5" />
                 </div>
-                <p className="text-gray-500 text-sm mb-1">{label}</p>
-                <p className="text-white font-semibold">{value}</p>
+                <div>
+                  <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">{label}</p>
+                  <p className="text-white font-bold text-sm">{value}</p>
+                </div>
               </motion.div>
             ))}
           </div>
 
           {/* Prize Pool */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-16"
           >
-            <h3 className="text-2xl font-bold text-white text-center mb-8">Prize Pool</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <p className="text-orange-500 font-bold text-xs tracking-[0.3em] uppercase mb-2">Rewards</p>
+            <h3 className="text-3xl font-black text-white uppercase mb-8">Prize Pool</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {PRIZES.map(({ place, amount, color }, i) => (
                 <motion.div
                   key={place}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.15 }}
-                  whileHover={{ scale: 1.05 }}
-                  className={`p-5 rounded-2xl bg-gradient-to-br border text-center ${color}`}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -4 }}
+                  className={`p-5 rounded-xl bg-gradient-to-br border text-center ${color}`}
                 >
-                  <p className="text-2xl mb-2">{place.split(' ')[0]}</p>
-                  <p className="text-white font-semibold mb-1 text-sm">{place.split(' ').slice(1).join(' ')}</p>
-                  <p className="text-2xl font-black gradient-text">{amount}</p>
+                  <p className="text-3xl mb-2">{place.split(' ')[0]}</p>
+                  <p className="text-white font-semibold text-xs mb-2">{place.split(' ').slice(1).join(' ')}</p>
+                  <p className="text-2xl font-black text-orange-400">{amount}</p>
                 </motion.div>
               ))}
             </div>
-            {/* Total */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              className="mt-4 max-w-2xl mx-auto p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-between"
+              transition={{ delay: 0.4 }}
+              className="mt-4 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-between"
             >
-              <span className="text-white font-bold text-lg">🏆 Total Prize Pool</span>
-              <span className="text-3xl font-black gradient-text">₹13,000</span>
+              <span className="text-white font-bold">🏆 Total Prize Pool</span>
+              <span className="text-2xl font-black text-orange-400">₹13,000</span>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* ── How It Works ── */}
-      <section className="py-24 px-6 bg-white/[0.02]">
-        <div className="max-w-5xl mx-auto">
+      {/* ══════════════════════════════════════════════
+          HOW TO REGISTER
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 px-6 bg-[#0a0e1a]">
+        <div className="max-w-6xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="mb-12"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">How to Register</h2>
-            <p className="text-gray-400 text-lg">Simple 4-step process to get your team in the tournament.</p>
+            <p className="text-orange-500 font-bold text-xs tracking-[0.3em] uppercase mb-2">Process</p>
+            <h2 className="text-4xl font-black text-white uppercase">How to Register</h2>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {STEPS.map(({ n, title, desc }, i) => (
               <motion.div
                 key={n}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="relative"
+                transition={{ delay: i * 0.1 }}
+                className="relative group"
               >
-                <div className="glass-card p-6 h-full">
-                  <div className="text-5xl font-black gradient-text mb-4 opacity-40">{n}</div>
+                <div className="p-6 rounded-xl border border-white/5 bg-[#0d1525] hover:border-orange-500/30 transition-colors h-full">
+                  <div className="text-6xl font-black text-orange-500/20 group-hover:text-orange-500/40 transition-colors mb-4 leading-none">{n}</div>
                   <h3 className="text-white font-bold mb-2">{title}</h3>
                   <p className="text-gray-500 text-sm">{desc}</p>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-3 z-10">
-                    <ChevronRight className="w-6 h-6 text-orange-500/50" />
+                  <div className="hidden lg:flex absolute top-1/2 -right-3 z-10 items-center justify-center">
+                    <ChevronRight className="w-5 h-5 text-orange-500/40" />
                   </div>
                 )}
               </motion.div>
@@ -387,69 +439,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {FEATURES.map(({ icon: Icon, title, desc }, i) => (
-              <motion.div
-                key={title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                whileHover={{ y: -6 }}
-                className="glass-card p-8 text-center group"
-              >
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                  className="inline-flex p-4 rounded-2xl bg-orange-500/10 text-orange-400 mb-6 group-hover:bg-orange-500/20 transition-colors"
-                >
-                  <Icon className="w-7 h-7" />
-                </motion.div>
-                <h3 className="text-white font-bold text-lg mb-3">{title}</h3>
-                <p className="text-gray-500">{desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA Banner ── */}
-      <section className="py-24 px-6">
+      {/* ══════════════════════════════════════════════
+          CTA BANNER
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 px-6 bg-[#0d1525]">
         <div className="max-w-4xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-600 to-orange-800 p-12 text-center"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-600 to-red-700 p-12 text-center"
           >
-            <div className="absolute inset-0 bg-hero-pattern opacity-20" />
+            <div className="absolute inset-0 opacity-10"
+              style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px)' }}
+            />
             <motion.div
-              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 6, repeat: Infinity }}
-              className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10 blur-3xl"
+              animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/10 blur-3xl"
             />
             <div className="relative z-10">
-              <Trophy className="w-12 h-12 text-yellow-300 mx-auto mb-6" />
-              <h2 className="text-4xl font-black text-white mb-4">Ready to Compete?</h2>
+              <p className="text-orange-200 font-bold text-xs tracking-[0.3em] uppercase mb-3">Don't Miss Out</p>
+              <h2 className="text-4xl sm:text-5xl font-black text-white uppercase mb-4">Ready to Compete?</h2>
               <p className="text-orange-100 text-lg mb-8 max-w-xl mx-auto">
-                Registration closes on <strong>{TOURNAMENT.deadline}</strong>. Don't miss your chance to win{' '}
-                <strong>₹13,000</strong>!
+                Registration closes <strong>{TOURNAMENT.deadline}</strong>. Win your share of <strong>₹13,000</strong>!
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/register')}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white text-orange-600 font-bold text-lg hover:bg-orange-50 transition-colors shadow-xl"
-                >
-                  Register Now
-                  <ArrowRight className="w-5 h-5" />
-                </motion.button>
-              </div>
-              <div className="mt-6 flex items-center justify-center gap-6 text-orange-200 text-sm">
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(255,255,255,0.3)' }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/register')}
+                className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-white text-orange-600 font-black text-lg hover:bg-orange-50 transition-colors shadow-2xl"
+              >
+                Register Now
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-orange-200 text-sm">
                 {['Free to browse', 'Instant confirmation', 'Secure payment'].map((t) => (
                   <div key={t} className="flex items-center gap-1.5">
                     <CheckCircle className="w-4 h-4" />
@@ -462,20 +486,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/5 py-8 px-6 text-center text-gray-600 text-sm">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <img src="/logo.png" alt="Shining Star United" className="w-6 h-6 rounded-full object-cover" />
-          <span className="text-white font-semibold">Shining Star United</span>
+      {/* ══════════════════════════════════════════════
+          FOOTER
+      ══════════════════════════════════════════════ */}
+      <footer className="bg-[#050810] border-t border-white/5 py-8 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
+            <div>
+              <p className="text-white font-bold text-sm">Shining Star United</p>
+              <p className="text-gray-600 text-xs">© 2025 All rights reserved.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <button onClick={() => navigate('/fixtures')} className="text-gray-500 hover:text-orange-400 transition-colors">Fixtures</button>
+            <button onClick={() => navigate('/leaderboard')} className="text-gray-500 hover:text-orange-400 transition-colors">Leaderboard</button>
+            <button onClick={() => navigate('/live')} className="text-gray-500 hover:text-orange-400 transition-colors">Live</button>
+            <a href="/admin/login" className="text-gray-500 hover:text-orange-400 transition-colors">Admin</a>
+          </div>
         </div>
-        <p>© 2025 Shining Star United. All rights reserved.</p>
-        <p className="mt-1">
-          Admin?{' '}
-          <a href="/admin/login" className="text-orange-400 hover:text-orange-300 transition-colors">
-            Sign in here
-          </a>
-        </p>
       </footer>
+
     </div>
   )
 }
