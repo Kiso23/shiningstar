@@ -74,35 +74,47 @@ export default function HomePage() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3
                    bg-[#0a0e1a]/90 backdrop-blur-xl border-b border-white/5"
       >
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="SSU" className="w-10 h-10 rounded-full object-cover border-2 border-orange-500" />
-          <span className="font-black text-white text-lg hidden sm:block tracking-wide">
-            SHINING STAR <span className="text-orange-500">UNITED</span>
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="SSU" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-orange-500 shrink-0" />
+          <span className="font-black text-white text-sm sm:text-base hidden xs:block tracking-wide">
+            <span className="hidden sm:inline">SHINING STAR </span>
+            <span className="text-orange-500 sm:inline hidden">UNITED</span>
+            <span className="sm:hidden text-orange-500">SSU</span>
           </span>
         </div>
 
-        {/* Nav links */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        {/* Nav links — hidden on very small screens, shown from sm */}
+        <div className="hidden sm:flex items-center gap-1">
           {[
-            { label: 'Home', path: '/' },
             { label: 'Fixtures', path: '/fixtures' },
             { label: 'Leaderboard', path: '/leaderboard' },
           ].map(({ label, path }) => (
             <button
               key={label}
               onClick={() => navigate(path)}
-              className="text-gray-300 hover:text-orange-400 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+              className="text-gray-300 hover:text-orange-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5"
             >
               {label}
             </button>
           ))}
           <button
             onClick={() => navigate('/live')}
-            className="flex items-center gap-1.5 text-green-400 hover:text-green-300 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            className="flex items-center gap-1.5 text-green-400 hover:text-green-300 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Live
+          </button>
+        </div>
+
+        {/* Mobile: just Live dot + Register */}
+        <div className="flex sm:hidden items-center gap-2">
+          <button
+            onClick={() => navigate('/live')}
+            className="flex items-center gap-1 text-green-400 text-xs font-medium px-2 py-1.5"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
             Live
@@ -114,9 +126,9 @@ export default function HomePage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/register')}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-5 py-2 rounded-lg transition-colors"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg transition-colors whitespace-nowrap"
         >
-          Register Now
+          Register
         </motion.button>
       </motion.nav>
 
@@ -155,15 +167,15 @@ export default function HomePage() {
         />
 
         {/* ── Left: Text content ── */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-24 pb-12 flex flex-col lg:flex-row items-center gap-12">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
 
-          <div className="flex-1 max-w-xl">
+          <div className="flex-1 max-w-xl w-full text-center lg:text-left">
             {/* Welcome tag */}
             <motion.p
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-orange-500 font-bold text-sm tracking-[0.3em] uppercase mb-4"
+              className="text-orange-500 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4"
             >
               ★ Welcome
             </motion.p>
@@ -173,7 +185,7 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3, duration: 0.7 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-black leading-none mb-6 uppercase"
+              className="text-4xl sm:text-6xl lg:text-7xl font-black leading-none mb-4 sm:mb-6 uppercase"
             >
               <span className="text-white">Shining</span>
               <br />
@@ -187,12 +199,12 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 }}
-              className="mb-6 px-4 py-3 border-l-4 border-orange-500 bg-orange-500/10 rounded-r-xl"
+              className="mb-4 sm:mb-6 px-4 py-3 border-l-4 border-orange-500 bg-orange-500/10 rounded-r-xl text-left"
             >
-              <p className="text-white font-bold text-sm sm:text-base leading-relaxed">
+              <p className="text-white font-bold text-sm leading-relaxed">
                 1st Lt. Solomon Timung &amp; Lt. Mongolsing Hanse,
               </p>
-              <p className="text-orange-400 font-semibold text-sm">Memorial Football Tournament</p>
+              <p className="text-orange-400 font-semibold text-xs sm:text-sm">Memorial Football Tournament</p>
             </motion.div>
 
             {/* Description */}
@@ -200,9 +212,9 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-gray-400 text-base mb-8 leading-relaxed"
+              className="text-gray-400 text-sm sm:text-base mb-6 sm:mb-8 leading-relaxed"
             >
-              {TOURNAMENT.date} · {TOURNAMENT.venue}. Up to {TOURNAMENT.maxTeams} teams compete for the championship title and ₹13,000 in prizes.
+              {TOURNAMENT.date} · {TOURNAMENT.venue}. Up to {TOURNAMENT.maxTeams} teams compete for ₹13,000 in prizes.
             </motion.p>
 
             {/* CTA buttons */}
@@ -210,22 +222,22 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="flex flex-wrap gap-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start"
             >
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(249,115,22,0.5)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/register')}
-                className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base"
               >
                 Register Your Team
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/fixtures')}
-                className="flex items-center gap-2 border border-white/20 hover:border-orange-500/50 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base hover:bg-white/5"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20 hover:border-orange-500/50 text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base hover:bg-white/5"
               >
                 View Fixtures
               </motion.button>
@@ -233,16 +245,16 @@ export default function HomePage() {
           </div>
 
           {/* ── Right: Countdown + quick links ── */}
-          <div className="flex-shrink-0 w-full lg:w-80 flex flex-col gap-4">
+          <div className="flex-shrink-0 w-full sm:w-96 lg:w-80 flex flex-col gap-4">
 
             {/* Countdown */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="bg-[#0d1525]/80 border border-white/10 rounded-2xl p-5 backdrop-blur-sm"
+              className="bg-[#0d1525]/80 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-sm"
             >
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                 <p className="text-orange-500 font-bold text-xs tracking-widest uppercase">Tournament Starts In</p>
               </div>
@@ -253,8 +265,8 @@ export default function HomePage() {
                   { val: countdown.mins, label: 'Mins' },
                   { val: countdown.secs, label: 'Secs' },
                 ].map(({ val, label }) => (
-                  <div key={label} className="bg-[#050810] rounded-xl p-2">
-                    <p className="text-2xl font-black text-white tabular-nums">
+                  <div key={label} className="bg-[#050810] rounded-xl p-2 sm:p-3">
+                    <p className="text-xl sm:text-2xl font-black text-white tabular-nums">
                       {String(val).padStart(2, '0')}
                     </p>
                     <p className="text-gray-500 text-xs mt-0.5">{label}</p>
@@ -262,7 +274,7 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="mt-3 pt-3 border-t border-white/5 text-xs text-gray-500 text-center">
-                VS · {TOURNAMENT.maxTeams} Teams · {TOURNAMENT.venue}
+                {TOURNAMENT.maxTeams} Teams · {TOURNAMENT.venue}
               </div>
             </motion.div>
 
@@ -284,7 +296,7 @@ export default function HomePage() {
                   onClick={() => navigate(path)}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${i > 0 ? 'border-t border-white/5' : ''}`}
                 >
-                  <div className={`p-2 rounded-lg bg-white/5 ${color}`}>
+                  <div className={`p-2 rounded-lg bg-white/5 ${color} shrink-0`}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -306,16 +318,16 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           STATS BAR
       ══════════════════════════════════════════════ */}
-      <section className="bg-orange-500 py-4 px-6">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-8 sm:gap-16">
+      <section className="bg-orange-500 py-4 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-4 gap-2 sm:gap-8 text-center">
           {[
             { val: `${TOURNAMENT.maxTeams}`, label: 'Teams' },
-            { val: '₹13,000', label: 'Prize Pool' },
+            { val: '₹13K', label: 'Prize Pool' },
             { val: '8', label: 'Days' },
-            { val: '₹801', label: 'Entry Fee' },
+            { val: '₹801', label: 'Entry' },
           ].map(({ val, label }) => (
-            <div key={label} className="text-center">
-              <p className="text-2xl font-black text-white">{val}</p>
+            <div key={label}>
+              <p className="text-lg sm:text-2xl font-black text-white">{val}</p>
               <p className="text-orange-200 text-xs font-medium uppercase tracking-wider">{label}</p>
             </div>
           ))}
@@ -452,7 +464,7 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-600 to-red-700 p-12 text-center"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-600 to-red-700 p-8 sm:p-12 text-center"
           >
             <div className="absolute inset-0 opacity-10"
               style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px)' }}
