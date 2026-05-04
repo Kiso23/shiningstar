@@ -16,6 +16,7 @@ export interface PlayerData {
 }
 
 export interface TeamResponse {
+  id: string
   registration_id: string
   team_name: string
   manager_name: string

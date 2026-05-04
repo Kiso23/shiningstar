@@ -24,6 +24,7 @@ class PaymentProofResponse(BaseModel):
 
 
 class TeamResponse(BaseModel):
+    id: uuid.UUID
     registration_id: str
     team_name: str
     manager_name: str

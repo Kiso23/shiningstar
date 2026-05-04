@@ -28,7 +28,7 @@ export default function FixturesTab() {
       setMatches(matchData)
       setTeams(
         teamData.items.map((t) => ({
-          id: (t as any).id ?? t.registration_id,
+          id: t.id,
           team_name: t.team_name,
         }))
       )
