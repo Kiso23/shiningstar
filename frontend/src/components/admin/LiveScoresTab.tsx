@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Loader2, AlertCircle, Radio, Calendar, CheckCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Loader2, AlertCircle, Radio, Calendar, CheckCircle, Trash2 } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../../api/matches'
+import { clearStandings } from '../../api/standings'
 import ScoreUpdateForm from './ScoreUpdateForm'
 
 type StatusGroup = 'live' | 'scheduled' | 'completed'
@@ -28,6 +29,8 @@ export default function LiveScoresTab() {
   const [matches, setMatches] = useState<MatchResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [clearing, setClearing] = useState(false)
 
   const fetchMatches = async () => {
     setLoading(true)
@@ -46,6 +49,18 @@ export default function LiveScoresTab() {
     fetchMatches()
   }, [])
 
+  const handleClearStandings = async () => {
+    setClearing(true)
+    try {
+      await clearStandings()
+      setShowClearConfirm(false)
+    } catch {
+      // ignore
+    } finally {
+      setClearing(false)
+    }
+  }
+
   const grouped: Record<StatusGroup, MatchResponse[]> = {
     live: matches.filter((m) => m.status === 'live'),
     scheduled: matches.filter((m) => m.status === 'scheduled'),
@@ -56,7 +71,55 @@ export default function LiveScoresTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-white font-bold text-lg">Live Scores</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-white font-bold text-lg">Live Scores</h2>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowClearConfirm(true)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors text-sm"
+        >
+          <Trash2 className="w-4 h-4" />
+          Clear Leaderboard
+        </motion.button>
+      </div>
+
+      {/* Clear confirmation dialog */}
+      <AnimatePresence>
+        {showClearConfirm && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+          >
+            <div className="flex items-start gap-2 flex-1">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-red-400 font-semibold text-sm">Clear all leaderboard standings?</p>
+                <p className="text-red-400/70 text-xs mt-0.5">This will reset all team points, wins, losses and goals. This cannot be undone.</p>
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                disabled={clearing}
+                className="px-3 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white text-sm transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearStandings}
+                disabled={clearing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors"
+              >
+                {clearing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                Yes, Clear
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {loading ? (
         <div className="flex items-center justify-center h-48">

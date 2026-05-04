@@ -1,10 +1,12 @@
 from typing import List
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, status
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.dependencies.auth import get_current_admin
 from app.dependencies.db import get_db
+from app.models.admin import Admin
 from app.models.standing import Standing
 from app.schemas.standing import StandingResponse
 
@@ -49,3 +51,14 @@ async def get_standings(db: AsyncSession = Depends(get_db)):
         )
         for s in sorted_standings
     ]
+
+
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
+async def clear_standings(
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Admin-only — delete all standing records (reset leaderboard)."""
+    await db.execute(delete(Standing))
+    await db.commit()
+    return None
