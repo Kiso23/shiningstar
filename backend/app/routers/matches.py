@@ -95,7 +95,7 @@ async def create_match(
     match = Match(
         team_a_id=data.team_a_id,
         team_b_id=data.team_b_id,
-        scheduled_at=data.scheduled_at,
+        scheduled_at=data.scheduled_at.replace(tzinfo=None),
         venue=data.venue,
         round=data.round,
         group=data.group,
@@ -126,7 +126,7 @@ async def update_match(
     match = await _get_match_with_teams(db, match_id)
 
     if data.scheduled_at is not None:
-        match.scheduled_at = data.scheduled_at
+        match.scheduled_at = data.scheduled_at.replace(tzinfo=None)
     if data.venue is not None:
         match.venue = data.venue
     if data.round is not None:
