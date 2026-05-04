@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, RefreshCw, AlertCircle, Radio } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../api/matches'
 import PageLoader from '../components/shared/PageLoader'
+import { trackVisit } from '../api/analytics'
 
 const AUTO_REFRESH_INTERVAL = 30_000 // 30 seconds
 
@@ -33,6 +34,7 @@ export default function LivePage() {
 
   // Initial fetch
   useEffect(() => {
+    trackVisit('live')
     fetchLiveMatches()
   }, [fetchLiveMatches])
 

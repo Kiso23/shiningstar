@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
+import { trackVisit } from '../api/analytics'
 import {
   Trophy, Calendar, MapPin, Users, Star, ChevronRight,
   Shield, Zap, Award, ArrowRight, CheckCircle
@@ -66,6 +67,8 @@ export default function HomePage() {
   const navigate = useNavigate()
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+
+  useEffect(() => { trackVisit('home') }, [])
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 

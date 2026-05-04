@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Calendar, MapPin, AlertCircle, RefreshCw } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../api/matches'
 import PageLoader from '../components/shared/PageLoader'
+import { trackVisit } from '../api/analytics'
 
 const ROUND_ORDER = [
   'Round of 32',
@@ -34,6 +35,7 @@ export default function FixturesPage() {
   }
 
   useEffect(() => {
+    trackVisit('fixtures')
     fetchMatches()
   }, [])
 

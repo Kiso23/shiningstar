@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Trophy, AlertCircle, RefreshCw } from 'lucide-react'
 import { getStandings, type StandingResponse } from '../api/standings'
 import PageLoader from '../components/shared/PageLoader'
+import { trackVisit } from '../api/analytics'
 
 const RANK_STYLES: Record<number, { bg: string; text: string; badge: string }> = {
   1: { bg: 'bg-yellow-500/10 border-yellow-500/20', text: 'text-yellow-400', badge: '🥇' },
@@ -31,6 +32,7 @@ export default function LeaderboardPage() {
   }
 
   useEffect(() => {
+    trackVisit('leaderboard')
     fetchStandings()
   }, [])
 

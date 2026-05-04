@@ -13,6 +13,14 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import create_tables
+# Import all models so create_tables picks them up
+import app.models.team  # noqa: F401
+import app.models.player  # noqa: F401
+import app.models.payment_proof  # noqa: F401
+import app.models.match  # noqa: F401
+import app.models.standing  # noqa: F401
+import app.models.admin  # noqa: F401
+import app.models.page_view  # noqa: F401
 
 
 @asynccontextmanager
@@ -75,12 +83,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Router registration
 from app.routers import auth, registrations, admin  # noqa: E402
-from app.routers import matches, standings  # noqa: E402
+from app.routers import matches, standings, analytics  # noqa: E402
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(registrations.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(matches.router, prefix="/api/v1")
 app.include_router(standings.router, prefix="/api/v1")
+app.include_router(analytics.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["health"])
