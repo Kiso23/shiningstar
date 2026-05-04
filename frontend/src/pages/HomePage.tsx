@@ -163,7 +163,7 @@ export default function HomePage() {
                   1st Lt. Solomon Timung &amp;
                 </div>
                 <div className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
-                  Lt. Mongolsing Timung,
+                  Lt. Mongolsing Hanse,
                 </div>
                 <div className="text-base sm:text-xl md:text-2xl font-bold text-orange-300 tracking-wide mt-1">
                   Memorial Football Tournament
