@@ -79,14 +79,27 @@ export default function HomePage() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4
                    bg-gray-950/80 backdrop-blur-xl border-b border-white/5"
       >
+        {/* Logo */}
         <div className="flex items-center gap-2">
           <img
             src="/logo.png"
             alt="Shining Star United Hamren"
             className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
           />
-          <span className="font-bold text-white">Shining Star United</span>
+          <span className="font-bold text-white hidden sm:block">Shining Star United</span>
         </div>
+
+        {/* Nav links */}
+        <div className="flex items-center gap-1 sm:gap-3">
+          <button onClick={() => navigate('/fixtures')} className="text-gray-400 hover:text-white text-sm transition-colors px-2 py-1">Fixtures</button>
+          <button onClick={() => navigate('/leaderboard')} className="text-gray-400 hover:text-white text-sm transition-colors px-2 py-1">Leaderboard</button>
+          <button onClick={() => navigate('/live')} className="flex items-center gap-1 text-green-400 hover:text-green-300 text-sm transition-colors px-2 py-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Live
+          </button>
+        </div>
+
+        {/* CTA */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -95,14 +108,6 @@ export default function HomePage() {
         >
           Register Now
         </motion.button>
-        <div className="hidden sm:flex items-center gap-2">
-          <button onClick={() => navigate('/fixtures')} className="text-gray-400 hover:text-white text-sm transition-colors px-2">Fixtures</button>
-          <button onClick={() => navigate('/leaderboard')} className="text-gray-400 hover:text-white text-sm transition-colors px-2">Leaderboard</button>
-          <button onClick={() => navigate('/live')} className="flex items-center gap-1 text-green-400 hover:text-green-300 text-sm transition-colors px-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            Live
-          </button>
-        </div>
       </motion.nav>
 
       {/* ── Hero Section ── */}
