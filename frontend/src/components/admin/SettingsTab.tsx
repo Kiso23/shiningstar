@@ -26,7 +26,8 @@ export default function SettingsTab() {
     setError(null)
     setSaved(false)
     try {
-      await updateTournamentDate(new Date(dateValue).toISOString().slice(0, 19))
+      // Send exactly what the user typed — no UTC conversion
+      await updateTournamentDate(dateValue + ':00')
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch {

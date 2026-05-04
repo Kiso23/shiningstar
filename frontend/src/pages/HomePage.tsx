@@ -41,16 +41,22 @@ export default function HomePage() {
   // Fetch countdown date from backend
   useEffect(() => {
     getTournamentDate().then((d) => {
+      // Parse as local time (no UTC shift)
       setTargetDate(new Date(d.tournament_start))
     }).catch(() => {}) // fallback to default
   }, [])
 
   // Live countdown
   const [countdown, setCountdown] = useState({ days: 0, hrs: 0, mins: 0, secs: 0 })
+  const [started, setStarted] = useState(false)
   useEffect(() => {
     const calc = () => {
       const diff = targetDate.getTime() - Date.now()
-      if (diff <= 0) return { days: 0, hrs: 0, mins: 0, secs: 0 }
+      if (diff <= 0) {
+        setStarted(true)
+        return { days: 0, hrs: 0, mins: 0, secs: 0 }
+      }
+      setStarted(false)
       return {
         days: Math.floor(diff / 86400000),
         hrs: Math.floor((diff % 86400000) / 3600000),
@@ -256,8 +262,16 @@ export default function HomePage() {
             >
               <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                <p className="text-orange-500 font-bold text-xs tracking-widest uppercase">Tournament Starts In</p>
+                <p className="text-orange-500 font-bold text-xs tracking-widest uppercase">
+                  {started ? 'Tournament is Live!' : 'Tournament Starts In'}
+                </p>
               </div>
+              {started ? (
+                <div className="text-center py-2">
+                  <p className="text-2xl font-black text-green-400">🏆 Underway!</p>
+                  <p className="text-gray-500 text-xs mt-1">The tournament has started</p>
+                </div>
+              ) : (
               <div className="grid grid-cols-4 gap-2 text-center">
                 {[
                   { val: countdown.days, label: 'Days' },
@@ -273,6 +287,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
+              )}
               <div className="mt-3 pt-3 border-t border-white/5 text-xs text-gray-500 text-center">
                 {TOURNAMENT.maxTeams} Teams · {TOURNAMENT.venue}
               </div>
