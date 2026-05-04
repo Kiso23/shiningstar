@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
-from sqlalchemy import func, select
+from sqlalchemy import func, select, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import get_current_admin
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 VALID_PAGES = {"home", "fixtures", "live", "leaderboard", "register"}
 
 
-# ── Schemas ──────────────────────────────────────────────────────────────────
+# ── Schemas ───────────────────────────────────────────────────────────────────
 
 class TrackRequest(BaseModel):
     page: str
@@ -53,7 +53,7 @@ async def track_visit(
     """Called by the frontend on every page load. Stores a hashed visit record."""
     page = body.page if body.page in VALID_PAGES else "other"
 
-    # Hash the IP so we never store PII
+    # Hash the IP — no PII stored
     raw_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown")
     ip = raw_ip.split(",")[0].strip()
     visitor_hash = hashlib.sha256(ip.encode()).hexdigest()
@@ -81,15 +81,16 @@ async def get_summary(
     total_result = await db.execute(select(func.count()).select_from(PageView))
     total_visits = total_result.scalar_one()
 
-    # Unique visitors (distinct hashes)
+    # Unique visitors
     unique_result = await db.execute(
         select(func.count(func.distinct(PageView.visitor_hash)))
     )
     unique_visitors = unique_result.scalar_one()
 
-    # Today's visits
+    # Today's visits — compare naive datetimes
     today_result = await db.execute(
-        select(func.count()).select_from(PageView).where(PageView.visited_at >= today_start)
+        select(func.count()).select_from(PageView)
+        .where(PageView.visited_at >= today_start)
     )
     today_visits = today_result.scalar_one()
 
@@ -101,17 +102,17 @@ async def get_summary(
     )
     by_page = [PageStat(page=row.page, visits=row.visits) for row in page_result]
 
-    # Last 7 days — generate all dates so gaps show as 0
-    daily_counts: dict[str, int] = {}
+    # Last 7 days — cast to Date to group by day
     daily_result = await db.execute(
         select(
-            func.date_trunc("day", PageView.visited_at).label("day"),
+            cast(PageView.visited_at, Date).label("day"),
             func.count().label("visits"),
         )
         .where(PageView.visited_at >= week_start)
-        .group_by(func.date_trunc("day", PageView.visited_at))
-        .order_by(func.date_trunc("day", PageView.visited_at))
+        .group_by(cast(PageView.visited_at, Date))
+        .order_by(cast(PageView.visited_at, Date))
     )
+    daily_counts: dict[str, int] = {}
     for row in daily_result:
         daily_counts[row.day.strftime("%Y-%m-%d")] = row.visits
 
