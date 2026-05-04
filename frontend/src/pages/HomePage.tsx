@@ -156,12 +156,18 @@ export default function HomePage() {
             >
               <div className="absolute inset-0 rounded-3xl" />
               <motion.div
-                className="relative z-10 text-3xl sm:text-5xl md:text-6xl font-black text-white text-center tracking-tight leading-tight drop-shadow-2xl"
+                className="relative z-10 text-center drop-shadow-2xl"
                 style={{ textShadow: '0 4px 20px rgba(0,0,0,0.9), 0 0 40px rgba(196,30,58,0.8)' }}
               >
-                KARDOM LAPEN KURVANGTHU
-                <br />
-                ANGTON APHAN TA
+                <div className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
+                  1st Lt. Solomon Timung &amp;
+                </div>
+                <div className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
+                  Lt. Mongolsing Timung,
+                </div>
+                <div className="text-base sm:text-xl md:text-2xl font-bold text-orange-300 tracking-wide mt-1">
+                  Memorial Football Tournament
+                </div>
               </motion.div>
             </motion.div>
           </motion.div>
