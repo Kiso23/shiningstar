@@ -84,14 +84,15 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Router registration
 from app.routers import auth, registrations, admin  # noqa: E402
-from app.routers import matches, standings, analytics, settings  # noqa: E402
+from app.routers import matches, standings, analytics  # noqa: E402
+from app.routers import settings as settings_router  # noqa: E402
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(registrations.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(matches.router, prefix="/api/v1")
 app.include_router(standings.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
-app.include_router(settings.router, prefix="/api/v1")
+app.include_router(settings_router.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["health"])
