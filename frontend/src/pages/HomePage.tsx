@@ -13,8 +13,9 @@ const TOURNAMENT = {
   venue: 'Rongbong Ronghang Playground',
   prize: '₹8,000',
   runnerUp: '₹4,000',
-  thirdPlace: '₹2,000',
-  registrationFee: '₹801 per team',
+  manOfTournament: '₹500',
+  bestKeeper: '₹500',
+  totalPrize: '₹13,000',
   maxTeams: 32,
   deadline: 'May 31, 2025',
 }
@@ -26,9 +27,10 @@ const FEATURES = [
 ]
 
 const PRIZES = [
-  { place: '🥇 Champion', amount: '₹8,000', color: 'from-yellow-500/20 to-yellow-600/10 border-yellow-500/30' },
+  { place: '🥇 Winner', amount: '₹8,000', color: 'from-yellow-500/20 to-yellow-600/10 border-yellow-500/30' },
   { place: '🥈 Runner-Up', amount: '₹4,000', color: 'from-gray-400/20 to-gray-500/10 border-gray-400/30' },
-  { place: '🥉 Third Place', amount: '₹2,000', color: 'from-orange-700/20 to-orange-800/10 border-orange-700/30' },
+  { place: '🏅 Man of the Tournament', amount: '₹500', color: 'from-orange-500/20 to-orange-600/10 border-orange-500/30' },
+  { place: '🧤 Best Keeper', amount: '₹500', color: 'from-green-500/20 to-green-600/10 border-green-500/30' },
 ]
 
 const STEPS = [
@@ -208,7 +210,7 @@ export default function HomePage() {
             {[
               { icon: Calendar, text: TOURNAMENT.date },
               { icon: MapPin, text: TOURNAMENT.venue },
-              { icon: Trophy, text: `Prize: ${TOURNAMENT.prize}` },
+              { icon: Trophy, text: `Prize: ₹13,000` },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-300 text-sm">
                 <Icon className="w-4 h-4 text-orange-400" />
@@ -283,7 +285,7 @@ export default function HomePage() {
               { icon: Calendar, label: 'Tournament Dates', value: TOURNAMENT.date, color: 'text-blue-400' },
               { icon: MapPin, label: 'Venue', value: TOURNAMENT.venue, color: 'text-green-400' },
               { icon: Users, label: 'Max Teams', value: `${TOURNAMENT.maxTeams} Teams`, color: 'text-purple-400' },
-              { icon: Trophy, label: 'Registration Fee', value: TOURNAMENT.registrationFee, color: 'text-orange-400' },
+              { icon: Trophy, label: 'Registration Fee', value: '₹801 per team', color: 'text-orange-400' },
             ].map(({ icon: Icon, label, value, color }, i) => (
               <motion.div
                 key={label}
@@ -311,7 +313,7 @@ export default function HomePage() {
             className="mb-16"
           >
             <h3 className="text-2xl font-bold text-white text-center mb-8">Prize Pool</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
               {PRIZES.map(({ place, amount, color }, i) => (
                 <motion.div
                   key={place}
@@ -320,14 +322,25 @@ export default function HomePage() {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.15 }}
                   whileHover={{ scale: 1.05 }}
-                  className={`p-6 rounded-2xl bg-gradient-to-br border text-center ${color}`}
+                  className={`p-5 rounded-2xl bg-gradient-to-br border text-center ${color}`}
                 >
                   <p className="text-2xl mb-2">{place.split(' ')[0]}</p>
-                  <p className="text-white font-semibold mb-1">{place.split(' ').slice(1).join(' ')}</p>
-                  <p className="text-3xl font-black gradient-text">{amount}</p>
+                  <p className="text-white font-semibold mb-1 text-sm">{place.split(' ').slice(1).join(' ')}</p>
+                  <p className="text-2xl font-black gradient-text">{amount}</p>
                 </motion.div>
               ))}
             </div>
+            {/* Total */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="mt-4 max-w-2xl mx-auto p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-between"
+            >
+              <span className="text-white font-bold text-lg">🏆 Total Prize Pool</span>
+              <span className="text-3xl font-black gradient-text">₹13,000</span>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -420,7 +433,7 @@ export default function HomePage() {
               <h2 className="text-4xl font-black text-white mb-4">Ready to Compete?</h2>
               <p className="text-orange-100 text-lg mb-8 max-w-xl mx-auto">
                 Registration closes on <strong>{TOURNAMENT.deadline}</strong>. Don't miss your chance to win{' '}
-                <strong>{TOURNAMENT.prize}</strong>!
+                <strong>₹13,000</strong>!
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <motion.button
