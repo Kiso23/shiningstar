@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import HomePage from './pages/HomePage'
@@ -14,6 +14,7 @@ import ProtectedRoute from './components/shared/ProtectedRoute'
 import LogoWatermark from './components/shared/LogoWatermark'
 import SplashScreen from './components/shared/SplashScreen'
 import { ThemeProvider } from './context/ThemeContext'
+import { startKeepAlive } from './utils/keepAlive'
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(
@@ -24,6 +25,11 @@ export default function App() {
     sessionStorage.setItem('splashShown', '1')
     setShowSplash(false)
   }
+
+  // Keep Render free tier alive — ping every 4 minutes
+  useEffect(() => {
+    startKeepAlive()
+  }, [])
 
   return (
     <ThemeProvider>
