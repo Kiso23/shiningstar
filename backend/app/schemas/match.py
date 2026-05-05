@@ -51,8 +51,8 @@ class ScoreUpdate(BaseModel):
 
 class MatchResponse(BaseModel):
     id: uuid.UUID
-    team_a_id: uuid.UUID
-    team_b_id: uuid.UUID
+    team_a_id: Optional[uuid.UUID]
+    team_b_id: Optional[uuid.UUID]
     team_a_name: str
     team_b_name: str
     team_a_score: Optional[int]
@@ -62,5 +62,7 @@ class MatchResponse(BaseModel):
     group: Optional[str]
     scheduled_at: datetime
     venue: str
+    bracket_slot: Optional[int] = None
+    next_match_id: Optional[uuid.UUID] = None
 
     model_config = ConfigDict(from_attributes=True)

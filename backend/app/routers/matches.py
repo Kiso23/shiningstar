@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
@@ -12,6 +13,7 @@ from app.models.match import Match
 from app.models.team import Team
 from app.schemas.match import MatchCreate, MatchUpdate, MatchResponse, ScoreUpdate
 from app.services.standings_service import recalculate_standings
+from app.services.bracket_service import generate_bracket, advance_winner
 
 router = APIRouter(prefix="/matches", tags=["matches"])
 
@@ -22,8 +24,8 @@ def _to_response(match: Match) -> MatchResponse:
         id=match.id,
         team_a_id=match.team_a_id,
         team_b_id=match.team_b_id,
-        team_a_name=match.team_a.team_name,
-        team_b_name=match.team_b.team_name,
+        team_a_name=match.team_a.team_name if match.team_a else "TBD",
+        team_b_name=match.team_b.team_name if match.team_b else "TBD",
         team_a_score=match.team_a_score,
         team_b_score=match.team_b_score,
         status=match.status,
@@ -31,6 +33,8 @@ def _to_response(match: Match) -> MatchResponse:
         group=match.group,
         scheduled_at=match.scheduled_at,
         venue=match.venue,
+        bracket_slot=match.bracket_slot,
+        next_match_id=match.next_match_id,
     )
 
 
@@ -191,6 +195,8 @@ async def update_score(
                 detail="Both scores must be set before marking a match as completed",
             )
         await recalculate_standings(db, match.team_a_id, match.team_b_id)
+        # Auto-advance winner in knockout bracket
+        await advance_winner(db, match)
 
     await db.commit()
 
@@ -201,3 +207,52 @@ async def update_score(
     )
     match = result.scalar_one()
     return _to_response(match)
+
+
+# ── Bracket generation ────────────────────────────────────────────────────────
+
+from pydantic import BaseModel as _BaseModel
+
+class BracketGenerateRequest(_BaseModel):
+    venue: str = "Rongbong Ronghang Playground"
+    first_match_time: Optional[datetime] = None
+
+
+@router.post("/generate-bracket", status_code=status.HTTP_201_CREATED)
+async def generate_knockout_bracket(
+    data: BracketGenerateRequest,
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """
+    Admin-only — generate a full single-elimination knockout bracket
+    from all approved teams. Clears existing matches first.
+    """
+    # Get all approved teams
+    result = await db.execute(
+        select(Team).where(Team.status == "approved")
+    )
+    teams = result.scalars().all()
+
+    if len(teams) < 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Need at least 2 approved teams. Found {len(teams)}.",
+        )
+
+    # Delete all existing matches
+    existing = await db.execute(select(Match))
+    for m in existing.scalars().all():
+        await db.delete(m)
+    await db.flush()
+
+    # Generate bracket
+    first_time = data.first_match_time.replace(tzinfo=None) if data.first_match_time else None
+    matches = await generate_bracket(db, list(teams), venue=data.venue, first_match_time=first_time)
+    await db.commit()
+
+    return {
+        "message": f"Bracket generated with {len(matches)} matches for {len(teams)} teams.",
+        "total_matches": len(matches),
+        "total_teams": len(teams),
+    }

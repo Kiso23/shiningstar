@@ -24,6 +24,16 @@ async def _run_migrations() -> None:
                 "ALTER TABLE otp_codes ALTER COLUMN code TYPE VARCHAR(64)"
             )
         )
+        # Add knockout bracket columns to matches table
+        for sql in [
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS bracket_slot INTEGER",
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS next_match_id UUID REFERENCES matches(id)",
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS next_match_slot VARCHAR(1)",
+            # Allow NULL team IDs for TBD slots in bracket
+            "ALTER TABLE matches ALTER COLUMN team_a_id DROP NOT NULL",
+            "ALTER TABLE matches ALTER COLUMN team_b_id DROP NOT NULL",
+        ]:
+            await conn.execute(__import__('sqlalchemy').text(sql))
     logger.info("Migrations complete.")
 # Import all models so create_tables picks them up
 import app.models.team  # noqa: F401

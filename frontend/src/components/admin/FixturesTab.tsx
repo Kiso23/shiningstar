@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Calendar, MapPin } from 'lucide-react'
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Calendar, MapPin, Zap } from 'lucide-react'
 import { getMatches, deleteMatch, type MatchResponse } from '../../api/matches'
 import { listRegistrations } from '../../api/admin'
 import { extractErrorMessage } from '../../api/errors'
 import FixtureForm, { type TeamOption } from './FixtureForm'
+import client from '../../api/client'
 
 export default function FixturesTab() {
   const [matches, setMatches] = useState<MatchResponse[]>([])
@@ -16,6 +17,9 @@ export default function FixturesTab() {
   const [deleteTarget, setDeleteTarget] = useState<MatchResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [generating, setGenerating] = useState(false)
+  const [generateMsg, setGenerateMsg] = useState<string | null>(null)
+  const [showGenerateConfirm, setShowGenerateConfirm] = useState(false)
 
   const fetchData = async () => {
     setLoading(true)
@@ -49,6 +53,23 @@ export default function FixturesTab() {
     fetchData()
   }
 
+  const handleGenerateBracket = async () => {
+    setGenerating(true)
+    setGenerateMsg(null)
+    try {
+      const res = await client.post('/matches/generate-bracket', {
+        venue: 'Rongbong Ronghang Playground',
+      })
+      setGenerateMsg(res.data.message)
+      setShowGenerateConfirm(false)
+      fetchData()
+    } catch (err: any) {
+      setGenerateMsg(err?.response?.data?.detail || 'Failed to generate bracket.')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   const handleEdit = (fixture: MatchResponse) => {
     setEditingFixture(fixture)
     setShowForm(true)
@@ -78,18 +99,69 @@ export default function FixturesTab() {
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-white font-bold text-lg">Fixtures</h2>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => { setEditingFixture(undefined); setShowForm(true) }}
-          className="btn-primary py-2 px-4 text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Add Fixture
-        </motion.button>
+        <div className="flex items-center gap-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowGenerateConfirm(true)}
+            className="flex items-center gap-2 py-2 px-3 text-sm rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 transition-colors"
+          >
+            <Zap className="w-4 h-4" />
+            Generate Bracket
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => { setEditingFixture(undefined); setShowForm(true) }}
+            className="btn-primary py-2 px-4 text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Fixture
+          </motion.button>
+        </div>
       </div>
+
+      {/* Generate bracket confirmation */}
+      <AnimatePresence>
+        {showGenerateConfirm && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 space-y-3"
+          >
+            <div className="flex items-start gap-2">
+              <Zap className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-green-400 font-semibold text-sm">Generate Knockout Bracket?</p>
+                <p className="text-green-400/70 text-xs mt-0.5">
+                  This will delete all existing fixtures and create a full single-elimination bracket from all approved teams. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowGenerateConfirm(false)} disabled={generating}
+                className="px-3 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white text-sm transition-colors">
+                Cancel
+              </button>
+              <button onClick={handleGenerateBracket} disabled={generating}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors">
+                {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                Yes, Generate
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {generateMsg && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
+          {generateMsg}
+        </motion.div>
+      )}
 
       {/* Content */}
       {loading ? (
