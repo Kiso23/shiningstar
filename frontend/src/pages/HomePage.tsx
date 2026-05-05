@@ -5,6 +5,7 @@ import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 import ThemeToggle from '../components/shared/ThemeToggle'
+import { useTheme } from '../context/ThemeContext'
 
 const TOURNAMENT = {
   name: 'Shining Star United',
@@ -37,6 +38,8 @@ const STEPS = [
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
   const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
   const [bannerLine1, setBannerLine1] = useState('Shining Star United FC')
   const [bannerLine2, setBannerLine2] = useState('Football Tournament')
@@ -75,7 +78,7 @@ export default function HomePage() {
 
   useEffect(() => { trackVisit('home') }, [])
   return (
-    <div className="min-h-screen bg-[#081508] overflow-x-hidden text-white">
+    <div className={`min-h-screen overflow-x-hidden text-white transition-colors duration-300 ${isLight ? 'bg-[#e8f5e9]' : 'bg-[#081508]'}`}>
 
       {/* ══════════════════════════════════════════════
           NAVBAR
@@ -84,13 +87,12 @@ export default function HomePage() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3
-                   bg-[#050a05]/90 backdrop-blur-xl border-b border-white/5"
+        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 backdrop-blur-xl border-b transition-colors duration-300 ${isLight ? 'bg-white/95 border-gray-200' : 'bg-[#050a05]/90 border-white/5'}`}
       >
         {/* Logo */}
         <div className="flex items-center gap-2">
           <img src="/logo.png" alt="SSU" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-orange-500 shrink-0" />
-          <span className="font-black text-white text-sm sm:text-base hidden xs:block tracking-wide">
+          <span className={`font-black text-sm sm:text-base hidden xs:block tracking-wide ${isLight ? 'text-gray-900' : 'text-white'}`}>
             <span className="hidden sm:inline">SHINING STAR </span>
             <span className="text-orange-500 sm:inline hidden">UNITED</span>
             <span className="sm:hidden text-orange-500">SSU</span>
@@ -150,9 +152,10 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
 
-        {/* ── Stadium night background ── */}
-        {/* Base dark sky */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050a0f 0%, #0a1a0a 55%, #0d2010 70%, #081508 100%)' }} />
+        {/* ── Stadium night background — hidden in light mode ── */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ${isLight ? 'opacity-0' : 'opacity-100'}`}>
+          {/* Base dark sky */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050a0f 0%, #0a1a0a 55%, #0d2010 70%, #081508 100%)' }} />
 
         {/* Pitch green ground — bottom third */}
         <div className="absolute bottom-0 left-0 right-0 h-[38%]" style={{
@@ -216,6 +219,14 @@ export default function HomePage() {
           className="absolute bottom-[30%] left-0 right-0 h-16 pointer-events-none"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.03) 70%, transparent)', filter: 'blur(8px)' }}
         />
+        </div>{/* end stadium background wrapper */}
+
+        {/* Light mode background */}
+        {isLight && (
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(180deg, #bbf7d0 0%, #dcfce7 40%, #a7f3d0 70%, #6ee7b7 100%)',
+          }} />
+        )}
 
         {/* ── Left: Text content ── */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
@@ -226,8 +237,7 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-orange-500 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4"
-            >
+              className="text-orange-500 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4"            >
               ★ Welcome
             </motion.p>
 
@@ -395,7 +405,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           TOURNAMENT DETAILS
       ══════════════════════════════════════════════ */}
-      <section id="details" className="py-20 px-6 bg-[#0a1a0a]">
+      <section id="details" className={`py-20 px-6 transition-colors duration-300 ${isLight ? 'bg-white' : 'bg-[#0a1a0a]'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -475,7 +485,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           HOW TO REGISTER
       ══════════════════════════════════════════════ */}
-      <section className="py-20 px-6 bg-[#081508]">
+      <section className={`py-20 px-6 transition-colors duration-300 ${isLight ? 'bg-gray-50' : 'bg-[#081508]'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -516,7 +526,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           CTA BANNER
       ══════════════════════════════════════════════ */}
-      <section className="py-20 px-6 bg-[#0a1a0a]">
+      <section className={`py-20 px-6 transition-colors duration-300 ${isLight ? 'bg-white' : 'bg-[#0a1a0a]'}`}>
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
@@ -563,7 +573,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════ */}
-      <footer className="bg-[#050a05] border-t border-white/5 py-8 px-6">
+      <footer className={`border-t py-8 px-6 transition-colors duration-300 ${isLight ? 'bg-white border-gray-200' : 'bg-[#050a05] border-white/5'}`}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
