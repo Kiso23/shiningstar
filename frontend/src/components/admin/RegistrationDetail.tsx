@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2, CheckCircle, XCircle, User, Phone, Mail,
-  Users, Calendar, Image, AlertCircle, ChevronDown, ChevronUp, Trash2
+  Users, Calendar, Image, AlertCircle, ChevronDown, ChevronUp, Trash2, Download
 } from 'lucide-react'
 import { getRegistrationDetail, updateStatus, deleteRegistration } from '../../api/admin'
 import type { TeamDetail } from '../../api/admin'
 import { extractErrorMessage } from '../../api/errors'
 import StatusBadge from './StatusBadge'
 import client from '../../api/client'
+import { jsPDF } from 'jspdf'
 
 interface Props {
   registrationId: string
@@ -116,6 +117,140 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
   const canApprove = detail.status === 'payment_submitted'
   const canReject = detail.status === 'pending' || detail.status === 'payment_submitted'
 
+  const downloadPDF = () => {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+    const pageW = doc.internal.pageSize.getWidth()
+    const margin = 20
+    let y = 20
+
+    // ── Header ──
+    doc.setFillColor(249, 115, 22) // orange
+    doc.rect(0, 0, pageW, 18, 'F')
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('SHINING STAR UNITED FC', pageW / 2, 11, { align: 'center' })
+
+    doc.setFillColor(30, 30, 30)
+    doc.rect(0, 18, pageW, 8, 'F')
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Team Registration Details', pageW / 2, 23.5, { align: 'center' })
+
+    y = 36
+
+    // ── Team name + ID ──
+    doc.setTextColor(30, 30, 30)
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(detail.team_name, margin, y)
+    y += 7
+
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(120, 120, 120)
+    doc.text(`Registration ID: ${detail.registration_id}`, margin, y)
+    doc.text(`Status: ${detail.status.toUpperCase()}`, pageW - margin, y, { align: 'right' })
+    y += 10
+
+    // ── Divider ──
+    doc.setDrawColor(249, 115, 22)
+    doc.setLineWidth(0.5)
+    doc.line(margin, y, pageW - margin, y)
+    y += 8
+
+    // ── Team Info ──
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(30, 30, 30)
+    doc.text('Team Information', margin, y)
+    y += 7
+
+    const info = [
+      ['Manager Name', detail.manager_name],
+      ['Contact Phone', detail.contact_phone],
+      ['Contact Email', detail.contact_email],
+      ['Number of Players', String(detail.player_count)],
+      ['Registration Date', new Date(detail.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })],
+    ]
+
+    doc.setFontSize(10)
+    info.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(80, 80, 80)
+      doc.text(`${label}:`, margin, y)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(30, 30, 30)
+      doc.text(value, margin + 45, y)
+      y += 7
+    })
+
+    y += 5
+
+    // ── Players ──
+    if (detail.players.length > 0) {
+      doc.setDrawColor(200, 200, 200)
+      doc.setLineWidth(0.3)
+      doc.line(margin, y, pageW - margin, y)
+      y += 8
+
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(30, 30, 30)
+      doc.text(`Player Roster (${detail.players.length} players)`, margin, y)
+      y += 8
+
+      // Table header
+      doc.setFillColor(249, 115, 22)
+      doc.rect(margin, y - 5, pageW - margin * 2, 7, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'bold')
+      doc.text('#', margin + 2, y)
+      doc.text('Player Name', margin + 12, y)
+      doc.text('Age', margin + 80, y)
+      doc.text('Jersey', margin + 100, y)
+      doc.text('Position', margin + 120, y)
+      y += 7
+
+      const sorted = [...detail.players].sort((a, b) => a.position_index - b.position_index)
+      sorted.forEach((p, i) => {
+        if (y > 270) {
+          doc.addPage()
+          y = 20
+        }
+        const bg = i % 2 === 0 ? [248, 248, 248] : [255, 255, 255]
+        doc.setFillColor(bg[0], bg[1], bg[2])
+        doc.rect(margin, y - 4.5, pageW - margin * 2, 7, 'F')
+
+        doc.setTextColor(30, 30, 30)
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(9)
+        doc.text(String(i + 1), margin + 2, y)
+        doc.text(p.full_name, margin + 12, y)
+        doc.text(String(p.age), margin + 80, y)
+        doc.text(String((p as any).jersey_number ?? '—'), margin + 100, y)
+        doc.text(String((p as any).position ?? '—'), margin + 120, y)
+        y += 7
+      })
+    }
+
+    y += 8
+
+    // ── Footer ──
+    doc.setDrawColor(249, 115, 22)
+    doc.setLineWidth(0.5)
+    doc.line(margin, y, pageW - margin, y)
+    y += 6
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'italic')
+    doc.setTextColor(150, 150, 150)
+    doc.text('Shining Star United FC — Tournament Registration System', pageW / 2, y, { align: 'center' })
+    doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, pageW / 2, y + 5, { align: 'center' })
+
+    doc.save(`${detail.registration_id}_${detail.team_name.replace(/\s+/g, '_')}.pdf`)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -128,7 +263,18 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
           <h2 className="text-xl font-bold text-white">{detail.team_name}</h2>
           <p className="text-gray-400 text-sm font-mono">{detail.registration_id}</p>
         </div>
-        <StatusBadge status={detail.status} />
+        <div className="flex items-center gap-2 shrink-0">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={downloadPDF}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/20 transition-colors text-xs font-semibold"
+          >
+            <Download className="w-3.5 h-3.5" />
+            PDF
+          </motion.button>
+          <StatusBadge status={detail.status} />
+        </div>
       </div>
 
       {/* Status hint for pending teams with no payment */}
