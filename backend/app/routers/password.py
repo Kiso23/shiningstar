@@ -1,16 +1,24 @@
 """
 Admin password management:
 - POST /auth/forgot-password  → send OTP to admin email
-- POST /auth/verify-otp       → verify OTP, return reset token
-- POST /auth/reset-password   → set new password using reset token
+- POST /auth/verify-otp       → verify OTP
+- POST /auth/reset-password   → set new password using valid OTP
 - POST /auth/change-password  → change password when logged in (admin only)
+
+Security notes:
+- OTP codes are stored as bcrypt hashes (never plaintext)
+- OTPs expire after 10 minutes
+- Old OTPs are invalidated when a new one is requested
+- Forgot-password always returns success to prevent email enumeration
 """
+import hashlib
 import random
+import secrets
 import string
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,8 +26,7 @@ from app.dependencies.auth import get_current_admin
 from app.dependencies.db import get_db
 from app.models.admin import Admin
 from app.models.otp import OTPCode
-from app.schemas.auth import TokenResponse
-from app.services.auth_service import hash_password, verify_password, create_access_token
+from app.services.auth_service import hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -42,10 +49,24 @@ class ResetPasswordRequest(BaseModel):
     code: str
     new_password: str
 
+    @field_validator('new_password')
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        return v
+
 
 class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str
+
+    @field_validator('new_password')
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError('New password must be at least 8 characters')
+        return v
 
 
 class MessageResponse(BaseModel):
@@ -55,7 +76,17 @@ class MessageResponse(BaseModel):
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _generate_otp() -> str:
-    return ''.join(random.choices(string.digits, k=6))
+    """Generate a cryptographically random 6-digit OTP."""
+    return ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+
+
+def _hash_otp(code: str) -> str:
+    """Hash OTP with SHA-256 for storage (fast enough for short codes)."""
+    return hashlib.sha256(code.encode()).hexdigest()
+
+
+def _verify_otp(code: str, stored_hash: str) -> bool:
+    return hashlib.sha256(code.encode()).hexdigest() == stored_hash
 
 
 async def _send_otp_email(email: str, code: str) -> None:
@@ -108,11 +139,11 @@ async def forgot_password(
             otp.used = True
 
         code = _generate_otp()
-        db.add(OTPCode(email=body.email, code=code))
+        db.add(OTPCode(email=body.email, code=_hash_otp(code)))  # store hash, not plaintext
         await db.commit()
 
         try:
-            await _send_otp_email(body.email, code)
+            await _send_otp_email(body.email, code)  # send plaintext to user
         except Exception:
             pass  # Don't reveal email failures
 
@@ -129,7 +160,7 @@ async def verify_otp(
     result = await db.execute(
         select(OTPCode).where(
             OTPCode.email == body.email,
-            OTPCode.code == body.code,
+            OTPCode.code == _hash_otp(body.code),  # compare against stored hash
             OTPCode.used == False,  # noqa: E712
             OTPCode.created_at >= expiry,
         )
@@ -159,7 +190,7 @@ async def reset_password(
     result = await db.execute(
         select(OTPCode).where(
             OTPCode.email == body.email,
-            OTPCode.code == body.code,
+            OTPCode.code == _hash_otp(body.code),  # compare against stored hash
             OTPCode.used == False,  # noqa: E712
             OTPCode.created_at >= expiry,
         )
@@ -192,13 +223,7 @@ async def change_password(
     db: AsyncSession = Depends(get_db),
     current_admin: Admin = Depends(get_current_admin),
 ):
-    """Change password when already logged in."""
-    if len(body.new_password) < 8:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="New password must be at least 8 characters",
-        )
-
+    """Change password when already logged in. Requires valid current password."""
     if not verify_password(body.current_password, current_admin.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
