@@ -152,9 +152,33 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
 
+        {/* ── Video background ── */}
+        {!isLight && (
+          <div className="absolute inset-0 overflow-hidden">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute w-full h-full object-cover pointer-events-none"
+              style={{ opacity: 0.5 }}
+            >
+              {/* Free football stadium video from Pexels (CDN) */}
+              <source src="https://videos.pexels.com/video-files/11918917/11918917-uhd_2560_1440_25fps.mp4" type="video/mp4" />
+              {/* Fallback lower quality */}
+              <source src="https://videos.pexels.com/video-files/11918917/11918917-hd_1920_1080_25fps.mp4" type="video/mp4" />
+            </video>
+            {/* Dark overlay so text stays readable */}
+            <div className="absolute inset-0 bg-black/60" />
+            {/* Green tint at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 h-1/3"
+              style={{ background: 'linear-gradient(0deg, rgba(5,20,5,0.85) 0%, transparent 100%)' }} />
+          </div>
+        )}
+
         {/* ── Stadium night background — hidden in light mode ── */}
         <div className={`absolute inset-0 transition-opacity duration-300 ${isLight ? 'opacity-0' : 'opacity-100'}`}>
-          {/* Base dark sky */}
+          {/* Base dark sky — shown as fallback if video doesn't load */}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050a0f 0%, #0a1a0a 55%, #0d2010 70%, #081508 100%)' }} />
 
         {/* Pitch green ground — bottom third */}
