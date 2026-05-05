@@ -204,7 +204,7 @@ export default function HomePage() {
               <br />
               <span className="text-white">Star</span>
               <br />
-              <span className="text-orange-500">United</span>
+              <span className="text-orange-500">United FC</span>
             </motion.h1>
 
             {/* Memorial banner */}
