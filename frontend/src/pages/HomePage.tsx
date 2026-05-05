@@ -75,7 +75,7 @@ export default function HomePage() {
 
   useEffect(() => { trackVisit('home') }, [])
   return (
-    <div className="min-h-screen bg-[#0a0e1a] overflow-x-hidden text-white">
+    <div className="min-h-screen bg-[#081508] overflow-x-hidden text-white">
 
       {/* ══════════════════════════════════════════════
           NAVBAR
@@ -85,7 +85,7 @@ export default function HomePage() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3
-                   bg-[#0a0e1a]/90 backdrop-blur-xl border-b border-white/5"
+                   bg-[#050a05]/90 backdrop-blur-xl border-b border-white/5"
       >
         {/* Logo */}
         <div className="flex items-center gap-2">
@@ -150,33 +150,71 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
 
-        {/* Dark stadium gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#050810] via-[#0d1525] to-[#050810]" />
+        {/* ── Stadium night background ── */}
+        {/* Base dark sky */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #050a0f 0%, #0a1a0a 55%, #0d2010 70%, #081508 100%)' }} />
 
-        {/* Stadium light rays */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/3 w-px h-full bg-gradient-to-b from-blue-500/20 via-transparent to-transparent transform -rotate-12 blur-sm" />
-          <div className="absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-blue-400/15 via-transparent to-transparent blur-sm" />
-          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-blue-500/20 via-transparent to-transparent transform rotate-12 blur-sm" />
+        {/* Pitch green ground — bottom third */}
+        <div className="absolute bottom-0 left-0 right-0 h-[38%]" style={{
+          background: 'linear-gradient(180deg, #0d2010 0%, #0f2a12 30%, #112e14 60%, #0a1f0c 100%)',
+        }} />
+
+        {/* Pitch line markings */}
+        <div className="absolute bottom-0 left-0 right-0 h-[38%] overflow-hidden opacity-20">
+          {/* Centre circle */}
+          <div className="absolute bottom-[30%] left-1/2 -translate-x-1/2 w-48 h-48 rounded-full border border-white/40" />
+          {/* Centre spot */}
+          <div className="absolute bottom-[46%] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white/60" />
+          {/* Halfway line */}
+          <div className="absolute bottom-0 left-1/2 w-px h-full bg-white/30" />
+          {/* Left penalty box */}
+          <div className="absolute bottom-0 left-0 w-[22%] h-[55%] border-r border-t border-white/30" />
+          {/* Right penalty box */}
+          <div className="absolute bottom-0 right-0 w-[22%] h-[55%] border-l border-t border-white/30" />
+          {/* Pitch stripes */}
+          {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((p) => (
+            <div key={p} className="absolute bottom-0 top-0 w-[11.1%] odd:bg-white/[0.03]" style={{ left: `${p - 10}%` }} />
+          ))}
         </div>
 
-        {/* Pitch lines overlay */}
-        <div className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.3) 60px, rgba(255,255,255,0.3) 61px)',
-          }}
-        />
+        {/* Floodlight glow — top left */}
+        <div className="absolute top-0 left-[15%] w-[300px] h-[300px] pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at top, rgba(255,240,180,0.18) 0%, rgba(255,220,100,0.08) 30%, transparent 70%)' }} />
+        {/* Floodlight glow — top right */}
+        <div className="absolute top-0 right-[15%] w-[300px] h-[300px] pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at top, rgba(255,240,180,0.18) 0%, rgba(255,220,100,0.08) 30%, transparent 70%)' }} />
+        {/* Floodlight glow — top center */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at top, rgba(200,220,255,0.12) 0%, rgba(150,180,255,0.05) 40%, transparent 70%)' }} />
 
-        {/* Glow orbs */}
+        {/* Light cone rays from top */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-[14%] w-1 h-[60%] opacity-20"
+            style={{ background: 'linear-gradient(180deg, rgba(255,240,180,0.8) 0%, transparent 100%)', transform: 'rotate(8deg)', transformOrigin: 'top center', filter: 'blur(3px)' }} />
+          <div className="absolute top-0 right-[14%] w-1 h-[60%] opacity-20"
+            style={{ background: 'linear-gradient(180deg, rgba(255,240,180,0.8) 0%, transparent 100%)', transform: 'rotate(-8deg)', transformOrigin: 'top center', filter: 'blur(3px)' }} />
+          <div className="absolute top-0 left-[48%] w-1 h-[55%] opacity-15"
+            style={{ background: 'linear-gradient(180deg, rgba(200,220,255,0.8) 0%, transparent 100%)', filter: 'blur(4px)' }} />
+        </div>
+
+        {/* Crowd silhouette — top edge */}
+        <div className="absolute top-0 left-0 right-0 h-16 overflow-hidden opacity-30">
+          <svg viewBox="0 0 1440 64" preserveAspectRatio="none" className="w-full h-full">
+            <path d="M0,64 L0,40 Q20,30 40,38 Q60,46 80,35 Q100,24 120,32 Q140,40 160,28 Q180,16 200,26 Q220,36 240,24 Q260,12 280,22 Q300,32 320,20 Q340,8 360,18 Q380,28 400,16 Q420,4 440,14 Q460,24 480,12 Q500,0 520,10 Q540,20 560,8 Q580,0 600,10 Q620,20 640,8 Q660,0 680,12 Q700,24 720,12 Q740,0 760,12 Q780,24 800,12 Q820,0 840,10 Q860,20 880,8 Q900,0 920,12 Q940,24 960,12 Q980,0 1000,10 Q1020,20 1040,8 Q1060,0 1080,12 Q1100,24 1120,14 Q1140,4 1160,16 Q1180,28 1200,18 Q1220,8 1240,20 Q1260,32 1280,22 Q1300,12 1320,24 Q1340,36 1360,26 Q1380,16 1400,28 Q1420,40 1440,32 L1440,64 Z"
+              fill="#0a1a0a" />
+          </svg>
+        </div>
+
+        {/* Ambient green pitch reflection on lower half */}
+        <div className="absolute bottom-0 left-0 right-0 h-[50%] pointer-events-none"
+          style={{ background: 'linear-gradient(0deg, rgba(10,40,15,0.4) 0%, transparent 100%)' }} />
+
+        {/* Subtle fog/mist layer */}
         <motion.div
-          animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
-          transition={{ duration: 6, repeat: Infinity }}
-          className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-3xl pointer-events-none"
-        />
-        <motion.div
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-          className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-orange-500/10 blur-3xl pointer-events-none"
+          animate={{ opacity: [0.3, 0.5, 0.3], x: [0, 20, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[30%] left-0 right-0 h-16 pointer-events-none"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.03) 70%, transparent)', filter: 'blur(8px)' }}
         />
 
         {/* ── Left: Text content ── */}
@@ -263,7 +301,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="bg-[#0d1525]/80 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-sm"
+              className="bg-[#0a1a0a]/80 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-sm"
             >
               <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
@@ -284,7 +322,7 @@ export default function HomePage() {
                   { val: countdown.mins, label: 'Mins' },
                   { val: countdown.secs, label: 'Secs' },
                 ].map(({ val, label }) => (
-                  <div key={label} className="bg-[#050810] rounded-xl p-2 sm:p-3">
+                  <div key={label} className="bg-[#050a05] rounded-xl p-2 sm:p-3">
                     <p className="text-xl sm:text-2xl font-black text-white tabular-nums">
                       {String(val).padStart(2, '0')}
                     </p>
@@ -303,7 +341,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
-              className="bg-[#0d1525]/80 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm"
+              className="bg-[#0a1a0a]/80 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm"
             >
               {[
                 { icon: Calendar, label: 'Match Fixtures', sub: 'View all scheduled matches', path: '/fixtures', color: 'text-blue-400' },
@@ -332,7 +370,7 @@ export default function HomePage() {
         </div>
 
         {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0e1a] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#081508] to-transparent pointer-events-none" />
       </section>
 
       {/* ══════════════════════════════════════════════
@@ -357,7 +395,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           TOURNAMENT DETAILS
       ══════════════════════════════════════════════ */}
-      <section id="details" className="py-20 px-6 bg-[#0d1525]">
+      <section id="details" className="py-20 px-6 bg-[#0a1a0a]">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -437,7 +475,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           HOW TO REGISTER
       ══════════════════════════════════════════════ */}
-      <section className="py-20 px-6 bg-[#0a0e1a]">
+      <section className="py-20 px-6 bg-[#081508]">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -478,7 +516,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           CTA BANNER
       ══════════════════════════════════════════════ */}
-      <section className="py-20 px-6 bg-[#0d1525]">
+      <section className="py-20 px-6 bg-[#0a1a0a]">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
@@ -525,7 +563,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════ */}
-      <footer className="bg-[#050810] border-t border-white/5 py-8 px-6">
+      <footer className="bg-[#050a05] border-t border-white/5 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
