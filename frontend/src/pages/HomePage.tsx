@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
-import { getTournamentDate } from '../api/settings'
+import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 import ThemeToggle from '../components/shared/ThemeToggle'
 
@@ -38,13 +38,16 @@ const STEPS = [
 export default function HomePage() {
   const navigate = useNavigate()
   const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
+  const [bannerLine1, setBannerLine1] = useState('Shining Star United FC')
+  const [bannerLine2, setBannerLine2] = useState('Football Tournament')
 
-  // Fetch countdown date from backend
+  // Fetch all settings from backend
   useEffect(() => {
-    getTournamentDate().then((d) => {
-      // Parse as local time (no UTC shift)
-      setTargetDate(new Date(d.tournament_start))
-    }).catch(() => {}) // fallback to default
+    getAllSettings().then((s) => {
+      setTargetDate(new Date(s.tournament_start))
+      setBannerLine1(s.banner_line1)
+      setBannerLine2(s.banner_line2)
+    }).catch(() => {})
   }, [])
 
   // Live countdown
@@ -211,10 +214,8 @@ export default function HomePage() {
               transition={{ delay: 0.5 }}
               className="mb-4 sm:mb-6 px-4 py-3 border-l-4 border-orange-500 bg-orange-500/10 rounded-r-xl text-left"
             >
-              <p className="text-white font-bold text-sm leading-relaxed">
-                1st Lt. Solomon Timung &amp; Lt. Mongolsing Hanse,
-              </p>
-              <p className="text-orange-400 font-semibold text-xs sm:text-sm">Memorial Football Tournament</p>
+              <p className="text-white font-bold text-sm leading-relaxed">{bannerLine1}</p>
+              <p className="text-orange-400 font-semibold text-xs sm:text-sm">{bannerLine2}</p>
             </motion.div>
 
             {/* Description */}

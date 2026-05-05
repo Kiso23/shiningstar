@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff } from 'lucide-react'
-import { getTournamentDate, updateTournamentDate } from '../../api/settings'
+import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Type } from 'lucide-react'
+import { getTournamentDate, updateTournamentDate, getAllSettings, updateBanner } from '../../api/settings'
 import { changePassword } from '../../api/password'
 
 // Reusable password field with eye toggle
@@ -43,11 +43,19 @@ export default function SettingsTab() {
   const [passSaved, setPassSaved] = useState(false)
   const [passError, setPassError] = useState<string | null>(null)
 
+  // Banner state
+  const [bannerLine1, setBannerLine1] = useState('')
+  const [bannerLine2, setBannerLine2] = useState('')
+  const [bannerSaving, setBannerSaving] = useState(false)
+  const [bannerSaved, setBannerSaved] = useState(false)
+  const [bannerError, setBannerError] = useState<string | null>(null)
+
   useEffect(() => {
-    getTournamentDate()
-      .then((d) => {
-        // Convert ISO to datetime-local format (YYYY-MM-DDTHH:MM)
-        setDateValue(d.tournament_start.slice(0, 16))
+    getAllSettings()
+      .then((s) => {
+        setDateValue(s.tournament_start.slice(0, 16))
+        setBannerLine1(s.banner_line1)
+        setBannerLine2(s.banner_line2)
       })
       .catch(() => setError('Failed to load settings.'))
       .finally(() => setLoading(false))
@@ -83,6 +91,20 @@ export default function SettingsTab() {
       setPassError(err?.response?.data?.detail || 'Failed to change password.')
     } finally {
       setPassLoading(false)
+    }
+  }
+
+  const handleSaveBanner = async () => {
+    if (!bannerLine1.trim()) { setBannerError('Line 1 cannot be empty'); return }
+    setBannerSaving(true); setBannerError(null); setBannerSaved(false)
+    try {
+      await updateBanner(bannerLine1.trim(), bannerLine2.trim())
+      setBannerSaved(true)
+      setTimeout(() => setBannerSaved(false), 3000)
+    } catch {
+      setBannerError('Failed to save banner.')
+    } finally {
+      setBannerSaving(false)
     }
   }
 
@@ -155,8 +177,67 @@ export default function SettingsTab() {
           </motion.button>
         </motion.div>
 
-        {/* Change Password */}
+        {/* Banner Text */}
         <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass-card p-6 space-y-4"
+        >
+          <div className="flex items-center gap-2">
+            <Type className="w-4 h-4 text-orange-400" />
+            <h3 className="text-white font-semibold">Homepage Banner Text</h3>
+          </div>
+          <p className="text-gray-500 text-sm">This appears on the hero section of the homepage.</p>
+
+          {/* Live preview */}
+          <div className="px-4 py-3 border-l-4 border-orange-500 bg-orange-500/10 rounded-r-xl">
+            <p className="text-white font-bold text-sm">{bannerLine1 || 'Line 1'}</p>
+            <p className="text-orange-400 font-semibold text-xs">{bannerLine2 || 'Line 2'}</p>
+          </div>
+
+          <div>
+            <label className="label">Line 1 (main text)</label>
+            <input
+              type="text"
+              value={bannerLine1}
+              onChange={(e) => setBannerLine1(e.target.value)}
+              placeholder="e.g. Shining Star United FC"
+              className="input-field mt-1"
+              maxLength={80}
+            />
+          </div>
+          <div>
+            <label className="label">Line 2 (subtitle)</label>
+            <input
+              type="text"
+              value={bannerLine2}
+              onChange={(e) => setBannerLine2(e.target.value)}
+              placeholder="e.g. Football Tournament"
+              className="input-field mt-1"
+              maxLength={80}
+            />
+          </div>
+
+          {bannerError && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />{bannerError}
+            </div>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleSaveBanner}
+            disabled={bannerSaving || !bannerLine1.trim()}
+            className="btn-primary w-full"
+          >
+            {bannerSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
+              : bannerSaved ? <><CheckCircle className="w-4 h-4" /> Saved!</>
+              : <><Save className="w-4 h-4" /> Save Banner</>}
+          </motion.button>
+        </motion.div>
+
+        {/* Change Password */}        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}

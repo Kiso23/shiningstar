@@ -12,14 +12,32 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 
 # Default tournament start date (ISO string)
 DEFAULT_TOURNAMENT_DATE = "2025-06-15T08:00:00"
+DEFAULT_BANNER_LINE1 = "Shining Star United FC"
+DEFAULT_BANNER_LINE2 = "Football Tournament"
 
 
 class TournamentDateUpdate(BaseModel):
     tournament_start: str  # ISO datetime string e.g. "2025-06-15T08:00:00"
 
 
+class BannerUpdate(BaseModel):
+    banner_line1: str
+    banner_line2: str
+
+
 class TournamentDateResponse(BaseModel):
     tournament_start: str
+
+
+class BannerResponse(BaseModel):
+    banner_line1: str
+    banner_line2: str
+
+
+class AllSettingsResponse(BaseModel):
+    tournament_start: str
+    banner_line1: str
+    banner_line2: str
 
 
 # ── Public: get tournament start date ────────────────────────────────────────
@@ -67,3 +85,52 @@ async def update_tournament_date(
 
     await db.commit()
     return TournamentDateResponse(tournament_start=body.tournament_start)
+
+
+# ── Public: get all settings at once ─────────────────────────────────────────
+
+@router.get("/all", response_model=AllSettingsResponse)
+async def get_all_settings(db: AsyncSession = Depends(get_db)):
+    """Public — returns all site settings in one call."""
+    result = await db.execute(select(Setting))
+    rows = {s.key: s.value for s in result.scalars().all()}
+    return AllSettingsResponse(
+        tournament_start=rows.get("tournament_start", DEFAULT_TOURNAMENT_DATE),
+        banner_line1=rows.get("banner_line1", DEFAULT_BANNER_LINE1),
+        banner_line2=rows.get("banner_line2", DEFAULT_BANNER_LINE2),
+    )
+
+
+# ── Public: get banner text ───────────────────────────────────────────────────
+
+@router.get("/banner", response_model=BannerResponse)
+async def get_banner(db: AsyncSession = Depends(get_db)):
+    """Public — returns the homepage banner text."""
+    result = await db.execute(select(Setting))
+    rows = {s.key: s.value for s in result.scalars().all()}
+    return BannerResponse(
+        banner_line1=rows.get("banner_line1", DEFAULT_BANNER_LINE1),
+        banner_line2=rows.get("banner_line2", DEFAULT_BANNER_LINE2),
+    )
+
+
+# ── Admin: update banner text ─────────────────────────────────────────────────
+
+@router.put("/banner", response_model=BannerResponse)
+async def update_banner(
+    body: BannerUpdate,
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Admin-only — update the homepage banner text."""
+    result = await db.execute(select(Setting))
+    rows = {s.key: s for s in result.scalars().all()}
+
+    for key, value in [("banner_line1", body.banner_line1), ("banner_line2", body.banner_line2)]:
+        if key in rows:
+            rows[key].value = value
+        else:
+            db.add(Setting(key=key, value=value))
+
+    await db.commit()
+    return BannerResponse(banner_line1=body.banner_line1, banner_line2=body.banner_line2)
