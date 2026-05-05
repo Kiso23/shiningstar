@@ -155,19 +155,16 @@ export default function HomePage() {
         {/* ── Video background ── */}
         {!isLight && (
           <div className="absolute inset-0 overflow-hidden">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="absolute w-full h-full object-cover pointer-events-none"
-              style={{ opacity: 0.5 }}
-            >
-              {/* Free football stadium video from Pexels (CDN) */}
-              <source src="https://videos.pexels.com/video-files/11918917/11918917-uhd_2560_1440_25fps.mp4" type="video/mp4" />
-              {/* Fallback lower quality */}
-              <source src="https://videos.pexels.com/video-files/11918917/11918917-hd_1920_1080_25fps.mp4" type="video/mp4" />
-            </video>
+            {/* YouTube embed as background video - muted autoplay */}
+            <div className="absolute inset-0 scale-[1.5] pointer-events-none">
+              <iframe
+                src="https://www.youtube.com/embed/tntOCGkgt98?autoplay=1&mute=1&loop=1&playlist=tntOCGkgt98&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0"
+                title="Stadium background"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full"
+                style={{ border: 'none', opacity: 0.55, minWidth: '100%', minHeight: '100%' }}
+              />
+            </div>
             {/* Dark overlay so text stays readable */}
             <div className="absolute inset-0 bg-black/60" />
             {/* Green tint at bottom */}
