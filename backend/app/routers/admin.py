@@ -104,8 +104,28 @@ async def update_registration_status(
 
     updated_team = await update_team_status(db, team.id, body.status)
 
-    # Send status update email in background
+    # Send status update email in background — load players for PDF attachment
     if body.status.value in ("approved", "rejected"):
+        # Reload with players for PDF generation
+        team_with_players = await db.execute(
+            select(Team)
+            .options(selectinload(Team.players))
+            .where(Team.id == updated_team.id)
+        )
+        full_team = team_with_players.scalar_one_or_none()
+        players_data = []
+        if full_team and full_team.players:
+            players_data = [
+                {
+                    "full_name": p.full_name,
+                    "age": p.age,
+                    "jersey_number": p.jersey_number,
+                    "position": p.position,
+                    "position_index": p.position_index,
+                }
+                for p in full_team.players
+            ]
+
         background_tasks.add_task(
             send_status_update,
             to_email=updated_team.contact_email,
@@ -113,6 +133,11 @@ async def update_registration_status(
             manager_name=updated_team.manager_name,
             registration_id=updated_team.registration_id,
             new_status=body.status.value,
+            players=players_data,
+            player_count=updated_team.player_count,
+            contact_phone=updated_team.contact_phone,
+            contact_email=updated_team.contact_email,
+            created_at=updated_team.created_at,
         )
 
     return TeamResponse.model_validate(updated_team)

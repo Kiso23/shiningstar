@@ -69,7 +69,7 @@ def _base_html(content: str) -> str:
 </html>"""
 
 
-def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
+def _send_via_brevo(to: str, subject: str, html: str, text: str, attachment_bytes: bytes = None, attachment_name: str = None) -> None:
     """Send email via Brevo HTTP API - works on Render free tier."""
     api_key = os.getenv("BREVO_API_KEY", "").strip()  # strip newlines/spaces
     if not api_key:
@@ -85,6 +85,14 @@ def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
         "htmlContent": html,
         "textContent": text,
     }
+
+    # Attach PDF if provided
+    if attachment_bytes and attachment_name:
+        import base64
+        payload["attachment"] = [{
+            "name": attachment_name,
+            "content": base64.b64encode(attachment_bytes).decode("utf-8"),
+        }]
 
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
@@ -103,11 +111,11 @@ def _send_via_brevo(to: str, subject: str, html: str, text: str) -> None:
         logger.info("✅ Email sent via Brevo to %s: %s", to, subject)
 
 
-async def _send(to: str, subject: str, html: str, text: str) -> None:
+async def _send(to: str, subject: str, html: str, text: str, attachment_bytes: bytes = None, attachment_name: str = None) -> None:
     """Send email via Brevo API."""
     loop = asyncio.get_event_loop()
     try:
-        await loop.run_in_executor(None, partial(_send_via_brevo, to, subject, html, text))
+        await loop.run_in_executor(None, partial(_send_via_brevo, to, subject, html, text, attachment_bytes, attachment_name))
     except Exception as exc:
         logger.error("❌ Email failed to %s: %s", to, exc)
 
@@ -183,6 +191,11 @@ async def send_status_update(
     manager_name: str,
     registration_id: str,
     new_status: str,
+    players: list = None,
+    player_count: int = 0,
+    contact_phone: str = "",
+    contact_email: str = "",
+    created_at=None,
 ) -> None:
     if new_status == "approved":
         subject = f"🎉 Registration Approved — {team_name} | {TOURNAMENT_NAME}"
@@ -249,4 +262,26 @@ Team Name       : {team_name}
 
 © 2025 Shining Star United"""
 
-    await _send(to_email, subject, _base_html(html_content), text_content)
+    # Generate and attach PDF for approved registrations
+    pdf_bytes = None
+    pdf_name = None
+    if new_status == "approved" and players is not None:
+        try:
+            from app.services.pdf_service import generate_registration_pdf
+            from datetime import datetime as _dt
+            pdf_bytes = generate_registration_pdf(
+                team_name=team_name,
+                registration_id=registration_id,
+                status=new_status,
+                manager_name=manager_name,
+                contact_phone=contact_phone,
+                contact_email=contact_email,
+                player_count=player_count,
+                created_at=created_at or _dt.utcnow(),
+                players=players,
+            )
+            pdf_name = f"{registration_id}_{team_name.replace(' ', '_')}.pdf"
+        except Exception as e:
+            logger.warning("Could not generate PDF attachment: %s", e)
+
+    await _send(to_email, subject, _base_html(html_content), text_content, pdf_bytes, pdf_name)
