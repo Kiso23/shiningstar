@@ -349,6 +349,59 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ══ TEAM PHOTOS ══ */}
+      <section style={{ backgroundColor: bg }} className="py-20 px-6 transition-colors duration-300">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12 text-center">
+            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Our Club</p>
+            <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">The Team</h2>
+            <p style={{ color: textMute }} className="mt-3 text-sm max-w-xl mx-auto">
+              Shining Star United FC — representing Hamren with pride on every pitch.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {[
+              { src: '/team1.jpg', caption: 'Shining Star United FC', year: '2023 Season' },
+              { src: '/team2.jpg', caption: 'Shining Star United FC', year: 'Previous Season' },
+            ].map(({ src, caption, year }, i) => (
+              <motion.div
+                key={src}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                style={{ backgroundColor: bgCard, borderColor: border }}
+                className="rounded-2xl border overflow-hidden group cursor-pointer"
+              >
+                <div className="relative overflow-hidden aspect-video">
+                  <img
+                    src={src}
+                    alt={caption}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  {/* Orange accent line */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-orange-500" />
+                </div>
+                <div className="p-4 flex items-center justify-between">
+                  <div>
+                    <p style={{ color: textMain }} className="font-bold text-sm">{caption}</p>
+                    <p style={{ color: textMute }} className="text-xs mt-0.5">{year}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                    style={{ backgroundColor: 'rgba(249,115,22,0.15)', color: '#f97316' }}>
+                    ⚽ SSU FC
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ══ CTA ══ */}
       <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
