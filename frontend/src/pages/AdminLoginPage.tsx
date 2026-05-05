@@ -133,16 +133,6 @@ export default function AdminLoginPage() {
                 <><Lock className="w-4 h-4" />Sign In</>
               )}
             </motion.button>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => navigate('/admin/forgot-password')}
-                className="text-orange-400 hover:text-orange-300 text-sm transition-colors"
-              >
-                Forgot password?
-              </button>
-            </div>
           </form>
         </div>
 
