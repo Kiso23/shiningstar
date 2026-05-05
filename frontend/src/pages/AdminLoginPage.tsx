@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { AlertCircle, Loader2, Lock, Mail, Star, Shield } from 'lucide-react'
+import { AlertCircle, Loader2, Lock, Mail, Eye, EyeOff } from 'lucide-react'
 import { useAdminAuth } from '../hooks/useAdminAuth'
 
 const schema = z.object({
@@ -16,12 +17,11 @@ type FormData = z.infer<typeof schema>
 export default function AdminLoginPage() {
   const navigate = useNavigate()
   const { login, loading, error } = useAdminAuth()
+  const [showPass, setShowPass] = useState(false)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  })
 
   const onSubmit = async (data: FormData) => {
     const ok = await login(data.email, data.password)
@@ -38,6 +38,7 @@ export default function AdminLoginPage() {
         transition={{ duration: 0.5 }}
         className="relative z-10 w-full max-w-sm"
       >
+        {/* Header */}
         <div className="text-center mb-8">
           <motion.div
             initial={{ scale: 0 }}
@@ -47,7 +48,7 @@ export default function AdminLoginPage() {
           >
             <img
               src="/logo.png"
-              alt="Shining Star United Hamren"
+              alt="Shining Star United"
               className="w-20 h-20 rounded-full object-cover border-2 border-orange-500/40 mx-auto"
             />
           </motion.div>
@@ -57,6 +58,8 @@ export default function AdminLoginPage() {
 
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+
+            {/* Email */}
             <div>
               <label className="label">
                 <span className="flex items-center gap-1.5">
@@ -72,13 +75,11 @@ export default function AdminLoginPage() {
                 className={`input-field ${errors.email ? 'input-error' : ''}`}
               />
               {errors.email && (
-                <p className="error-text">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  {errors.email.message}
-                </p>
+                <p className="error-text"><AlertCircle className="w-3.5 h-3.5" />{errors.email.message}</p>
               )}
             </div>
 
+            {/* Password with eye toggle */}
             <div>
               <label className="label">
                 <span className="flex items-center gap-1.5">
@@ -86,18 +87,25 @@ export default function AdminLoginPage() {
                   Password
                 </span>
               </label>
-              <input
-                {...register('password')}
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                className={`input-field ${errors.password ? 'input-error' : ''}`}
-              />
+              <div className="relative">
+                <input
+                  {...register('password')}
+                  type={showPass ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className={`input-field pr-10 ${errors.password ? 'input-error' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-400 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               {errors.password && (
-                <p className="error-text">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  {errors.password.message}
-                </p>
+                <p className="error-text"><AlertCircle className="w-3.5 h-3.5" />{errors.password.message}</p>
               )}
             </div>
 
@@ -120,15 +128,9 @@ export default function AdminLoginPage() {
               className="btn-primary w-full py-4"
             >
               {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing in...
-                </>
+                <><Loader2 className="w-5 h-5 animate-spin" />Signing in...</>
               ) : (
-                <>
-                  <Lock className="w-4 h-4" />
-                  Sign In
-                </>
+                <><Lock className="w-4 h-4" />Sign In</>
               )}
             </motion.button>
 

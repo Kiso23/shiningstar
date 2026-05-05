@@ -1,10 +1,42 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, KeyRound, Lock, ArrowLeft, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
+import { Mail, KeyRound, Lock, ArrowLeft, Loader2, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { forgotPassword, verifyOTP, resetPassword } from '../api/password'
 
 type Step = 'email' | 'otp' | 'newpass' | 'done'
+
+// Reusable password input with eye toggle
+function PasswordInput({
+  value, onChange, placeholder, onKeyDown,
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+  onKeyDown?: (e: React.KeyboardEvent) => void
+}) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative">
+      <input
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder || '••••••••'}
+        className="input-field pr-10"
+        onKeyDown={onKeyDown}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((v) => !v)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-400 transition-colors"
+        tabIndex={-1}
+      >
+        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  )
+}
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate()
@@ -72,7 +104,7 @@ export default function ForgotPasswordPage() {
             {/* Step 1: Email */}
             {step === 'email' && (
               <motion.div key="email" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                <div className="flex items-center gap-2 text-orange-400 mb-2">
+                <div className="flex items-center gap-2 text-orange-400">
                   <Mail className="w-5 h-5" />
                   <p className="font-semibold text-sm">Enter your admin email</p>
                 </div>
@@ -98,18 +130,20 @@ export default function ForgotPasswordPage() {
             {/* Step 2: OTP */}
             {step === 'otp' && (
               <motion.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                <div className="flex items-center gap-2 text-orange-400 mb-2">
+                <div className="flex items-center gap-2 text-orange-400">
                   <KeyRound className="w-5 h-5" />
                   <p className="font-semibold text-sm">Enter OTP</p>
                 </div>
-                <p className="text-gray-500 text-sm">A 6-digit code was sent to <span className="text-orange-400">{email}</span>. It expires in 10 minutes.</p>
+                <p className="text-gray-500 text-sm">
+                  A 6-digit code was sent to <span className="text-orange-400">{email}</span>. Expires in 10 minutes.
+                </p>
                 <div>
                   <label className="label">OTP Code</label>
                   <input
                     type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="123456"
+                    placeholder="1 2 3 4 5 6"
                     className="input-field text-center text-2xl tracking-[0.5em] font-mono"
                     maxLength={6}
                     onKeyDown={(e) => e.key === 'Enter' && handleVerifyOTP()}
@@ -128,18 +162,22 @@ export default function ForgotPasswordPage() {
             {/* Step 3: New password */}
             {step === 'newpass' && (
               <motion.div key="newpass" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                <div className="flex items-center gap-2 text-orange-400 mb-2">
+                <div className="flex items-center gap-2 text-orange-400">
                   <Lock className="w-5 h-5" />
                   <p className="font-semibold text-sm">Set new password</p>
                 </div>
                 <div>
                   <label className="label">New Password</label>
-                  <input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} placeholder="Min. 8 characters" className="input-field" />
+                  <PasswordInput value={newPass} onChange={setNewPass} placeholder="Min. 8 characters" />
                 </div>
                 <div>
                   <label className="label">Confirm Password</label>
-                  <input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} placeholder="Repeat password" className="input-field"
-                    onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()} />
+                  <PasswordInput
+                    value={confirmPass}
+                    onChange={setConfirmPass}
+                    placeholder="Repeat password"
+                    onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
+                  />
                 </div>
                 {error && <p className="flex items-center gap-2 text-red-400 text-sm"><AlertCircle className="w-4 h-4" />{error}</p>}
                 <button onClick={handleResetPassword} disabled={loading} className="btn-primary w-full">
@@ -163,11 +201,18 @@ export default function ForgotPasswordPage() {
           </AnimatePresence>
         </div>
 
-        <p className="text-center text-gray-600 text-sm mt-6">
-          <button onClick={() => navigate('/admin/login')} className="text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1 mx-auto">
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to login
-          </button>
-        </p>
+        {/* Back to sign in — prominent */}
+        {step !== 'done' && (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/admin/login')}
+            className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:border-orange-500/30 transition-colors text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Sign In
+          </motion.button>
+        )}
       </motion.div>
     </div>
   )

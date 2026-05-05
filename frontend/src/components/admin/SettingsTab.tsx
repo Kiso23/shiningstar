@@ -1,8 +1,32 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock } from 'lucide-react'
+import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff } from 'lucide-react'
 import { getTournamentDate, updateTournamentDate } from '../../api/settings'
 import { changePassword } from '../../api/password'
+
+// Reusable password field with eye toggle
+function PasswordField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative">
+      <input
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder || '••••••••'}
+        className="input-field pr-10 mt-1"
+      />
+      <button
+        type="button"
+        onClick={() => setShow((v) => !v)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-400 transition-colors"
+        tabIndex={-1}
+      >
+        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  )
+}
 
 export default function SettingsTab() {
   const [dateValue, setDateValue] = useState('')
@@ -144,15 +168,15 @@ export default function SettingsTab() {
           </div>
           <div>
             <label className="label">Current Password</label>
-            <input type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} placeholder="••••••••" className="input-field mt-1" />
+            <PasswordField value={currentPass} onChange={setCurrentPass} placeholder="Current password" />
           </div>
           <div>
             <label className="label">New Password</label>
-            <input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} placeholder="Min. 8 characters" className="input-field mt-1" />
+            <PasswordField value={newPass} onChange={setNewPass} placeholder="Min. 8 characters" />
           </div>
           <div>
             <label className="label">Confirm New Password</label>
-            <input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} placeholder="Repeat new password" className="input-field mt-1" />
+            <PasswordField value={confirmPass} onChange={setConfirmPass} placeholder="Repeat new password" />
           </div>
           {passError && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
