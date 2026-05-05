@@ -362,9 +362,9 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              { src: '/team1.jpg', caption: 'Shining Star United FC', year: '2023 Season' },
-              { src: '/team2.jpg', caption: 'Shining Star United FC', year: 'Previous Season' },
-            ].map(({ src, caption, year }, i) => (
+            { src: '/team1.jpg', caption: 'Shining Star United FC' },
+              { src: '/team2.jpg', caption: 'Shining Star United FC' },
+            ].map(({ src, caption }, i) => (
               <motion.div
                 key={src}
                 initial={{ opacity: 0, y: 40 }}
@@ -389,7 +389,6 @@ export default function HomePage() {
                 <div className="p-4 flex items-center justify-between">
                   <div>
                     <p style={{ color: textMain }} className="font-bold text-sm">{caption}</p>
-                    <p style={{ color: textMute }} className="text-xs mt-0.5">{year}</p>
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: 'rgba(249,115,22,0.15)', color: '#f97316' }}>
