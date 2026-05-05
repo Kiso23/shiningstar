@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getTournamentDate } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
+import ThemeToggle from '../components/shared/ThemeToggle'
 
 const TOURNAMENT = {
   name: 'Shining Star United',
@@ -128,14 +129,17 @@ export default function HomePage() {
         </div>
 
         {/* CTA */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/register')}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg transition-colors whitespace-nowrap"
-        >
-          Register
-        </motion.button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/register')}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg transition-colors whitespace-nowrap"
+          >
+            Register
+          </motion.button>
+        </div>
       </motion.nav>
 
       {/* ══════════════════════════════════════════════

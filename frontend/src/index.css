@@ -129,3 +129,47 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* ── Light mode overrides ─────────────────────────────────────────────────── */
+html.light body {
+  background-color: #f1f5f9;
+  background-image: none;
+  color: #0f172a;
+}
+
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a;
+}
+
+html.light .glass-card p,
+html.light .glass-card span,
+html.light .glass-card h1,
+html.light .glass-card h2,
+html.light .glass-card h3 {
+  color: #0f172a;
+}
+
+html.light .input-field {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: #0f172a !important;
+}
+
+html.light .input-field::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light .label {
+  color: #374151 !important;
+}
+
+html.light .text-gray-400 { color: #4b5563 !important; }
+html.light .text-gray-500 { color: #6b7280 !important; }
+html.light .text-gray-600 { color: #9ca3af !important; }
+html.light .text-white    { color: #0f172a !important; }
+html.light .bg-gray-950   { background-color: #f8fafc !important; }
+html.light .bg-gray-900   { background-color: #f1f5f9 !important; }
+html.light .border-white\/5  { border-color: rgba(0,0,0,0.08) !important; }
+html.light .border-white\/10 { border-color: rgba(0,0,0,0.1) !important; }
