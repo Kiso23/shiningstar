@@ -12,7 +12,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.database import create_tables
+from app.database import create_tables, engine
+
+
+async def _run_migrations() -> None:
+    """Inline schema migrations — safe to run on every startup (idempotent)."""
+    async with engine.begin() as conn:
+        # Widen otp_codes.code from VARCHAR(6) to VARCHAR(64) for SHA-256 hashes
+        await conn.execute(
+            __import__('sqlalchemy').text(
+                "ALTER TABLE otp_codes ALTER COLUMN code TYPE VARCHAR(64)"
+            )
+        )
+    logger.info("Migrations complete.")
 # Import all models so create_tables picks them up
 import app.models.team  # noqa: F401
 import app.models.player  # noqa: F401
@@ -29,6 +41,8 @@ import app.models.otp  # noqa: F401
 async def lifespan(app: FastAPI):
     # Startup: create DB tables and ensure uploads directory exists
     await create_tables()
+    # Run inline migrations for column changes
+    await _run_migrations()
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     os.makedirs(os.path.join(settings.UPLOAD_DIR, "logos"), exist_ok=True)
     os.makedirs(os.path.join(settings.UPLOAD_DIR, "payment_proofs"), exist_ok=True)
