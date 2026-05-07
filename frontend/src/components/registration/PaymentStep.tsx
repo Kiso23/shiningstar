@@ -6,39 +6,12 @@ import { uploadPayment } from '../../api/registrations'
 import { extractErrorMessage } from '../../api/errors'
 import { useRegistrationStore } from '../../store/registrationStore'
 
-const UPI_ID = 'shiningstarunited@upi'
+const UPI_ID = 'sarlongki360@oksbi'
 const UPI_APPS = [
   { name: 'Google Pay', color: 'from-blue-500/20 to-blue-600/10 border-blue-500/30', emoji: '🔵' },
   { name: 'PhonePe', color: 'from-purple-500/20 to-purple-600/10 border-purple-500/30', emoji: '🟣' },
   { name: 'Paytm', color: 'from-sky-500/20 to-sky-600/10 border-sky-500/30', emoji: '🔷' },
 ]
-
-// Simple QR code placeholder (in production, use a real QR code library)
-function QRCodePlaceholder() {
-  return (
-    <div
-      className="w-48 h-48 bg-white rounded-2xl p-3 mx-auto"
-      role="img"
-      aria-label="UPI QR code for payment to Shining Star United"
-    >
-      <div className="w-full h-full bg-gray-900 rounded-xl flex items-center justify-center">
-        <div className="grid grid-cols-7 gap-0.5 p-2">
-          {Array.from({ length: 49 }, (_, i) => (
-            <div
-              key={i}
-              className={`w-3 h-3 rounded-sm ${
-                [0,1,2,3,4,5,6,7,14,21,28,35,42,43,44,45,46,47,48,
-                 8,15,22,29,36,10,11,12,17,19,24,26,31,33,38,40].includes(i)
-                  ? 'bg-white'
-                  : 'bg-transparent'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 interface Props {
   onNext: () => void
@@ -105,8 +78,15 @@ export default function PaymentStep({ onNext, onBack }: Props) {
 
         {/* QR Code */}
         <div className="glass-card p-6 text-center">
-          <p className="text-white font-semibold mb-4">Scan QR Code to Pay</p>
-          <QRCodePlaceholder />
+          <p className="text-white font-semibold mb-1">Scan QR Code to Pay</p>
+          <p className="text-gray-500 text-xs mb-4">Sarlongki Teron · Any UPI app</p>
+          <div className="mx-auto w-56 h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg shadow-orange-500/10">
+            <img
+              src="/qr-payment.png"
+              alt="UPI QR Code - Scan to pay ₹801"
+              className="w-full h-full object-contain"
+            />
+          </div>
           <div className="mt-4 flex items-center justify-center gap-2">
             <code className="text-orange-400 font-mono text-sm bg-orange-500/10 px-3 py-1.5 rounded-lg">
               {UPI_ID}
@@ -130,6 +110,7 @@ export default function PaymentStep({ onNext, onBack }: Props) {
               </AnimatePresence>
             </motion.button>
           </div>
+          <p className="text-gray-600 text-xs mt-2">Tap the icon to copy UPI ID</p>
         </div>
 
         {/* Accepted UPI apps */}
