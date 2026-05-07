@@ -6,7 +6,7 @@ import { uploadPayment } from '../../api/registrations'
 import { extractErrorMessage } from '../../api/errors'
 import { useRegistrationStore } from '../../store/registrationStore'
 
-const UPI_ID = 'sarlongki360@oksbi'
+const UPI_ID = 'sarlongkisarlongki143@okhdfcbank'
 const UPI_APPS = [
   { name: 'Google Pay', color: 'from-blue-500/20 to-blue-600/10 border-blue-500/30', emoji: '🔵' },
   { name: 'PhonePe', color: 'from-purple-500/20 to-purple-600/10 border-purple-500/30', emoji: '🟣' },
