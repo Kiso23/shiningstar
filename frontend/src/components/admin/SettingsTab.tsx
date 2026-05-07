@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Type } from 'lucide-react'
-import { getTournamentDate, updateTournamentDate, getAllSettings, updateBanner } from '../../api/settings'
+import { getTournamentDate, updateTournamentDate, getAllSettings, updateBanner, updateHero } from '../../api/settings'
 import { changePassword } from '../../api/password'
 
 // Reusable password field with eye toggle
@@ -50,12 +50,23 @@ export default function SettingsTab() {
   const [bannerSaved, setBannerSaved] = useState(false)
   const [bannerError, setBannerError] = useState<string | null>(null)
 
+  // Hero title state
+  const [heroLine1, setHeroLine1] = useState('')
+  const [heroLine2, setHeroLine2] = useState('')
+  const [heroLine3, setHeroLine3] = useState('')
+  const [heroSaving, setHeroSaving] = useState(false)
+  const [heroSaved, setHeroSaved] = useState(false)
+  const [heroError, setHeroError] = useState<string | null>(null)
+
   useEffect(() => {
     getAllSettings()
       .then((s) => {
         setDateValue(s.tournament_start.slice(0, 16))
         setBannerLine1(s.banner_line1)
         setBannerLine2(s.banner_line2)
+        setHeroLine1(s.hero_line1 || 'Shining')
+        setHeroLine2(s.hero_line2 || 'Star')
+        setHeroLine3(s.hero_line3 || 'United FC')
       })
       .catch(() => setError('Failed to load settings.'))
       .finally(() => setLoading(false))
@@ -105,6 +116,20 @@ export default function SettingsTab() {
       setBannerError('Failed to save banner.')
     } finally {
       setBannerSaving(false)
+    }
+  }
+
+  const handleSaveHero = async () => {
+    if (!heroLine1.trim()) { setHeroError('Line 1 cannot be empty'); return }
+    setHeroSaving(true); setHeroError(null); setHeroSaved(false)
+    try {
+      await updateHero(heroLine1.trim(), heroLine2.trim(), heroLine3.trim())
+      setHeroSaved(true)
+      setTimeout(() => setHeroSaved(false), 3000)
+    } catch {
+      setHeroError('Failed to save hero title.')
+    } finally {
+      setHeroSaving(false)
     }
   }
 
@@ -174,6 +199,58 @@ export default function SettingsTab() {
             ) : (
               <><Save className="w-4 h-4" /> Save Settings</>
             )}
+          </motion.button>
+        </motion.div>
+
+        {/* Hero Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass-card p-6 space-y-4"
+        >
+          <div className="flex items-center gap-2">
+            <Type className="w-4 h-4 text-orange-400" />
+            <h3 className="text-white font-semibold">Hero Title (Big Text)</h3>
+          </div>
+          <p className="text-gray-500 text-sm">The large title on the homepage hero section.</p>
+
+          {/* Live preview */}
+          <div className="p-4 rounded-xl bg-black/30 text-center">
+            <p className="text-white font-black text-2xl uppercase leading-tight">
+              {heroLine1 || 'Line 1'}<br />
+              {heroLine2 || 'Line 2'}<br />
+              <span className="text-orange-500">{heroLine3 || 'Line 3'}</span>
+            </p>
+          </div>
+
+          <div>
+            <label className="label">Line 1 (white)</label>
+            <input type="text" value={heroLine1} onChange={(e) => setHeroLine1(e.target.value)}
+              placeholder="e.g. Shining" className="input-field mt-1" maxLength={30} />
+          </div>
+          <div>
+            <label className="label">Line 2 (white)</label>
+            <input type="text" value={heroLine2} onChange={(e) => setHeroLine2(e.target.value)}
+              placeholder="e.g. Star" className="input-field mt-1" maxLength={30} />
+          </div>
+          <div>
+            <label className="label">Line 3 (orange)</label>
+            <input type="text" value={heroLine3} onChange={(e) => setHeroLine3(e.target.value)}
+              placeholder="e.g. United FC" className="input-field mt-1" maxLength={30} />
+          </div>
+
+          {heroError && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />{heroError}
+            </div>
+          )}
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            onClick={handleSaveHero} disabled={heroSaving || !heroLine1.trim()}
+            className="btn-primary w-full">
+            {heroSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
+              : heroSaved ? <><CheckCircle className="w-4 h-4" /> Saved!</>
+              : <><Save className="w-4 h-4" /> Save Hero Title</>}
           </motion.button>
         </motion.div>
 

@@ -13,6 +13,9 @@ export interface AllSettingsResponse {
   tournament_start: string
   banner_line1: string
   banner_line2: string
+  hero_line1: string
+  hero_line2: string
+  hero_line3: string
 }
 
 export async function getTournamentDate(): Promise<TournamentDateResponse> {
@@ -32,5 +35,10 @@ export async function getAllSettings(): Promise<AllSettingsResponse> {
 
 export async function updateBanner(banner_line1: string, banner_line2: string): Promise<BannerResponse> {
   const res = await client.put('/settings/banner', { banner_line1, banner_line2 })
+  return res.data
+}
+
+export async function updateHero(hero_line1: string, hero_line2: string, hero_line3: string): Promise<{ hero_line1: string; hero_line2: string; hero_line3: string }> {
+  const res = await client.put('/settings/hero', { hero_line1, hero_line2, hero_line3 })
   return res.data
 }

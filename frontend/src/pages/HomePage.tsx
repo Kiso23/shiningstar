@@ -47,12 +47,18 @@ export default function HomePage() {
   const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
   const [bannerLine1, setBannerLine1] = useState('Shining Star United FC')
   const [bannerLine2, setBannerLine2] = useState('Football Tournament')
+  const [heroLine1, setHeroLine1] = useState('Shining')
+  const [heroLine2, setHeroLine2] = useState('Star')
+  const [heroLine3, setHeroLine3] = useState('United FC')
 
   useEffect(() => {
     getAllSettings().then((s) => {
       setTargetDate(new Date(s.tournament_start))
       setBannerLine1(s.banner_line1)
       setBannerLine2(s.banner_line2)
+      setHeroLine1(s.hero_line1 || 'Shining')
+      setHeroLine2(s.hero_line2 || 'Star')
+      setHeroLine3(s.hero_line3 || 'United FC')
     }).catch(() => {})
   }, [])
 
@@ -170,7 +176,7 @@ export default function HomePage() {
             <motion.h1 initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
               className="text-4xl sm:text-6xl lg:text-7xl font-black leading-none mb-4 sm:mb-6 uppercase"
               style={{ color: textMain }}>
-              Shining<br />Star<br /><span className="text-orange-500">United FC</span>
+              {heroLine1}<br />{heroLine2}<br /><span className="text-orange-500">{heroLine3}</span>
             </motion.h1>
 
             <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}

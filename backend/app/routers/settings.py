@@ -14,6 +14,9 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 DEFAULT_TOURNAMENT_DATE = "2026-07-08T08:00:00"
 DEFAULT_BANNER_LINE1 = "Shining Star United FC"
 DEFAULT_BANNER_LINE2 = "Football Tournament"
+DEFAULT_HERO_LINE1 = "Shining"
+DEFAULT_HERO_LINE2 = "Star"
+DEFAULT_HERO_LINE3 = "United FC"
 
 
 class TournamentDateUpdate(BaseModel):
@@ -38,6 +41,9 @@ class AllSettingsResponse(BaseModel):
     tournament_start: str
     banner_line1: str
     banner_line2: str
+    hero_line1: str
+    hero_line2: str
+    hero_line3: str
 
 
 # ── Public: get tournament start date ────────────────────────────────────────
@@ -98,6 +104,9 @@ async def get_all_settings(db: AsyncSession = Depends(get_db)):
         tournament_start=rows.get("tournament_start", DEFAULT_TOURNAMENT_DATE),
         banner_line1=rows.get("banner_line1", DEFAULT_BANNER_LINE1),
         banner_line2=rows.get("banner_line2", DEFAULT_BANNER_LINE2),
+        hero_line1=rows.get("hero_line1", DEFAULT_HERO_LINE1),
+        hero_line2=rows.get("hero_line2", DEFAULT_HERO_LINE2),
+        hero_line3=rows.get("hero_line3", DEFAULT_HERO_LINE3),
     )
 
 
@@ -134,3 +143,39 @@ async def update_banner(
 
     await db.commit()
     return BannerResponse(banner_line1=body.banner_line1, banner_line2=body.banner_line2)
+
+
+class HeroUpdate(BaseModel):
+    hero_line1: str
+    hero_line2: str
+    hero_line3: str
+
+
+class HeroResponse(BaseModel):
+    hero_line1: str
+    hero_line2: str
+    hero_line3: str
+
+
+@router.put("/hero", response_model=HeroResponse)
+async def update_hero(
+    body: HeroUpdate,
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Admin-only — update the homepage hero title text."""
+    result = await db.execute(select(Setting))
+    rows = {s.key: s for s in result.scalars().all()}
+
+    for key, value in [
+        ("hero_line1", body.hero_line1),
+        ("hero_line2", body.hero_line2),
+        ("hero_line3", body.hero_line3),
+    ]:
+        if key in rows:
+            rows[key].value = value
+        else:
+            db.add(Setting(key=key, value=value))
+
+    await db.commit()
+    return HeroResponse(hero_line1=body.hero_line1, hero_line2=body.hero_line2, hero_line3=body.hero_line3)
