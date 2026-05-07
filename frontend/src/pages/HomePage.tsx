@@ -401,6 +401,55 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ══ RULES & REGULATIONS ══ */}
+      <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
+            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Official</p>
+            <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">Rules & Regulations</h2>
+            <p style={{ color: textMute }} className="mt-2 text-sm">SSU Champions Trophy — As per Assam Football Association / AIFF Guidelines</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { num: '01', title: 'Laws of the Game', body: 'All matches played per official FIFA/AIFF Laws adopted by Assam Football Association.' },
+              { num: '02', title: 'Team & Players', body: 'Up to 15–18 players per team. Only registered players may play. A player cannot represent more than one team.' },
+              { num: '03', title: 'Player Identification', body: 'Valid ID proof required if asked. Any fake player leads to immediate disqualification.' },
+              { num: '04', title: 'Match Duration', body: '30 minutes per match (15–15 halves). 5–10 minute break between halves.' },
+              { num: '05', title: 'Equipment', body: 'Jersey, shorts, socks, shin guards mandatory. No dangerous items allowed.' },
+              { num: '06', title: 'Substitution Rules', body: 'Rolling substitutions allowed as per local tournament rules.' },
+              { num: '07', title: 'Referee Authority', body: 'Official referee controls the match. Referee decision is final and binding.' },
+              { num: '08', title: 'Discipline', body: 'Yellow card = warning. Two yellows = next match suspension. Red card = direct suspension by committee.' },
+              { num: '09', title: 'Reporting Time', body: 'Teams must report 30 minutes before match. Late teams may be given a walkover.' },
+              { num: '10', title: 'Match Result', body: 'Draw → Direct penalty shootout. No extra time unless decided by organizers.' },
+              { num: '11', title: 'Protest & Appeal', body: 'Protests must be submitted immediately after the match. Organizing committee decision is final.' },
+              { num: '12', title: 'Misconduct', body: 'Indiscipline, fighting, or abuse leads to disqualification.' },
+              { num: '13', title: 'Organizer Rights', body: 'Organizing committee reserves the right to modify rules if necessary.' },
+            ].map(({ num, title, body }, i) => (
+              <motion.div key={num}
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+                style={{ backgroundColor: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(17,31,17,0.7)', borderColor: border }}
+                className="p-4 rounded-xl border flex gap-3">
+                <span className="text-2xl font-black text-orange-500/30 leading-none shrink-0 w-8">{num}</span>
+                <div>
+                  <p style={{ color: textMain }} className="font-bold text-sm mb-1">{title}</p>
+                  <p style={{ color: textMute }} className="text-xs leading-relaxed">{body}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Note */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}
+            className="mt-6 p-4 rounded-xl border border-orange-500/30 text-center"
+            style={{ backgroundColor: 'rgba(249,115,22,0.08)' }}>
+            <p className="text-orange-400 font-bold text-sm">
+              ⚽ Fair play, discipline, and respect must be maintained as per AFA standards. Thank you!
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ══ CTA ══ */}
       <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
