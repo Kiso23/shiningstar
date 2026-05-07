@@ -4,9 +4,6 @@ import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
-import ThemeToggle from '../components/shared/ThemeToggle'
-import { useTheme } from '../context/ThemeContext'
-
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
 // Mid dark:     #0e1a0e  (deep forest green-black)
@@ -41,8 +38,8 @@ const STEPS = [
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const { theme } = useTheme()
-  const isLight = theme === 'light'
+export default function HomePage() {
+  const navigate = useNavigate()
 
   const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
   const [bannerLine1, setBannerLine1] = useState('Shining Star United FC')
@@ -83,23 +80,23 @@ export default function HomePage() {
 
   useEffect(() => { trackVisit('home') }, [])
 
-  // Theme-aware colors
-  const bg       = isLight ? '#f0fdf4' : '#080c08'
-  const bgMid    = isLight ? '#ffffff' : '#0e1a0e'
-  const bgCard   = isLight ? 'rgba(255,255,255,0.95)' : 'rgba(17,31,17,0.85)'
-  const border   = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)'
-  const textMain = isLight ? '#0f1f0f' : '#f0f4f0'
-  const textMute = isLight ? '#4b5563' : '#6b7a6b'
+  // Dark mode only — fixed colors
+  const bg       = '#080c08'
+  const bgMid    = '#0e1a0e'
+  const bgCard   = 'rgba(17,31,17,0.85)'
+  const border   = 'rgba(255,255,255,0.06)'
+  const textMain = '#f0f4f0'
+  const textMute = '#6b7a6b'
 
   return (
-    <div style={{ backgroundColor: bg }} className="min-h-screen overflow-x-hidden text-white transition-colors duration-300">
+    <div style={{ backgroundColor: bg }} className="min-h-screen overflow-x-hidden text-white">
 
       {/* ══ NAVBAR ══ */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        style={{ backgroundColor: isLight ? 'rgba(240,253,244,0.97)' : 'rgba(8,12,8,0.92)', borderBottomColor: border }}
+        style={{ backgroundColor: 'rgba(8,12,8,0.92)', borderBottomColor: border }}
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 backdrop-blur-xl border-b transition-colors duration-300"
       >
         <div className="flex items-center gap-2">
@@ -130,7 +127,6 @@ export default function HomePage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/register')}
             className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg transition-colors whitespace-nowrap">
@@ -143,8 +139,7 @@ export default function HomePage() {
       <section className="relative min-h-screen flex items-center overflow-hidden">
 
         {/* Video background */}
-        {!isLight && (
-          <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
             <video autoPlay muted loop playsInline
               className="absolute w-full h-full object-cover pointer-events-none"
               style={{ opacity: 0.85 }}>
@@ -154,14 +149,6 @@ export default function HomePage() {
             <div className="absolute bottom-0 left-0 right-0 h-1/3"
               style={{ background: 'linear-gradient(0deg, rgba(8,12,8,0.9) 0%, transparent 100%)' }} />
           </div>
-        )}
-
-        {/* Light mode hero bg */}
-        {isLight && (
-          <div className="absolute inset-0" style={{
-            background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 50%, #a7f3d0 100%)',
-          }} />
-        )}
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
@@ -226,7 +213,7 @@ export default function HomePage() {
               ) : (
                 <div className="grid grid-cols-4 gap-2 text-center">
                   {[{ val: countdown.days, label: 'Days' }, { val: countdown.hrs, label: 'Hrs' }, { val: countdown.mins, label: 'Mins' }, { val: countdown.secs, label: 'Secs' }].map(({ val, label }) => (
-                    <div key={label} style={{ backgroundColor: isLight ? '#f0fdf4' : '#050a05' }} className="rounded-xl p-2 sm:p-3">
+                    <div key={label} style={{ backgroundColor: '#050a05' }} className="rounded-xl p-2 sm:p-3">
                       <p style={{ color: textMain }} className="text-xl sm:text-2xl font-black tabular-nums">{String(val).padStart(2, '0')}</p>
                       <p style={{ color: textMute }} className="text-xs mt-0.5">{label}</p>
                     </div>
@@ -434,7 +421,7 @@ export default function HomePage() {
             ].map(({ num, title, body }, i) => (
               <motion.div key={num}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                style={{ backgroundColor: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(17,31,17,0.7)', borderColor: border }}
+                style={{ backgroundColor: 'rgba(17,31,17,0.7)', borderColor: border }}
                 className="p-4 rounded-xl border flex gap-3">
                 <span className="text-2xl font-black text-orange-500/30 leading-none shrink-0 w-8">{num}</span>
                 <div>
@@ -489,7 +476,7 @@ export default function HomePage() {
                 transition={{ delay: i * 0.07, duration: 0.4, ease: 'easeOut' }}
                 whileHover={{ y: -4, scale: 1.02 }}
                 style={{
-                  backgroundColor: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(10,20,15,0.8)',
+                  backgroundColor: 'rgba(10,20,15,0.8)',
                   borderColor: `${color}30`,
                   borderWidth: 1,
                   borderStyle: 'solid',
@@ -547,7 +534,7 @@ export default function HomePage() {
       </section>
 
       {/* ══ FOOTER ══ */}
-      <footer style={{ backgroundColor: isLight ? '#f0fdf4' : '#050a05', borderTopColor: border }} className="border-t py-8 px-6 transition-colors duration-300">
+      <footer style={{ backgroundColor: '#050a05', borderTopColor: border }} className="border-t py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
