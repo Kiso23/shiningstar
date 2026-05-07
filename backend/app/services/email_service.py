@@ -265,9 +265,10 @@ Team Name       : {team_name}
     # Generate and attach PDF for approved registrations
     pdf_bytes = None
     pdf_name = None
+    rules_pdf_bytes = None
     if new_status == "approved" and players is not None:
         try:
-            from app.services.pdf_service import generate_registration_pdf
+            from app.services.pdf_service import generate_registration_pdf, generate_rules_pdf
             from datetime import datetime as _dt
             pdf_bytes = generate_registration_pdf(
                 team_name=team_name,
@@ -281,7 +282,44 @@ Team Name       : {team_name}
                 players=players,
             )
             pdf_name = f"{registration_id}_{team_name.replace(' ', '_')}.pdf"
+            rules_pdf_bytes = generate_rules_pdf()
         except Exception as e:
             logger.warning("Could not generate PDF attachment: %s", e)
 
+    # Send registration PDF
     await _send(to_email, subject, _base_html(html_content), text_content, pdf_bytes, pdf_name)
+
+    # Send rules PDF as a separate email if approved
+    if new_status == "approved" and rules_pdf_bytes:
+        rules_subject = f"📋 Tournament Rules & Regulations — {TOURNAMENT_NAME}"
+        rules_html = _base_html(f"""
+          <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">📋 Rules & Regulations</h2>
+          <p style="margin:0 0 16px;color:#aaa;font-size:14px;">
+            Hi <strong style="color:#fff;">{manager_name}</strong>, please find attached the official
+            Rules & Regulations for the <strong style="color:#f97316;">SSU Champions Trophy</strong>.
+          </p>
+          <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:16px;">
+            <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
+              Please read the rules carefully and ensure all your players are aware of them before the tournament begins.
+              Fair play, discipline, and respect must be maintained as per AFA standards.
+            </p>
+          </div>
+          <p style="margin:0;color:#666;font-size:12px;">
+            Tournament Date: <strong style="color:#f97316;">08 July 2026</strong> &nbsp;|&nbsp;
+            Venue: <strong style="color:#fff;">Rongbong Ronghang Playground</strong>
+          </p>
+        """)
+        rules_text = f"""Tournament Rules & Regulations — {TOURNAMENT_NAME}
+
+Hi {manager_name},
+
+Please find attached the official Rules & Regulations for the SSU Champions Trophy.
+
+Tournament Date: 08 July 2026
+Venue: Rongbong Ronghang Playground
+
+Fair play, discipline, and respect must be maintained as per AFA standards.
+
+© 2025 Shining Star United"""
+        await _send(to_email, rules_subject, rules_html, rules_text,
+                    rules_pdf_bytes, "SSU_Champions_Trophy_Rules_Regulations.pdf")

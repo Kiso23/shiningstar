@@ -192,3 +192,137 @@ def generate_registration_pdf(
 
     doc.build(story)
     return buffer.getvalue()
+
+
+# ── Rules & Regulations PDF ───────────────────────────────────────────────────
+
+TOURNAMENT_RULES = [
+    ("1. Laws of the Game",
+     "All matches will be played according to the official Laws of the Game (FIFA/AIFF) adopted by Assam Football Association."),
+    ("2. Team & Players",
+     "• Each team can register up to 15–18 players\n• Only registered players are allowed to play\n• A player cannot represent more than one team"),
+    ("3. Player Identification",
+     "• Players must produce valid ID proof if required\n• Any fake player will lead to disqualification"),
+    ("4. Match Duration",
+     "• Each match: 30 minutes (15–15 halves)\n• 5–10 minutes break (Organizer may adjust based on schedule)"),
+    ("5. Equipment",
+     "• Proper jersey, shorts, socks, shin guards mandatory\n• No dangerous items allowed"),
+    ("6. Substitution Rules",
+     "Rolling substitutions allowed (as per local tournament rules)"),
+    ("7. Referee Authority",
+     "• Match will be controlled by official referee\n• Referee decision is final and binding"),
+    ("8. Discipline",
+     "• Yellow card = warning\n• Two yellow cards = suspension for next match\n• Red card = direct suspension (decision by committee)"),
+    ("9. Reporting Time",
+     "• Teams must report at least 30 minutes before match\n• Late team may be given walkover"),
+    ("10. Match Result",
+     "• Draw match → Direct penalty shootout\n• No extra time (unless decided by organizers)"),
+    ("11. Protest & Appeal",
+     "• Any protest must be submitted immediately after match\n• Decision of organizing committee will be final"),
+    ("12. Misconduct",
+     "Any indiscipline, fighting, or abuse will lead to disqualification"),
+    ("13. Organizer Rights",
+     "Organizing committee reserves the right to modify rules if necessary"),
+]
+
+
+def generate_rules_pdf() -> bytes:
+    """Generate the Rules & Regulations PDF and return as bytes."""
+    buffer = io.BytesIO()
+    page_w, page_h = A4
+    margin = 20 * mm
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=margin,
+        rightMargin=margin,
+        topMargin=0,
+        bottomMargin=15 * mm,
+    )
+
+    story = []
+
+    # ── Orange header ─────────────────────────────────────────────────────────
+    header_data = [['SHINING STAR UNITED FC']]
+    header_table = Table(header_data, colWidths=[page_w - 2 * margin])
+    header_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), ORANGE),
+        ('TEXTCOLOR', (0, 0), (-1, -1), WHITE),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 16),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    story.append(header_table)
+
+    sub_data = [['SSU Champions Trophy — Rules & Regulations']]
+    sub_table = Table(sub_data, colWidths=[page_w - 2 * margin])
+    sub_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), DARK),
+        ('TEXTCOLOR', (0, 0), (-1, -1), WHITE),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    story.append(sub_table)
+    story.append(Spacer(1, 6 * mm))
+
+    # ── Intro ─────────────────────────────────────────────────────────────────
+    intro_style = ParagraphStyle('intro', fontName='Helvetica-Bold', fontSize=10,
+                                  textColor=DARK, spaceAfter=4)
+    story.append(Paragraph(
+        'Rules & Regulations of the Tournament: SSU Champions Trophy',
+        intro_style
+    ))
+    sub_intro = ParagraphStyle('subintro', fontName='Helvetica', fontSize=9,
+                                textColor=GRAY, spaceAfter=6)
+    story.append(Paragraph(
+        'Follow as per Assam Football Association / AIFF Guidelines.',
+        sub_intro
+    ))
+    story.append(HRFlowable(width='100%', thickness=1, color=ORANGE))
+    story.append(Spacer(1, 4 * mm))
+
+    # ── Rules ─────────────────────────────────────────────────────────────────
+    title_style = ParagraphStyle('rtitle', fontName='Helvetica-Bold', fontSize=10,
+                                  textColor=ORANGE, spaceBefore=6, spaceAfter=2)
+    body_style = ParagraphStyle('rbody', fontName='Helvetica', fontSize=9,
+                                 textColor=DARK, leading=14, spaceAfter=4,
+                                 leftIndent=4 * mm)
+
+    for title, body in TOURNAMENT_RULES:
+        story.append(Paragraph(title, title_style))
+        # Replace \n with <br/> for ReportLab
+        body_html = body.replace('\n', '<br/>')
+        story.append(Paragraph(body_html, body_style))
+
+    story.append(Spacer(1, 6 * mm))
+    story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#d1d5db')))
+    story.append(Spacer(1, 3 * mm))
+
+    # ── Note ──────────────────────────────────────────────────────────────────
+    note_style = ParagraphStyle('note', fontName='Helvetica-Bold', fontSize=9,
+                                 textColor=DARK, alignment=TA_CENTER)
+    story.append(Paragraph(
+        'Note: Fair play, discipline, and respect must be maintained as per AFA standards. Thank you!',
+        note_style
+    ))
+    story.append(Spacer(1, 4 * mm))
+
+    # ── Footer ────────────────────────────────────────────────────────────────
+    story.append(HRFlowable(width='100%', thickness=1, color=ORANGE))
+    story.append(Spacer(1, 3 * mm))
+    footer_style = ParagraphStyle('footer', fontName='Helvetica-Oblique', fontSize=8,
+                                   textColor=GRAY, alignment=TA_CENTER)
+    story.append(Paragraph('Shining Star United FC — Tournament Registration System', footer_style))
+    story.append(Paragraph(
+        f'Generated: {datetime.utcnow().strftime("%d %B %Y, %H:%M UTC")}',
+        footer_style
+    ))
+
+    doc.build(story)
+    return buffer.getvalue()
