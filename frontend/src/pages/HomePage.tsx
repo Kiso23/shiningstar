@@ -461,7 +461,7 @@ export default function HomePage() {
               { no: '05', name: 'Mr. Sarmon Lekthe', role: 'Finance Secretary', color: '#14b8a6' },
               { no: '06', name: 'Mr. Bimol Ingti', role: 'Treasurer', color: '#22c55e' },
               { no: '07', name: 'Mr. Timothy Tokbi', role: 'Head Coach', color: '#06b6d4' },
-              { no: '08', name: 'Mr. Lalin Phangcho', role: 'Manager', color: '#3b82f6' },
+              { no: '08', name: 'Mr. Jalinson Phangcho', role: 'Manager', color: '#3b82f6' },
               { no: '09', name: 'Mr. Birlong Kro', role: 'Medical Officer / Physio', color: '#10b981' },
               { no: '10', name: 'Mr. Enoch Rongpi', role: 'Captain', color: '#f59e0b' },
               { no: '11', name: 'Mr. Winnerstone', role: 'Vice Captain', color: '#84cc16' },
