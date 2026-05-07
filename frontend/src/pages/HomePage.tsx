@@ -38,8 +38,6 @@ const STEPS = [
 
 export default function HomePage() {
   const navigate = useNavigate()
-export default function HomePage() {
-  const navigate = useNavigate()
 
   const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
   const [bannerLine1, setBannerLine1] = useState('Shining Star United FC')
@@ -140,15 +138,15 @@ export default function HomePage() {
 
         {/* Video background */}
         <div className="absolute inset-0 overflow-hidden">
-            <video autoPlay muted loop playsInline
-              className="absolute w-full h-full object-cover pointer-events-none"
-              style={{ opacity: 0.85 }}>
-              <source src="/stadium.mp4" type="video/mp4" />
-            </video>
-            <div className="absolute inset-0" style={{ background: 'rgba(8,12,8,0.45)' }} />
-            <div className="absolute bottom-0 left-0 right-0 h-1/3"
-              style={{ background: 'linear-gradient(0deg, rgba(8,12,8,0.9) 0%, transparent 100%)' }} />
-          </div>
+          <video autoPlay muted loop playsInline
+            className="absolute w-full h-full object-cover pointer-events-none"
+            style={{ opacity: 0.85 }}>
+            <source src="/stadium.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0" style={{ background: 'rgba(8,12,8,0.45)' }} />
+          <div className="absolute bottom-0 left-0 right-0 h-1/3"
+            style={{ background: 'linear-gradient(0deg, rgba(8,12,8,0.9) 0%, transparent 100%)' }} />
+        </div>
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
