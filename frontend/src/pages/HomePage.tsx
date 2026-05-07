@@ -28,7 +28,7 @@ const TOURNAMENT = {
 const PRIZES = [
   { place: '🥇 Winner', amount: '₹8,000', color: 'from-yellow-500/15 to-yellow-600/5 border-yellow-500/25' },
   { place: '🥈 Runner-Up', amount: '₹4,000', color: 'from-slate-400/15 to-slate-500/5 border-slate-400/25' },
-  { place: '🏅 Player of Tournament', amount: '₹500', color: 'from-orange-500/15 to-orange-600/5 border-orange-500/25' },
+  { place: '🏅 Player of the Tournament', amount: '₹500', color: 'from-orange-500/15 to-orange-600/5 border-orange-500/25' },
   { place: '🧤 Best Keeper', amount: '₹500', color: 'from-green-500/15 to-green-600/5 border-green-500/25' },
 ]
 
