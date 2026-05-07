@@ -456,8 +456,73 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ CTA ══ */}
+      {/* ══ OFFICIAL BEARERS ══ */}
       <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12 text-center">
+            <p className="text-emerald-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">SSU FC</p>
+            <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">Official Bearers</h2>
+            <p style={{ color: textMute }} className="mt-3 text-sm max-w-xl mx-auto">
+              The dedicated team behind Shining Star United FC
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { no: '01', name: 'Mr. Thekphrong Hanse', role: 'President', color: '#10b981', icon: '👑' },
+              { no: '02', name: 'Mr. Diamond Tokbi', role: 'Vice President', color: '#06b6d4', icon: '⭐' },
+              { no: '03', name: 'Mr. Jeffry Timung', role: 'General Secretary', color: '#3b82f6', icon: '📋' },
+              { no: '04', name: 'Mr. Sarlongki Teron', role: 'Assistant Secretary', color: '#8b5cf6', icon: '📝' },
+              { no: '05', name: 'Mr. Sarmon Lekthe', role: 'Finance Secretary', color: '#14b8a6', icon: '💼' },
+              { no: '06', name: 'Mr. Bimol Ingti', role: 'Treasurer', color: '#22c55e', icon: '💰' },
+              { no: '07', name: 'Mr. Timothy Tokbi', role: 'Head Coach', color: '#06b6d4', icon: '🎯' },
+              { no: '08', name: 'Mr. Lalin Phangcho', role: 'Manager', color: '#3b82f6', icon: '🗂️' },
+              { no: '09', name: 'Mr. Birlong Kro', role: 'Medical Officer / Physio', color: '#10b981', icon: '🏥' },
+              { no: '10', name: 'Mr. Enoch Rongpi', role: 'Captain', color: '#f59e0b', icon: '🏆' },
+              { no: '11', name: 'Mr. Winnerstone', role: 'Vice Captain', color: '#84cc16', icon: '⚡' },
+            ].map(({ no, name, role, color, icon }, i) => (
+              <motion.div
+                key={no}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.07, duration: 0.4, ease: 'easeOut' }}
+                whileHover={{ y: -4, scale: 1.02 }}
+                style={{
+                  backgroundColor: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(10,20,15,0.8)',
+                  borderColor: `${color}30`,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                }}
+                className="rounded-2xl p-5 flex items-center gap-4 cursor-default backdrop-blur-sm"
+              >
+                {/* Number badge */}
+                <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm"
+                  style={{ backgroundColor: `${color}20`, color }}>
+                  {no}
+                </div>
+
+                {/* Icon */}
+                <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                  style={{ backgroundColor: `${color}15` }}>
+                  {icon}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p style={{ color: textMain }} className="font-bold text-sm truncate">{name}</p>
+                  <p className="text-xs font-semibold mt-0.5" style={{ color }}>{role}</p>
+                </div>
+
+                {/* Accent line */}
+                <div className="shrink-0 w-1 h-10 rounded-full" style={{ backgroundColor: color }} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ CTA ══ */}      <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
             className="relative overflow-hidden rounded-2xl p-8 sm:p-12 text-center"
