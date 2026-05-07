@@ -28,7 +28,7 @@ const TOURNAMENT = {
 const PRIZES = [
   { place: '🥇 Winner', amount: '₹8,000', color: 'from-yellow-500/15 to-yellow-600/5 border-yellow-500/25' },
   { place: '🥈 Runner-Up', amount: '₹4,000', color: 'from-slate-400/15 to-slate-500/5 border-slate-400/25' },
-  { place: '🏅 Man of Tournament', amount: '₹500', color: 'from-orange-500/15 to-orange-600/5 border-orange-500/25' },
+  { place: '🏅 Player of Tournament', amount: '₹500', color: 'from-orange-500/15 to-orange-600/5 border-orange-500/25' },
   { place: '🧤 Best Keeper', amount: '₹500', color: 'from-green-500/15 to-green-600/5 border-green-500/25' },
 ]
 
@@ -421,7 +421,7 @@ export default function HomePage() {
               { num: '01', title: 'Laws of the Game', body: 'All matches played per official FIFA/AIFF Laws adopted by Assam Football Association.' },
               { num: '02', title: 'Team & Players', body: 'Up to 15–18 players per team. Only registered players may play. A player cannot represent more than one team.' },
               { num: '03', title: 'Player Identification', body: 'Valid ID proof required if asked. Any fake player leads to immediate disqualification.' },
-              { num: '04', title: 'Match Duration', body: '30 minutes per match (15–15 halves). 5–10 minute break between halves.' },
+              { num: '04', title: 'Match Duration', body: '60 minutes per match (30–30 halves). 5–10 minute break between halves.' },
               { num: '05', title: 'Equipment', body: 'Jersey, shorts, socks, shin guards mandatory. No dangerous items allowed.' },
               { num: '06', title: 'Substitution Rules', body: 'Rolling substitutions allowed as per local tournament rules.' },
               { num: '07', title: 'Referee Authority', body: 'Official referee controls the match. Referee decision is final and binding.' },
