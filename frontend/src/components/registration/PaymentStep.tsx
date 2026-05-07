@@ -8,9 +8,21 @@ import { useRegistrationStore } from '../../store/registrationStore'
 
 const UPI_ID = 'sarlongkisarlongki143@okhdfcbank'
 const UPI_APPS = [
-  { name: 'Google Pay', color: 'from-blue-500/20 to-blue-600/10 border-blue-500/30', emoji: '🔵' },
-  { name: 'PhonePe', color: 'from-purple-500/20 to-purple-600/10 border-purple-500/30', emoji: '🟣' },
-  { name: 'Paytm', color: 'from-sky-500/20 to-sky-600/10 border-sky-500/30', emoji: '🔷' },
+  {
+    name: 'Google Pay',
+    color: 'from-white/10 to-white/5 border-white/10',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png',
+  },
+  {
+    name: 'PhonePe',
+    color: 'from-purple-600/20 to-purple-700/10 border-purple-500/30',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png',
+  },
+  {
+    name: 'Paytm',
+    color: 'from-sky-500/20 to-sky-600/10 border-sky-500/30',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png',
+  },
 ]
 
 interface Props {
@@ -120,12 +132,14 @@ export default function PaymentStep({ onNext, onBack }: Props) {
             Accepted UPI apps
           </p>
           <div className="grid grid-cols-3 gap-3">
-            {UPI_APPS.map(({ name, color, emoji }) => (
+            {UPI_APPS.map(({ name, color, logo }) => (
               <div
                 key={name}
                 className={`p-3 rounded-xl bg-gradient-to-br border text-center text-sm font-medium text-white ${color}`}
               >
-                <div className="text-xl mb-1">{emoji}</div>
+                <div className="w-10 h-10 mx-auto mb-2 rounded-xl overflow-hidden bg-white flex items-center justify-center">
+                  <img src={logo} alt={name} className="w-8 h-8 object-contain" />
+                </div>
                 {name}
               </div>
             ))}
