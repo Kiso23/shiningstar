@@ -469,18 +469,18 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { no: '01', name: 'Mr. Thekphrong Hanse', role: 'President', color: '#10b981', icon: '👑' },
-              { no: '02', name: 'Mr. Diamond Tokbi', role: 'Vice President', color: '#06b6d4', icon: '⭐' },
-              { no: '03', name: 'Mr. Jeffry Timung', role: 'General Secretary', color: '#3b82f6', icon: '📋' },
-              { no: '04', name: 'Mr. Sarlongki Teron', role: 'Assistant Secretary', color: '#8b5cf6', icon: '📝' },
-              { no: '05', name: 'Mr. Sarmon Lekthe', role: 'Finance Secretary', color: '#14b8a6', icon: '💼' },
-              { no: '06', name: 'Mr. Bimol Ingti', role: 'Treasurer', color: '#22c55e', icon: '💰' },
-              { no: '07', name: 'Mr. Timothy Tokbi', role: 'Head Coach', color: '#06b6d4', icon: '🎯' },
-              { no: '08', name: 'Mr. Lalin Phangcho', role: 'Manager', color: '#3b82f6', icon: '🗂️' },
-              { no: '09', name: 'Mr. Birlong Kro', role: 'Medical Officer / Physio', color: '#10b981', icon: '🏥' },
-              { no: '10', name: 'Mr. Enoch Rongpi', role: 'Captain', color: '#f59e0b', icon: '🏆' },
-              { no: '11', name: 'Mr. Winnerstone', role: 'Vice Captain', color: '#84cc16', icon: '⚡' },
-            ].map(({ no, name, role, color, icon }, i) => (
+              { no: '01', name: 'Mr. Thekphrong Hanse', role: 'President', color: '#10b981' },
+              { no: '02', name: 'Mr. Diamond Tokbi', role: 'Vice President', color: '#06b6d4' },
+              { no: '03', name: 'Mr. Jeffry Timung', role: 'General Secretary', color: '#3b82f6' },
+              { no: '04', name: 'Mr. Sarlongki Teron', role: 'Assistant Secretary', color: '#8b5cf6' },
+              { no: '05', name: 'Mr. Sarmon Lekthe', role: 'Finance Secretary', color: '#14b8a6' },
+              { no: '06', name: 'Mr. Bimol Ingti', role: 'Treasurer', color: '#22c55e' },
+              { no: '07', name: 'Mr. Timothy Tokbi', role: 'Head Coach', color: '#06b6d4' },
+              { no: '08', name: 'Mr. Lalin Phangcho', role: 'Manager', color: '#3b82f6' },
+              { no: '09', name: 'Mr. Birlong Kro', role: 'Medical Officer / Physio', color: '#10b981' },
+              { no: '10', name: 'Mr. Enoch Rongpi', role: 'Captain', color: '#f59e0b' },
+              { no: '11', name: 'Mr. Winnerstone', role: 'Vice Captain', color: '#84cc16' },
+            ].map(({ no, name, role, color }, i) => (
               <motion.div
                 key={no}
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -500,12 +500,6 @@ export default function HomePage() {
                 <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm"
                   style={{ backgroundColor: `${color}20`, color }}>
                   {no}
-                </div>
-
-                {/* Icon */}
-                <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                  style={{ backgroundColor: `${color}15` }}>
-                  {icon}
                 </div>
 
                 {/* Info */}
