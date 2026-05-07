@@ -11,7 +11,7 @@ from app.models.setting import Setting
 router = APIRouter(prefix="/settings", tags=["settings"])
 
 # Default tournament start date (ISO string)
-DEFAULT_TOURNAMENT_DATE = "2025-06-15T08:00:00"
+DEFAULT_TOURNAMENT_DATE = "2026-07-08T08:00:00"
 DEFAULT_BANNER_LINE1 = "Shining Star United FC"
 DEFAULT_BANNER_LINE2 = "Football Tournament"
 

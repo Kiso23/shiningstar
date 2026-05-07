@@ -18,11 +18,11 @@ import { useTheme } from '../context/ThemeContext'
 // Text muted:   #6b7a6b  (muted green-grey)
 
 const TOURNAMENT = {
-  date: 'June 15–22, 2025',
+  date: 'July 8, 2026',
   venue: 'Rongbong Ronghang Playground',
   maxTeams: 32,
-  deadline: 'May 31, 2025',
-  startDate: new Date('2025-06-15T08:00:00'),
+  deadline: 'June 30, 2026',
+  startDate: new Date('2026-07-08T08:00:00'),
 }
 
 const PRIZES = [
