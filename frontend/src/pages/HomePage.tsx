@@ -22,13 +22,6 @@ const TOURNAMENT = {
   startDate: new Date('2026-07-08T08:00:00'),
 }
 
-const PRIZES = [
-  { place: '🥇 Winner', amount: '₹8,000', color: 'from-yellow-500/15 to-yellow-600/5 border-yellow-500/25' },
-  { place: '🥈 Runner-Up', amount: '₹4,000', color: 'from-slate-400/15 to-slate-500/5 border-slate-400/25' },
-  { place: '🏅 Player of the Tournament', amount: '₹500', color: 'from-orange-500/15 to-orange-600/5 border-orange-500/25' },
-  { place: '🧤 Best Keeper', amount: '₹500', color: 'from-green-500/15 to-green-600/5 border-green-500/25' },
-]
-
 const STEPS = [
   { n: '01', title: 'Register Team', desc: 'Fill in your team and manager details.' },
   { n: '02', title: 'Add Players', desc: 'Submit your complete player roster.' },
@@ -173,7 +166,7 @@ export default function HomePage() {
 
             <motion.p initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
               style={{ color: textMute }} className="text-sm sm:text-base mb-6 sm:mb-8 leading-relaxed">
-              {TOURNAMENT.date} · {TOURNAMENT.venue}. Up to {TOURNAMENT.maxTeams} teams compete for ₹13,000 in prizes.
+              {TOURNAMENT.date} · {TOURNAMENT.venue}. Up to {TOURNAMENT.maxTeams} teams compete for the championship title.
             </motion.p>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
@@ -253,9 +246,8 @@ export default function HomePage() {
 
       {/* ══ STATS BAR ══ */}
       <section style={{ backgroundColor: '#f97316' }} className="py-4 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-4 gap-2 sm:gap-8 text-center">
-          {[{ val: `${TOURNAMENT.maxTeams}`, label: 'Teams' }, { val: '₹13K', label: 'Prize Pool' }, { val: '8', label: 'Days' }, { val: '₹801', label: 'Entry' }].map(({ val, label }) => (
-            <div key={label}>
+        <div className="max-w-6xl mx-auto grid grid-cols-3 gap-2 sm:gap-8 text-center">
+          {[{ val: `${TOURNAMENT.maxTeams}`, label: 'Teams' }, { val: '8', label: 'Days' }, { val: '₹801', label: 'Entry' }].map(({ val, label }) => (            <div key={label}>
               <p className="text-lg sm:text-2xl font-black text-white">{val}</p>
               <p className="text-orange-200 text-xs font-medium uppercase tracking-wider">{label}</p>
             </div>
@@ -290,21 +282,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Prize Pool */}
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Rewards</p>
-            <h3 style={{ color: textMain }} className="text-3xl font-black uppercase mb-8">Prize Pool</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {PRIZES.map(({ place, amount, color }, i) => (
-                <motion.div key={place} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} whileHover={{ y: -4 }}
-                  className={`p-5 rounded-xl bg-gradient-to-br border text-center ${color}`}>
-                  <p className="text-3xl mb-2">{place.split(' ')[0]}</p>
-                  <p style={{ color: textMain }} className="font-semibold text-xs mb-2">{place.split(' ').slice(1).join(' ')}</p>
-                  <p className="text-2xl font-black text-orange-400">{amount}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          {/* Prize Pool section removed */}
         </div>
       </section>
 
@@ -499,7 +477,7 @@ export default function HomePage() {
               <p className="text-orange-200 font-bold text-xs tracking-[0.3em] uppercase mb-3">Don't Miss Out</p>
               <h2 className="text-4xl sm:text-5xl font-black text-white uppercase mb-4">Ready to Compete?</h2>
               <p className="text-orange-100 text-lg mb-8 max-w-xl mx-auto">
-                Registration closes <strong>{TOURNAMENT.deadline}</strong>. Win your share of <strong>₹13,000</strong>!
+                Registration closes <strong>{TOURNAMENT.deadline}</strong>. Don't miss your chance to compete!
               </p>
               <motion.button whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(255,255,255,0.3)' }} whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/register')}
