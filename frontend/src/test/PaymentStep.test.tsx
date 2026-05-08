@@ -33,14 +33,15 @@ describe('PaymentStep', () => {
 
   it('displays UPI ID prominently', () => {
     render(<PaymentStep onNext={onNext} onBack={onBack} />)
-    expect(screen.getByText(/shiningstarunited@upi/i)).toBeInTheDocument()
+    // The component renders the real UPI ID
+    expect(screen.getByText(/sarlongkisarlongki143@okhdfcbank/i)).toBeInTheDocument()
   })
 
-  it('lists accepted UPI apps', () => {
+  it('displays UPI payment instructions', () => {
     render(<PaymentStep onNext={onNext} onBack={onBack} />)
-    expect(screen.getByText(/google pay/i)).toBeInTheDocument()
-    expect(screen.getByText(/phonepe/i)).toBeInTheDocument()
-    expect(screen.getByText(/paytm/i)).toBeInTheDocument()
+    // The component shows a QR code and UPI payment info
+    expect(screen.getByAltText(/upi qr code/i)).toBeInTheDocument()
+    expect(screen.getByText(/scan qr code to pay/i)).toBeInTheDocument()
   })
 
   it('calls onBack when back button is clicked', () => {

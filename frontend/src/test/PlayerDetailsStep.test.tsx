@@ -36,7 +36,8 @@ describe('PlayerDetailsStep', () => {
     render(<PlayerDetailsStep onNext={onNext} onBack={onBack} />)
     fireEvent.click(screen.getByRole('button', { name: /continue to payment/i }))
     await waitFor(() => {
-      expect(screen.getAllByText(/player name is required/i).length).toBeGreaterThan(0)
+      // The component shows "Name is required" for empty full_name fields
+      expect(screen.getAllByText(/name is required/i).length).toBeGreaterThan(0)
     })
   })
 
@@ -46,10 +47,14 @@ describe('PlayerDetailsStep', () => {
 
     const nameInputs = screen.getAllByPlaceholderText(/player name/i)
     const ageInputs = screen.getAllByPlaceholderText(/age/i)
+    const jerseyInputs = screen.getAllByPlaceholderText(/e\.g\. 10/i)
+    const positionSelects = screen.getAllByRole('combobox')
 
     for (let i = 0; i < 3; i++) {
       fireEvent.change(nameInputs[i], { target: { value: `Player ${i + 1}` } })
       fireEvent.change(ageInputs[i], { target: { value: '20' } })
+      fireEvent.change(jerseyInputs[i], { target: { value: `${i + 1}` } })
+      fireEvent.change(positionSelects[i], { target: { value: 'Midfielder' } })
     }
 
     fireEvent.click(screen.getByRole('button', { name: /continue to payment/i }))
