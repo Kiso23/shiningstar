@@ -33,6 +33,8 @@ async def _run_migrations() -> None:
             # Allow NULL team IDs for TBD slots in bracket
             "ALTER TABLE matches ALTER COLUMN team_a_id DROP NOT NULL",
             "ALTER TABLE matches ALTER COLUMN team_b_id DROP NOT NULL",
+            # Add address column to teams
+            "ALTER TABLE teams ADD COLUMN IF NOT EXISTS address VARCHAR(300)",
         ]:
             await conn.execute(__import__('sqlalchemy').text(sql))
     logger.info("Migrations complete.")

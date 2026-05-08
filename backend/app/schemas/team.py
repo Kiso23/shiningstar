@@ -12,6 +12,7 @@ class TeamCreate(BaseModel):
     contact_phone: str = Field(..., pattern=r"^\d{10}$")
     contact_email: EmailStr
     player_count: int = Field(..., ge=7, le=18)
+    address: Optional[str] = Field(None, max_length=300)
 
 
 class PaymentProofResponse(BaseModel):
@@ -31,6 +32,7 @@ class TeamResponse(BaseModel):
     contact_phone: str
     contact_email: str
     player_count: int
+    address: Optional[str] = None
     status: RegistrationStatus
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)

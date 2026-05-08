@@ -40,6 +40,7 @@ async def create_team(db: AsyncSession, data: TeamCreate, logo_path: Optional[st
         contact_phone=data.contact_phone,
         contact_email=data.contact_email,
         player_count=data.player_count,
+        address=sanitize_text(data.address) if data.address else None,
         logo_path=logo_path,
         status=RegistrationStatus.pending.value,
     )

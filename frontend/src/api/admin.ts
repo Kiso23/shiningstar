@@ -3,6 +3,7 @@ import type { TeamResponse } from './registrations'
 
 export interface TeamDetail extends TeamResponse {
   id: string
+  address?: string
   logo_path?: string
   updated_at: string
   players: { id: string; full_name: string; age: number; jersey_number: number; position: string; position_index: number }[]

@@ -16,6 +16,7 @@ class Team(Base):
     contact_phone: Mapped[str] = mapped_column(String(15))
     contact_email: Mapped[str] = mapped_column(String(254))
     player_count: Mapped[int] = mapped_column(Integer)
+    address: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
     logo_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

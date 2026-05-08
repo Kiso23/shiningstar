@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { AlertCircle, Loader2, Users, Mail, Phone, User, Shield } from 'lucide-react'
+import { AlertCircle, Loader2, Users, Mail, Phone, User, Shield, MapPin } from 'lucide-react'
 import FileUpload from '../shared/FileUpload'
 import { createTeam } from '../../api/registrations'
 import { extractErrorMessage } from '../../api/errors'
@@ -19,6 +19,7 @@ const schema = z.object({
     .int()
     .min(7, 'Minimum 7 players')
     .max(18, 'Maximum 18 players'),
+  address: z.string().max(300, 'Max 300 characters').optional(),
 })
 
 type FormData = z.infer<typeof schema>
@@ -147,10 +148,31 @@ export default function TeamDetailsStep({ onNext }: Props) {
           )}
         </div>
 
+        {/* Address */}
+        <div>
+          <label className="label">
+            <span className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-orange-400" />
+              Address (optional)
+            </span>
+          </label>
+          <input
+            {...register('address')}
+            type="text"
+            placeholder="Village / Town, District"
+            className={`input-field ${errors.address ? 'input-error' : ''}`}
+          />
+          {errors.address && (
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="error-text">
+              <AlertCircle className="w-3.5 h-3.5" />
+              {errors.address.message}
+            </motion.p>
+          )}
+        </div>
+
         {/* Logo upload */}
         <div>
-          <label className="label">Team Logo (optional)</label>
-          <FileUpload
+          <label className="label">Team Logo (optional)</label>          <FileUpload
             accept="image/jpeg,image/png"
             maxSizeBytes={2 * 1024 * 1024}
             label="Upload team logo (JPEG/PNG, max 2 MB)"

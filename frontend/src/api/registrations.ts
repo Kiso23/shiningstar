@@ -6,6 +6,7 @@ export interface TeamCreateData {
   contact_phone: string
   contact_email: string
   player_count: number
+  address?: string
 }
 
 export interface PlayerData {

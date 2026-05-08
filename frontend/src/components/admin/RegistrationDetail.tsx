@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2, CheckCircle, XCircle, User, Phone, Mail,
-  Users, Calendar, Image, AlertCircle, ChevronDown, ChevronUp, Trash2, Download
+  Users, Calendar, Image, AlertCircle, ChevronDown, ChevronUp, Trash2, Download, MapPin
 } from 'lucide-react'
 import { getRegistrationDetail, updateStatus, deleteRegistration } from '../../api/admin'
 import type { TeamDetail } from '../../api/admin'
@@ -292,9 +292,9 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
           { icon: Phone, label: 'Phone', value: detail.contact_phone },
           { icon: Mail, label: 'Email', value: detail.contact_email },
           { icon: Users, label: 'Players', value: `${detail.player_count} players` },
+          ...(detail.address ? [{ icon: MapPin, label: 'Address', value: detail.address }] : []),
           {
-            icon: Calendar, label: 'Registered',
-            value: new Date(detail.created_at).toLocaleDateString('en-IN', {
+            icon: Calendar, label: 'Registered',            value: new Date(detail.created_at).toLocaleDateString('en-IN', {
               day: 'numeric', month: 'short', year: 'numeric',
             }),
           },
