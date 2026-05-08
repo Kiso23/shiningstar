@@ -11,7 +11,7 @@ class TeamCreate(BaseModel):
     manager_name: str = Field(..., min_length=1, max_length=100)
     contact_phone: str = Field(..., pattern=r"^\d{10}$")
     contact_email: EmailStr
-    player_count: int = Field(..., ge=7, le=18)
+    player_count: int = Field(..., ge=11, le=18)
     address: Optional[str] = Field(None, max_length=300)
 
 

@@ -3,14 +3,16 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2, Star } from 'lucide-react'
 import { submitPlayers } from '../../api/registrations'
 import { extractErrorMessage } from '../../api/errors'
 import { useRegistrationStore } from '../../store/registrationStore'
 
 const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'] as const
+const REQUIRED_PLAYERS = 11 // First 11 are mandatory
 
-const playerSchema = z.object({
+// Required player schema (all fields mandatory)
+const requiredPlayerSchema = z.object({
   full_name: z.string().min(1, 'Name is required').max(100),
   age: z.number({ invalid_type_error: 'Age is required' }).int().min(5, 'Min 5').max(60, 'Max 60'),
   jersey_number: z
@@ -21,8 +23,17 @@ const playerSchema = z.object({
   position: z.enum(POSITIONS, { errorMap: () => ({ message: 'Select a position' }) }),
 })
 
+// Optional player schema (all fields optional — skip if empty)
+const optionalPlayerSchema = z.object({
+  full_name: z.string().max(100).optional().or(z.literal('')),
+  age: z.number().int().min(5).max(60).optional().or(z.nan()),
+  jersey_number: z.number().int().min(1).max(99).optional().or(z.nan()),
+  position: z.string().optional().or(z.literal('')),
+})
+
 const schema = z.object({
-  players: z.array(playerSchema),
+  required_players: z.array(requiredPlayerSchema),
+  optional_players: z.array(optionalPlayerSchema),
 })
 
 type FormData = z.infer<typeof schema>
@@ -34,7 +45,8 @@ interface Props {
 
 export default function PlayerDetailsStep({ onNext, onBack }: Props) {
   const { registrationId, teamData, setPlayerData } = useRegistrationStore()
-  const playerCount = teamData?.player_count || 7
+  const playerCount = teamData?.player_count || 11
+  const optionalCount = Math.max(0, playerCount - REQUIRED_PLAYERS)
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
@@ -44,7 +56,13 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      players: Array.from({ length: playerCount }, () => ({
+      required_players: Array.from({ length: REQUIRED_PLAYERS }, () => ({
+        full_name: '',
+        age: '' as any,
+        jersey_number: '' as any,
+        position: '' as any,
+      })),
+      optional_players: Array.from({ length: Math.max(optionalCount, 7) }, () => ({
         full_name: '',
         age: '' as any,
         jersey_number: '' as any,
@@ -57,12 +75,137 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
     if (!registrationId) return
     setServerError(null)
     try {
-      await submitPlayers(registrationId, data.players)
-      setPlayerData(data.players as any)
+      // Combine required + filled optional players
+      const allPlayers = [
+        ...data.required_players.map((p) => ({
+          full_name: p.full_name,
+          age: p.age,
+          jersey_number: p.jersey_number,
+          position: p.position,
+        })),
+        ...data.optional_players
+          .filter((p) => p.full_name && p.full_name.trim() !== '')
+          .map((p) => ({
+            full_name: p.full_name as string,
+            age: p.age as number,
+            jersey_number: p.jersey_number as number,
+            position: p.position as string,
+          })),
+      ]
+      await submitPlayers(registrationId, allPlayers)
+      setPlayerData(allPlayers as any)
       onNext()
     } catch (err) {
       setServerError(extractErrorMessage(err))
     }
+  }
+
+  const renderPlayerCard = (i: number, isRequired: boolean, fieldPrefix: 'required_players' | 'optional_players', idx: number) => {
+    const playerErrors = isRequired
+      ? (errors.required_players?.[idx] as any)
+      : (errors.optional_players?.[idx] as any)
+
+    return (
+      <motion.div
+        key={`${fieldPrefix}-${idx}`}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: i * 0.03 }}
+        className={`glass-card p-4 ${isRequired ? 'border-orange-500/20' : 'border-white/5'}`}
+        style={{ borderWidth: 1, borderStyle: 'solid' }}
+      >
+        {/* Player header */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+            isRequired ? 'bg-orange-500/20 text-orange-400' : 'bg-white/10 text-gray-400'
+          }`}>
+            {i + 1}
+          </div>
+          <span className="text-sm font-medium text-gray-300">Player {i + 1}</span>
+          {isRequired ? (
+            <span className="flex items-center gap-1 text-xs text-orange-400 font-semibold ml-auto">
+              <Star className="w-3 h-3 fill-orange-400" /> Required
+            </span>
+          ) : (
+            <span className="text-xs text-gray-600 ml-auto">Optional</span>
+          )}
+        </div>
+
+        {/* Row 1: Name + Jersey */}
+        <div className="grid grid-cols-3 gap-2 mb-2">
+          <div className="col-span-2">
+            <label className="label text-xs">Full Name {isRequired ? '*' : ''}</label>
+            <input
+              {...register(`${fieldPrefix}.${idx}.full_name` as any)}
+              placeholder="Player name"
+              className={`input-field text-sm py-2 ${playerErrors?.full_name ? 'input-error' : ''}`}
+            />
+            {playerErrors?.full_name && (
+              <p className="error-text text-xs mt-0.5">
+                <AlertCircle className="w-3 h-3" />
+                {playerErrors.full_name?.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="label text-xs">Jersey #{isRequired ? ' *' : ''}</label>
+            <input
+              {...register(`${fieldPrefix}.${idx}.jersey_number` as any, { valueAsNumber: true })}
+              type="number"
+              min={1}
+              max={99}
+              placeholder="e.g. 10"
+              className={`input-field text-sm py-2 ${playerErrors?.jersey_number ? 'input-error' : ''}`}
+            />
+            {playerErrors?.jersey_number && (
+              <p className="error-text text-xs mt-0.5">
+                <AlertCircle className="w-3 h-3" />
+                {playerErrors.jersey_number?.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Row 2: Position + Age */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="label text-xs">Position{isRequired ? ' *' : ''}</label>
+            <select
+              {...register(`${fieldPrefix}.${idx}.position` as any)}
+              className={`input-field text-sm py-2 appearance-none cursor-pointer ${playerErrors?.position ? 'input-error' : ''}`}
+            >
+              <option value="" className="bg-gray-900">Select...</option>
+              {POSITIONS.map((p) => (
+                <option key={p} value={p} className="bg-gray-900">{p}</option>
+              ))}
+            </select>
+            {playerErrors?.position && (
+              <p className="error-text text-xs mt-0.5">
+                <AlertCircle className="w-3 h-3" />
+                {playerErrors.position?.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="label text-xs">Age{isRequired ? ' *' : ''}</label>
+            <input
+              {...register(`${fieldPrefix}.${idx}.age` as any, { valueAsNumber: true })}
+              type="number"
+              min={5}
+              max={60}
+              placeholder="Age"
+              className={`input-field text-sm py-2 ${playerErrors?.age ? 'input-error' : ''}`}
+            />
+            {playerErrors?.age && (
+              <p className="error-text text-xs mt-0.5">
+                <AlertCircle className="w-3 h-3" />
+                {playerErrors.age?.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    )
   }
 
   return (
@@ -75,104 +218,32 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white mb-1">Player Roster</h2>
         <p className="text-gray-400 text-sm">
-          Fill in details for all{' '}
-          <span className="text-orange-400 font-semibold">{playerCount} players</span>.
+          <span className="text-orange-400 font-semibold flex items-center gap-1 inline-flex">
+            <Star className="w-3.5 h-3.5 fill-orange-400" /> First 11 players are required.
+          </span>{' '}
+          Players 12–18 are optional.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
-          {Array.from({ length: playerCount }, (_, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.03 }}
-              className="glass-card p-4"
-            >
-              {/* Player header */}
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-bold shrink-0">
-                  {i + 1}
-                </div>
-                <span className="text-sm font-medium text-gray-300">Player {i + 1}</span>
-              </div>
 
-              {/* Row 1: Name + Jersey */}
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                <div className="col-span-2">
-                  <label className="label text-xs">Full Name *</label>
-                  <input
-                    {...register(`players.${i}.full_name`)}
-                    placeholder="Player name"
-                    className={`input-field text-sm py-2 ${errors.players?.[i]?.full_name ? 'input-error' : ''}`}
-                  />
-                  {errors.players?.[i]?.full_name && (
-                    <p className="error-text text-xs mt-0.5">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.players[i]?.full_name?.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="label text-xs">Jersey # *</label>
-                  <input
-                    {...register(`players.${i}.jersey_number`, { valueAsNumber: true })}
-                    type="number"
-                    min={1}
-                    max={99}
-                    placeholder="e.g. 10"
-                    className={`input-field text-sm py-2 ${errors.players?.[i]?.jersey_number ? 'input-error' : ''}`}
-                  />
-                  {errors.players?.[i]?.jersey_number && (
-                    <p className="error-text text-xs mt-0.5">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.players[i]?.jersey_number?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
+          {/* Required players 1–11 */}
+          {Array.from({ length: REQUIRED_PLAYERS }, (_, idx) =>
+            renderPlayerCard(idx, true, 'required_players', idx)
+          )}
 
-              {/* Row 2: Position + Age */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="label text-xs">Position *</label>
-                  <select
-                    {...register(`players.${i}.position`)}
-                    className={`input-field text-sm py-2 appearance-none cursor-pointer ${errors.players?.[i]?.position ? 'input-error' : ''}`}
-                  >
-                    <option value="" className="bg-gray-900">Select...</option>
-                    {POSITIONS.map((p) => (
-                      <option key={p} value={p} className="bg-gray-900">{p}</option>
-                    ))}
-                  </select>
-                  {errors.players?.[i]?.position && (
-                    <p className="error-text text-xs mt-0.5">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.players[i]?.position?.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="label text-xs">Age *</label>
-                  <input
-                    {...register(`players.${i}.age`, { valueAsNumber: true })}
-                    type="number"
-                    min={5}
-                    max={60}
-                    placeholder="Age"
-                    className={`input-field text-sm py-2 ${errors.players?.[i]?.age ? 'input-error' : ''}`}
-                  />
-                  {errors.players?.[i]?.age && (
-                    <p className="error-text text-xs mt-0.5">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.players[i]?.age?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+          {/* Divider */}
+          <div className="flex items-center gap-3 py-2">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-xs text-gray-500 font-medium">Optional Players (12–18)</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          {/* Optional players 12–18 */}
+          {Array.from({ length: 7 }, (_, idx) =>
+            renderPlayerCard(REQUIRED_PLAYERS + idx, false, 'optional_players', idx)
+          )}
         </div>
 
         {serverError && (

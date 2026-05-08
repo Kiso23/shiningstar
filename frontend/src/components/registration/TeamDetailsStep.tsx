@@ -17,7 +17,7 @@ const schema = z.object({
   player_count: z
     .number({ invalid_type_error: 'Player count is required' })
     .int()
-    .min(7, 'Minimum 7 players')
+    .min(11, 'Minimum 11 players')
     .max(18, 'Maximum 18 players'),
   address: z.string().max(300, 'Max 300 characters').optional(),
 })
@@ -129,7 +129,7 @@ export default function TeamDetailsStep({ onNext }: Props) {
           <label className="label">
             <span className="flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-orange-400" />
-              Number of Players (7–18)
+              Number of Players (11–18)
             </span>
           </label>
           <input
