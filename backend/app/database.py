@@ -39,6 +39,18 @@ Base = declarative_base()
 
 async def create_tables() -> None:
     """Create all database tables defined in the ORM models."""
-    async with engine.begin() as conn:
-        # Use checkfirst=True to avoid errors if tables already exist
-        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+    try:
+        async with engine.begin() as conn:
+            # Use checkfirst=True to avoid errors if tables already exist
+            await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+    except Exception as e:
+        # Neon PostgreSQL sometimes raises a duplicate type error on pooled connections
+        # when tables already exist — this is safe to ignore
+        err_str = str(e)
+        if "pg_type_typname_nsp_index" in err_str or "already exists" in err_str:
+            import logging
+            logging.getLogger(__name__).warning(
+                "create_tables: ignoring known Neon duplicate type error (tables already exist)"
+            )
+        else:
+            raise
