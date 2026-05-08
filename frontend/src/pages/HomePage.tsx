@@ -501,6 +501,111 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ══ CTA ══ */}
+
+      {/* ══ PLAYERS & MEMBERS ══ */}
+      <section style={{ backgroundColor: bg }} className="py-20 px-6 transition-colors duration-300">
+        <div className="max-w-6xl mx-auto space-y-16">
+
+          {/* SSU FC Players */}
+          <div>
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10 text-center">
+              <p className="text-cyan-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Squad</p>
+              <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">SSU FC Players</h2>
+            </motion.div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {[
+                { no: '10', name: 'Enoch Rongpi', role: 'Captain', color: '#f59e0b' },
+                { no: '11', name: 'Winnerstone Rongpi', role: 'Vice Captain', color: '#84cc16' },
+                { no: '01', name: 'Phankim Tisso', role: 'Player', color: '#06b6d4' },
+                { no: '02', name: 'Marcus Ingti', role: 'Player', color: '#06b6d4' },
+                { no: '03', name: 'Sarbinong Ronghang', role: 'Player', color: '#06b6d4' },
+                { no: '04', name: 'Birton Senar', role: 'Player', color: '#06b6d4' },
+                { no: '05', name: 'Cleanson Teron', role: 'Player', color: '#06b6d4' },
+                { no: '06', name: 'Longbor Teron', role: 'Player', color: '#06b6d4' },
+                { no: '07', name: 'Rukasen Bey', role: 'Player', color: '#06b6d4' },
+                { no: '08', name: 'Theang Tisso', role: 'Player', color: '#06b6d4' },
+                { no: '09', name: 'Sengkan Engleng', role: 'Player', color: '#06b6d4' },
+                { no: '12', name: 'Ponjiv Ingti', role: 'Player', color: '#06b6d4' },
+                { no: '13', name: 'Ainingwell Timung', role: 'Player', color: '#06b6d4' },
+                { no: '14', name: 'Bikrom Terang', role: 'Player', color: '#06b6d4' },
+                { no: '15', name: 'Alfred Vaiphei', role: 'Player', color: '#06b6d4' },
+              ].map(({ no, name, role, color }, i) => (
+                <motion.div key={no}
+                  initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+                  style={{ backgroundColor: 'rgba(10,20,30,0.7)', borderColor: `${color}25` }}
+                  className="rounded-xl border p-3 text-center">
+                  <div className="w-8 h-8 rounded-lg mx-auto mb-2 flex items-center justify-center font-black text-sm"
+                    style={{ backgroundColor: `${color}20`, color }}>
+                    {no}
+                  </div>
+                  <p style={{ color: textMain }} className="font-semibold text-xs leading-tight">{name}</p>
+                  <p className="text-xs mt-0.5 font-medium" style={{ color }}>{role}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Executive Members */}
+          <div>
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10 text-center">
+              <p className="text-purple-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Committee</p>
+              <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">Executive Members</h2>
+            </motion.div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { no: '01', name: 'Mr. Bor Im Timung', color: '#8b5cf6' },
+                { no: '02', name: 'Mr. Mindar Timung', color: '#8b5cf6' },
+                { no: '03', name: 'Mr. Raipon Timung', color: '#8b5cf6' },
+                { no: '04', name: 'Mr. Recho Tisso', color: '#8b5cf6' },
+                { no: '05', name: 'Mr. Sardhon Tisso', color: '#8b5cf6' },
+                { no: '06', name: 'Mr. Clinton Phangcho', color: '#8b5cf6' },
+                { no: '07', name: 'Mr. Kamsing Tisso', color: '#8b5cf6' },
+                { no: '08', name: 'Mr. Chingri Ingti', color: '#8b5cf6' },
+                { no: '09', name: 'Mr. Sarkiri Hanse', color: '#8b5cf6' },
+              ].map(({ no, name, color }, i) => (
+                <motion.div key={no}
+                  initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }} transition={{ delay: i * 0.06 }}
+                  style={{ backgroundColor: 'rgba(17,31,17,0.85)', borderColor: `${color}30` }}
+                  className="rounded-xl border p-4 flex items-center gap-3">
+                  <div className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm"
+                    style={{ backgroundColor: `${color}20`, color }}>
+                    {no}
+                  </div>
+                  <p style={{ color: textMain }} className="font-semibold text-sm">{name}</p>
+                  <div className="ml-auto shrink-0 w-1 h-8 rounded-full" style={{ backgroundColor: color }} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* IT Officer */}
+          <div>
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8 text-center">
+              <p className="text-emerald-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Office Bearers</p>
+              <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">IT Officer</h2>
+            </motion.div>
+            <div className="max-w-sm mx-auto">
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+                style={{ backgroundColor: 'rgba(17,31,17,0.85)', borderColor: 'rgba(16,185,129,0.3)' }}
+                className="rounded-2xl border p-6 flex items-center gap-4">
+                <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg"
+                  style={{ backgroundColor: 'rgba(16,185,129,0.2)', color: '#10b981' }}>
+                  💻
+                </div>
+                <div>
+                  <p style={{ color: textMain }} className="font-bold">Mr. Sarlongki Teron</p>
+                  <p className="text-sm font-semibold" style={{ color: '#10b981' }}>IT Officer</p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       {/* ══ CTA ══ */}      <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
