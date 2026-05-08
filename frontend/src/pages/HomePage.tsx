@@ -304,12 +304,6 @@ export default function HomePage() {
                 </motion.div>
               ))}
             </div>
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4 }}
-              style={{ backgroundColor: 'rgba(249,115,22,0.1)', borderColor: 'rgba(249,115,22,0.3)' }}
-              className="mt-4 p-4 rounded-xl border flex items-center justify-between">
-              <span style={{ color: textMain }} className="font-bold">🏆 Total Prize Pool</span>
-              <span className="text-2xl font-black text-orange-400">₹13,000</span>
-            </motion.div>
           </motion.div>
         </div>
       </section>
