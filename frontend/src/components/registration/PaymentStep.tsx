@@ -7,23 +7,44 @@ import { extractErrorMessage } from '../../api/errors'
 import { useRegistrationStore } from '../../store/registrationStore'
 
 const UPI_ID = 'sarlongkisarlongki143@okhdfcbank'
+const AMOUNT = '801'
+const UPI_NOTE = 'SSU+FC+Tournament+Registration'
+
+// UPI deep links — open the app directly with amount pre-filled
 const UPI_APPS = [
   {
     name: 'Google Pay',
     color: 'from-white/10 to-white/5 border-white/10',
     logo: '/gpay.png',
+    deepLink: `tez://upi/pay?pa=${UPI_ID}&pn=Shining+Star+United+FC&am=${AMOUNT}&cu=INR&tn=${UPI_NOTE}`,
+    fallback: `https://pay.google.com/intl/en_in/about/`,
   },
   {
     name: 'PhonePe',
     color: 'from-purple-600/20 to-purple-700/10 border-purple-500/30',
     logo: '/phonepe.png',
+    deepLink: `phonepe://pay?pa=${UPI_ID}&pn=Shining+Star+United+FC&am=${AMOUNT}&cu=INR&tn=${UPI_NOTE}`,
+    fallback: `https://www.phonepe.com/`,
   },
   {
     name: 'Paytm',
     color: 'from-sky-500/20 to-sky-600/10 border-sky-500/30',
     logo: '/paytm.png',
+    deepLink: `paytmmp://pay?pa=${UPI_ID}&pn=Shining+Star+United+FC&am=${AMOUNT}&cu=INR&tn=${UPI_NOTE}`,
+    fallback: `https://paytm.com/`,
   },
 ]
+
+// Opens UPI deep link; falls back to website if app not installed
+function openUpiApp(deepLink: string, fallback: string) {
+  const start = Date.now()
+  window.location.href = deepLink
+  setTimeout(() => {
+    if (Date.now() - start < 2000) {
+      window.open(fallback, '_blank')
+    }
+  }, 1500)
+}
 
 interface Props {
   onNext: () => void
@@ -132,16 +153,21 @@ export default function PaymentStep({ onNext, onBack }: Props) {
             Accepted UPI apps
           </p>
           <div className="grid grid-cols-3 gap-3">
-            {UPI_APPS.map(({ name, color, logo }) => (
-              <div
+            {UPI_APPS.map(({ name, color, logo, deepLink, fallback }) => (
+              <motion.button
                 key={name}
-                className={`p-3 rounded-xl bg-gradient-to-br border text-center text-sm font-medium text-white ${color}`}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => openUpiApp(deepLink, fallback)}
+                className={`p-3 rounded-xl bg-gradient-to-br border text-center text-sm font-medium text-white transition-all cursor-pointer ${color}`}
+                title={`Pay ₹801 via ${name}`}
               >
                 <div className="w-10 h-10 mx-auto mb-2 rounded-xl overflow-hidden bg-white flex items-center justify-center">
                   <img src={logo} alt={name} className="w-8 h-8 object-contain" />
                 </div>
                 {name}
-              </div>
+                <p className="text-xs text-white/50 mt-0.5">Tap to pay</p>
+              </motion.button>
             ))}
           </div>
         </div>
