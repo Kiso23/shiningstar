@@ -97,7 +97,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
           {[
             { emoji: '💰', title: 'Payment Policy', color: 'red', items: [
               'Registration fee of ₹801 per team must be paid via UPI.',
-              'No refunds once payment is made, under any circumstances.',
+              'Refund Policy: Cancel at least 4 days before tournament start for full refund. Cancellations within 4 days are not eligible for refund.',
               'Payment proof (screenshot) must be uploaded during registration.',
               'Registration is confirmed only after admin approval.',
             ]},
@@ -146,8 +146,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
               {checked && <Check className="w-3 h-3 text-white" />}
             </div>
             <span className="text-gray-300 text-sm leading-relaxed">
-              I have read and agree to the Terms & Conditions. I understand the registration fee is{' '}
-              <strong className="text-red-400">non-refundable</strong>.
+              I have read and agree to the Terms & Conditions. I understand the refund policy and payment terms.
             </span>
           </label>
         </div>
