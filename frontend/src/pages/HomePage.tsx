@@ -139,7 +139,7 @@ export default function HomePage() {
       </motion.nav>
 
       {/* ══ MARQUEE NOTIFICATION ══ */}
-      <div className="fixed top-16 left-0 right-0 z-40 w-full">
+      <div className="fixed top-14 left-0 right-0 z-40 w-full">
         <MarqueeNotification
           message="Refund Policy: Cancel at least 4 days before tournament start for full refund. Cancellations within 4 days are not eligible for refund. Registration fee ₹801 via UPI. Bring Aadhaar or PAN card for verification."
           backgroundColor="rgba(249, 115, 22, 0.12)"
@@ -149,7 +149,7 @@ export default function HomePage() {
       </div>
 
       {/* ══ HERO ══ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
 
         {/* Video background */}
         <div className="absolute inset-0 overflow-hidden">
