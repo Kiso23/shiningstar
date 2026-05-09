@@ -282,7 +282,31 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Prize Pool section removed */}
+          {/* Prizes */}
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Awards</p>
+            <h3 style={{ color: textMain }} className="text-3xl font-black uppercase mb-2">Tournament Prizes</h3>
+            <p style={{ color: textMute }} className="text-sm mb-8">Money, Trophy &amp; Certificate</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { emoji: '🥇', label: 'Winner', amount: '₹8,000', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)' },
+                { emoji: '🥈', label: 'Runner Up', amount: '₹4,000', color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.25)' },
+                { emoji: '🏅', label: 'Player of the Tournament', amount: '₹500', color: '#f97316', bg: 'rgba(249,115,22,0.1)', border: 'rgba(249,115,22,0.25)' },
+                { emoji: '🧤', label: 'Best Goalkeeper', amount: '₹500', color: '#22c55e', bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.25)' },
+              ].map(({ emoji, label, amount, color, bg, border }, i) => (
+                <motion.div key={label}
+                  initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -4 }}
+                  style={{ backgroundColor: bg, borderColor: border, borderWidth: 1, borderStyle: 'solid' }}
+                  className="p-5 rounded-2xl text-center">
+                  <p className="text-3xl mb-3">{emoji}</p>
+                  <p style={{ color: textMute }} className="text-xs font-medium mb-2 leading-tight">{label}</p>
+                  <p className="text-2xl font-black" style={{ color }}>{amount}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
