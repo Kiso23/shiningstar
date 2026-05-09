@@ -88,7 +88,7 @@ async def test_full_registration_flow(client, tmp_path):
         "manager_name": "John Doe",
         "contact_phone": "9876543210",
         "contact_email": "john@example.com",
-        "player_count": 7,
+        "player_count": 11,
     })
     assert resp.status_code == 201
     data = resp.json()
@@ -99,7 +99,7 @@ async def test_full_registration_flow(client, tmp_path):
     # Step 2: Submit players (now includes jersey_number and position)
     players = [
         {"full_name": f"Player {i}", "age": 20 + i, "jersey_number": i + 1, "position": "Midfielder"}
-        for i in range(7)
+        for i in range(11)
     ]
     resp = await client.post(f"/api/v1/registrations/{reg_id}/players", json=players)
     assert resp.status_code == 201
@@ -128,7 +128,7 @@ async def test_invalid_phone_rejected(client):
         "manager_name": "John",
         "contact_phone": "123",  # invalid
         "contact_email": "john@example.com",
-        "player_count": 7,
+        "player_count": 11,
     })
     assert resp.status_code == 422
 
@@ -140,7 +140,7 @@ async def test_invalid_player_count_rejected(client):
         "manager_name": "John",
         "contact_phone": "9876543210",
         "contact_email": "john@example.com",
-        "player_count": 5,  # below minimum of 7
+        "player_count": 5,  # below minimum of 11
     })
     assert resp.status_code == 422
 
@@ -152,7 +152,7 @@ async def test_invalid_email_rejected(client):
         "manager_name": "John",
         "contact_phone": "9876543210",
         "contact_email": "not-an-email",
-        "player_count": 7,
+        "player_count": 11,
     })
     assert resp.status_code == 422
 
@@ -164,7 +164,7 @@ async def test_non_image_payment_proof_rejected(client):
     # Create a team first
     resp = await client.post("/api/v1/registrations", json={
         "team_name": "Test FC", "manager_name": "John",
-        "contact_phone": "9876543210", "contact_email": "j@e.com", "player_count": 7,
+        "contact_phone": "9876543210", "contact_email": "j@e.com", "player_count": 11,
     })
     reg_id = resp.json()["registration_id"]
 
@@ -179,7 +179,7 @@ async def test_non_image_payment_proof_rejected(client):
 async def test_png_payment_proof_accepted(client):
     resp = await client.post("/api/v1/registrations", json={
         "team_name": "PNG FC", "manager_name": "Jane",
-        "contact_phone": "9876543211", "contact_email": "jane@e.com", "player_count": 7,
+        "contact_phone": "9876543211", "contact_email": "jane@e.com", "player_count": 11,
     })
     reg_id = resp.json()["registration_id"]
 
@@ -231,7 +231,7 @@ async def test_admin_list_registrations(client, auth_headers):
         await client.post("/api/v1/registrations", json={
             "team_name": f"Team {i}", "manager_name": f"Manager {i}",
             "contact_phone": f"987654321{i}", "contact_email": f"m{i}@e.com",
-            "player_count": 7,
+            "player_count": 11,
         })
 
     resp = await client.get("/api/v1/admin/registrations", headers=auth_headers)
@@ -246,7 +246,7 @@ async def test_admin_approve_team(client, auth_headers):
     # Create team and upload payment
     resp = await client.post("/api/v1/registrations", json={
         "team_name": "Approve FC", "manager_name": "Bob",
-        "contact_phone": "9876543210", "contact_email": "bob@e.com", "player_count": 7,
+        "contact_phone": "9876543210", "contact_email": "bob@e.com", "player_count": 11,
     })
     reg_id = resp.json()["registration_id"]
 
@@ -269,7 +269,7 @@ async def test_admin_approve_team(client, auth_headers):
 async def test_admin_reject_team(client, auth_headers):
     resp = await client.post("/api/v1/registrations", json={
         "team_name": "Reject FC", "manager_name": "Alice",
-        "contact_phone": "9876543210", "contact_email": "alice@e.com", "player_count": 7,
+        "contact_phone": "9876543210", "contact_email": "alice@e.com", "player_count": 11,
     })
     reg_id = resp.json()["registration_id"]
 
@@ -294,7 +294,7 @@ async def test_admin_filter_by_status(client, auth_headers):
     for i in range(2):
         r = await client.post("/api/v1/registrations", json={
             "team_name": f"Filter {i}", "manager_name": f"M{i}",
-            "contact_phone": f"987654321{i}", "contact_email": f"f{i}@e.com", "player_count": 7,
+            "contact_phone": f"987654321{i}", "contact_email": f"f{i}@e.com", "player_count": 11,
         })
         reg_id = r.json()["registration_id"]
         if i == 0:
@@ -321,11 +321,11 @@ async def test_admin_filter_by_status(client, auth_headers):
 async def test_admin_search(client, auth_headers):
     await client.post("/api/v1/registrations", json={
         "team_name": "Lions FC", "manager_name": "Carlos",
-        "contact_phone": "9876543210", "contact_email": "c@e.com", "player_count": 7,
+        "contact_phone": "9876543210", "contact_email": "c@e.com", "player_count": 11,
     })
     await client.post("/api/v1/registrations", json={
         "team_name": "Tigers FC", "manager_name": "David",
-        "contact_phone": "9876543211", "contact_email": "d@e.com", "player_count": 7,
+        "contact_phone": "9876543211", "contact_email": "d@e.com", "player_count": 11,
     })
 
     resp = await client.get(
@@ -340,7 +340,7 @@ async def test_admin_search(client, auth_headers):
 async def test_export_csv(client, auth_headers):
     await client.post("/api/v1/registrations", json={
         "team_name": "Export FC", "manager_name": "Eve",
-        "contact_phone": "9876543210", "contact_email": "e@e.com", "player_count": 7,
+        "contact_phone": "9876543210", "contact_email": "e@e.com", "player_count": 11,
     })
 
     resp = await client.get(
@@ -368,7 +368,7 @@ async def two_teams(client, auth_headers):
             "manager_name": f"Manager {i+1}",
             "contact_phone": f"987654321{i}",
             "contact_email": f"team{i+1}@test.com",
-            "player_count": 7,
+            "player_count": 11,
         })
         assert resp.status_code == 201
         reg_id = resp.json()["registration_id"]

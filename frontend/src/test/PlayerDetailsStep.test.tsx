@@ -45,12 +45,22 @@ describe('PlayerDetailsStep', () => {
     vi.mocked(submitPlayers).mockResolvedValue(undefined)
     render(<PlayerDetailsStep onNext={onNext} onBack={onBack} />)
 
+    // Fill all 11 required players
     const nameInputs = screen.getAllByPlaceholderText(/player name/i)
     const ageInputs = screen.getAllByPlaceholderText(/age/i)
     const jerseyInputs = screen.getAllByPlaceholderText(/e\.g\. 10/i)
     const positionSelects = screen.getAllByRole('combobox')
 
-    for (let i = 0; i < 3; i++) {
+    // Fill first 3 (enough to test the flow — mock returns success)
+    for (let i = 0; i < Math.min(3, nameInputs.length); i++) {
+      fireEvent.change(nameInputs[i], { target: { value: `Player ${i + 1}` } })
+      fireEvent.change(ageInputs[i], { target: { value: '20' } })
+      fireEvent.change(jerseyInputs[i], { target: { value: `${i + 1}` } })
+      fireEvent.change(positionSelects[i], { target: { value: 'Midfielder' } })
+    }
+
+    // Fill remaining required players (4-11)
+    for (let i = 3; i < nameInputs.length && i < 11; i++) {
       fireEvent.change(nameInputs[i], { target: { value: `Player ${i + 1}` } })
       fireEvent.change(ageInputs[i], { target: { value: '20' } })
       fireEvent.change(jerseyInputs[i], { target: { value: `${i + 1}` } })
