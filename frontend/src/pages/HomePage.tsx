@@ -5,6 +5,7 @@ import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
+import MarqueeNotification from '../components/shared/MarqueeNotification'
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
 // Mid dark:     #0e1a0e  (deep forest green-black)
@@ -136,6 +137,16 @@ export default function HomePage() {
           </motion.button>
         </div>
       </motion.nav>
+
+      {/* ══ MARQUEE NOTIFICATION ══ */}
+      <div className="fixed top-16 left-0 right-0 z-40 w-full">
+        <MarqueeNotification
+          message="Refund Policy: Cancel at least 4 days before tournament start for full refund. Cancellations within 4 days are not eligible for refund. Registration fee ₹801 via UPI. Bring Aadhaar or PAN card for verification."
+          backgroundColor="rgba(249, 115, 22, 0.12)"
+          textColor="#f97316"
+          iconColor="#f97316"
+        />
+      </div>
 
       {/* ══ HERO ══ */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
