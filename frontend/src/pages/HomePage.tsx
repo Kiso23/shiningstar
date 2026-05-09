@@ -86,7 +86,7 @@ export default function HomePage() {
       {/* ══ TOAST NOTIFICATION ══ */}
       {showToast && (
         <ToastNotification
-          message="Registration can be done after four days from the start of the tournament; however, it will be considered nonrefundable as per tournament rules and regulations. Please bring Aadhaar or PAN card for verification."
+          message="No refunds once payment is made, under any circumstances. Registration fee ₹801 per team must be paid via UPI. Please bring Aadhaar or PAN card for verification."
           type="warning"
           onClose={() => setShowToast(false)}
           duration={10000}
