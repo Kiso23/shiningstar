@@ -40,7 +40,7 @@ export default function HomePage() {
   const [heroLine1, setHeroLine1] = useState('Shining')
   const [heroLine2, setHeroLine2] = useState('Star')
   const [heroLine3, setHeroLine3] = useState('United FC')
-  const [showToast, setShowToast] = useState(true)
+  const [showToast, setShowToast] = useState(false)
 
   useEffect(() => {
     getAllSettings().then((s) => {
