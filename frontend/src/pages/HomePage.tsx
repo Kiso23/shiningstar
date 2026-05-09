@@ -86,7 +86,7 @@ export default function HomePage() {
       {/* ══ TOAST NOTIFICATION ══ */}
       {showToast && (
         <ToastNotification
-          message="No refunds once payment is made, under any circumstances. Registration fee ₹801 per team must be paid via UPI. Please bring Aadhaar or PAN card for verification."
+          message="Refund Policy: Cancel at least 4 days before tournament start for full refund. Cancellations within 4 days are not eligible for refund. Registration fee ₹801 via UPI. Bring Aadhaar or PAN card for verification."
           type="warning"
           onClose={() => setShowToast(false)}
           duration={10000}
