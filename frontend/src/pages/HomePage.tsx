@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
+import ToastNotification from '../components/shared/ToastNotification'
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
 // Mid dark:     #0e1a0e  (deep forest green-black)
@@ -38,6 +39,7 @@ export default function HomePage() {
   const [heroLine1, setHeroLine1] = useState('Shining')
   const [heroLine2, setHeroLine2] = useState('Star')
   const [heroLine3, setHeroLine3] = useState('United FC')
+  const [showToast, setShowToast] = useState(true)
 
   useEffect(() => {
     getAllSettings().then((s) => {
@@ -81,6 +83,15 @@ export default function HomePage() {
 
   return (
     <div style={{ backgroundColor: bg }} className="min-h-screen overflow-x-hidden text-white">
+      {/* ══ TOAST NOTIFICATION ══ */}
+      {showToast && (
+        <ToastNotification
+          message="Registration can be done after four days from the start of the tournament; however, it will be considered nonrefundable as per tournament rules and regulations. Please bring Aadhaar or PAN card for verification."
+          type="warning"
+          onClose={() => setShowToast(false)}
+          duration={10000}
+        />
+      )}
 
       {/* ══ NAVBAR ══ */}
       <motion.nav

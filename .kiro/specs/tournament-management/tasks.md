@@ -172,7 +172,7 @@ Extend the Shining Star United platform from a registration-only system into a f
   - Verify `GET /api/v1/matches` and `GET /api/v1/standings` return 200 without auth headers
   - _Requirements: 2.1, 4.1, 5.1_
 
-- [ ] 6. Checkpoint — Ensure all backend tests pass
+- [x] 6. Checkpoint — Ensure all backend tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 7. Add integration tests for full match lifecycle
@@ -192,7 +192,7 @@ Extend the Shining Star United platform from a registration-only system into a f
       - Verify `/api/v1/matches` and `/api/v1/standings` return 200 without `Authorization` header
       - _Requirements: 2.1, 4.1, 5.1_
 
-- [-] 8. Create frontend API client functions
+- [x] 8. Create frontend API client functions
   - [x] 8.1 Create `frontend/src/api/matches.ts`
     - Implement `getMatches(params?)`, `getMatch(id)`, `createMatch(data)`, `updateMatch(id, data)`, `deleteMatch(id)`, `updateScore(id, data)`
     - Export TypeScript interfaces: `MatchCreate`, `MatchUpdate`, `ScoreUpdate`, `MatchResponse`
