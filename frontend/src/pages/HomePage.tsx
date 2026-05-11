@@ -547,7 +547,7 @@ export default function HomePage() {
             <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
             <div>
               <p style={{ color: textMain }} className="font-bold text-sm">Shining Star United</p>
-              <p style={{ color: textMute }} className="text-xs">© 2025 All rights reserved.</p>
+              <p style={{ color: textMute }} className="text-xs">© 2025 All rights reserved. Developed by Sarlongki Teron</p>
             </div>
           </div>
           <div className="flex items-center gap-6 text-sm">
