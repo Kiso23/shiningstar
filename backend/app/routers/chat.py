@@ -13,7 +13,7 @@ from app.services.chat_service import ChatService
 from app.models.chat import MessageType, Chat, ChatMessage
 import uuid
 
-router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
+router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 async def get_db() -> AsyncSession:
