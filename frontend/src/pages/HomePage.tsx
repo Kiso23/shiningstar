@@ -6,7 +6,6 @@ import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
-import ThreeDHero from '../components/shared/ThreeDHero'
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
 // Mid dark:     #0e1a0e  (deep forest green-black)
@@ -210,11 +209,6 @@ export default function HomePage() {
 
           {/* Right: Countdown + links */}
           <div className="flex-shrink-0 w-full sm:w-96 lg:w-80 flex flex-col gap-4">
-            {/* 3D Football Player */}
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}>
-              <ThreeDHero />
-            </motion.div>
-
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
               style={{ backgroundColor: bgCard, borderColor: border }}
               className="border rounded-2xl p-4 sm:p-5 backdrop-blur-sm">
