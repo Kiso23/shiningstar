@@ -14,6 +14,7 @@ import ProtectedRoute from './components/shared/ProtectedRoute'
 import LogoWatermark from './components/shared/LogoWatermark'
 import SplashScreen from './components/shared/SplashScreen'
 import MusicPlayer from './components/shared/MusicPlayer'
+import ChatWidget from './components/shared/ChatWidget'
 import { ThemeProvider } from './context/ThemeContext'
 import { startKeepAlive } from './utils/keepAlive'
 
@@ -62,6 +63,8 @@ export default function App() {
         </AnimatePresence>
         {/* Global Music Player - Plays on all pages */}
         <MusicPlayer src="/stadium-music.mp3" title="Stadium Rock" artist="Pufino" />
+        {/* Global Chat Widget - Available on all pages */}
+        <ChatWidget />
       </BrowserRouter>
     </ThemeProvider>
   )
