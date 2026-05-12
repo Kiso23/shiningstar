@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.models.chat import Chat, ChatMessage, ChatStatus, MessageType
+from app.models.chat import Chat, ChatMessage, ChatStatus, MessageType, ReadStatus
 from app.schemas.chat import ChatMessageCreate
 from datetime import datetime
+from typing import Optional
 import re
 
 
@@ -89,6 +90,7 @@ class ChatService:
         chat_id: int,
         message_type: str,
         content: str,
+        sender_id: Optional[str] = None,
         is_sensitive: bool = False,
         requires_transfer: bool = False,
         db: AsyncSession = None
@@ -97,9 +99,11 @@ class ChatService:
         message = ChatMessage(
             chat_id=chat_id,
             message_type=message_type,
+            sender_id=sender_id,
             content=content,
             is_sensitive=is_sensitive,
-            requires_transfer=requires_transfer
+            requires_transfer=requires_transfer,
+            read_status=ReadStatus.UNREAD
         )
         db.add(message)
         await db.commit()
@@ -112,7 +116,7 @@ class ChatService:
         result = await db.execute(select(Chat).filter(Chat.id == chat_id))
         chat = result.scalar_one_or_none()
         result = await db.execute(
-            select(ChatMessage).filter(ChatMessage.chat_id == chat_id)
+            select(ChatMessage).filter(ChatMessage.chat_id == chat_id).order_by(ChatMessage.created_at)
         )
         messages = result.scalars().all()
         return chat, messages
@@ -145,7 +149,7 @@ class ChatService:
     async def get_pending_chats(db: AsyncSession):
         """Get all chats waiting for admin"""
         result = await db.execute(
-            select(Chat).filter(Chat.status == ChatStatus.TRANSFERRED)
+            select(Chat).filter(Chat.status == ChatStatus.TRANSFERRED).order_by(Chat.created_at.desc())
         )
         return result.scalars().all()
 
@@ -153,6 +157,34 @@ class ChatService:
     async def get_admin_chats(admin_id: str, db: AsyncSession):
         """Get chats assigned to specific admin"""
         result = await db.execute(
-            select(Chat).filter(Chat.assigned_admin == admin_id)
+            select(Chat).filter(Chat.assigned_admin == admin_id).order_by(Chat.created_at.desc())
         )
         return result.scalars().all()
+
+    @staticmethod
+    async def mark_message_as_read(message_id: int, db: AsyncSession) -> ChatMessage:
+        """Mark a message as read"""
+        result = await db.execute(select(ChatMessage).filter(ChatMessage.id == message_id))
+        message = result.scalar_one_or_none()
+        if message:
+            message.read_status = ReadStatus.READ
+            message.read_at = datetime.utcnow()
+            await db.commit()
+            await db.refresh(message)
+        return message
+
+    @staticmethod
+    async def mark_chat_messages_as_read(chat_id: int, db: AsyncSession):
+        """Mark all unread messages in a chat as read"""
+        result = await db.execute(
+            select(ChatMessage).filter(
+                ChatMessage.chat_id == chat_id,
+                ChatMessage.read_status == ReadStatus.UNREAD
+            )
+        )
+        messages = result.scalars().all()
+        for message in messages:
+            message.read_status = ReadStatus.READ
+            message.read_at = datetime.utcnow()
+        await db.commit()
+        return messages

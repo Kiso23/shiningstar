@@ -17,6 +17,11 @@ class ChatStatus(str, enum.Enum):
     CLOSED = "closed"
 
 
+class ReadStatus(str, enum.Enum):
+    UNREAD = "unread"
+    READ = "read"
+
+
 class Chat(Base):
     __tablename__ = "chats"
 
@@ -38,7 +43,12 @@ class ChatMessage(Base):
     id = Column(Integer, primary_key=True, index=True)
     chat_id = Column(Integer, index=True)
     message_type = Column(String, default=MessageType.USER)  # user, ai, admin
+    sender_id = Column(String, nullable=True)  # session_id for user, admin_id for admin
     content = Column(Text)
     is_sensitive = Column(Boolean, default=False)
     requires_transfer = Column(Boolean, default=False)
-    created_at = Column(DateTime, server_default=func.now())
+    read_status = Column(String, default=ReadStatus.UNREAD)  # unread, read
+    is_typing = Column(Boolean, default=False)  # For real-time typing indicator
+    created_at = Column(DateTime, server_default=func.now(), index=True)
+    read_at = Column(DateTime, nullable=True)  # When message was read
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

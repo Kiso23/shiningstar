@@ -15,10 +15,15 @@ class ChatMessageResponse(BaseModel):
     id: int
     chat_id: int
     message_type: str
+    sender_id: Optional[str]
     content: str
     is_sensitive: bool
     requires_transfer: bool
+    read_status: str
+    is_typing: bool
     created_at: datetime
+    read_at: Optional[datetime]
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -55,3 +60,12 @@ class AdminRespondRequest(BaseModel):
     chat_id: int
     admin_id: str
     message: str
+
+
+class MarkMessageReadRequest(BaseModel):
+    message_id: int
+
+
+class TypingStatusRequest(BaseModel):
+    chat_id: int
+    is_typing: bool

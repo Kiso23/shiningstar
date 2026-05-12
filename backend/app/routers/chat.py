@@ -8,7 +8,9 @@ from app.schemas.chat import (
     ChatResponse,
     ChatHistoryResponse,
     TransferToAdminRequest,
-    AdminRespondRequest
+    AdminRespondRequest,
+    MarkMessageReadRequest,
+    TypingStatusRequest
 )
 from app.services.chat_service import ChatService
 from app.models.chat import MessageType, Chat, ChatMessage
@@ -48,6 +50,7 @@ async def send_message(
     user_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.USER,
+        sender_id=payload.session_id,
         content=payload.content,
         db=db
     )
@@ -59,6 +62,7 @@ async def send_message(
     ai_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.AI,
+        sender_id="ai-bot",
         content=ai_response,
         is_sensitive=requires_transfer,
         requires_transfer=requires_transfer,
@@ -138,6 +142,7 @@ async def admin_respond(
     admin_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.ADMIN,
+        sender_id=payload.admin_id,
         content=payload.message,
         db=db
     )
@@ -172,4 +177,51 @@ async def close_chat(chat_id: int, db: AsyncSession = Depends(get_db)):
         "chat_id": chat.id,
         "status": chat.status,
         "closed_at": chat.closed_at
+    }
+
+
+@router.post("/message/read")
+async def mark_message_read(
+    payload: MarkMessageReadRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """Mark a message as read"""
+    message = await ChatService.mark_message_as_read(payload.message_id, db)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return {
+        "success": True,
+        "message_id": message.id,
+        "read_status": message.read_status,
+        "read_at": message.read_at
+    }
+
+
+@router.post("/chat/{chat_id}/mark-all-read")
+async def mark_chat_read(
+    chat_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """Mark all messages in a chat as read"""
+    messages = await ChatService.mark_chat_messages_as_read(chat_id, db)
+    return {
+        "success": True,
+        "chat_id": chat_id,
+        "marked_count": len(messages)
+    }
+
+
+@router.post("/typing")
+async def update_typing_status(
+    payload: TypingStatusRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """Update typing status for a chat (for real-time indicators)"""
+    # In a real system, this would update a cache or WebSocket connection
+    # For now, we just acknowledge the request
+    return {
+        "success": True,
+        "chat_id": payload.chat_id,
+        "is_typing": payload.is_typing
     }
