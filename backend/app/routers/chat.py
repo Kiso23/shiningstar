@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.database import AsyncSessionLocal
 from app.schemas.chat import (
     ChatMessageCreate,
     ChatMessageResponse,
@@ -15,17 +16,23 @@ import uuid
 router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
 
 
+async def get_db() -> AsyncSession:
+    """Dependency to get async database session"""
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
 @router.post("/message")
-def send_message(
+async def send_message(
     payload: ChatMessageCreate,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Send a message to the chat system.
     AI processes common questions, transfers sensitive ones to admin.
     """
     # Get or create chat session
-    chat = ChatService.get_or_create_chat(payload.session_id, db)
+    chat = await ChatService.get_or_create_chat(payload.session_id, db)
 
     # Update chat with user info if provided
     if payload.team_name:
@@ -34,10 +41,10 @@ def send_message(
         chat.email = payload.email
     if payload.phone:
         chat.phone = payload.phone
-    db.commit()
+    await db.commit()
 
     # Save user message
-    user_message = ChatService.save_message(
+    user_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.USER,
         content=payload.content,
@@ -48,7 +55,7 @@ def send_message(
     ai_response, requires_transfer = ChatService.get_ai_response(payload.content)
 
     # Save AI response
-    ai_message = ChatService.save_message(
+    ai_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.AI,
         content=ai_response,
@@ -59,7 +66,7 @@ def send_message(
 
     # Transfer to admin if needed
     if requires_transfer:
-        ChatService.transfer_to_admin(
+        await ChatService.transfer_to_admin(
             chat_id=chat.id,
             admin_id="pending",
             reason="Requires admin assistance",
@@ -77,15 +84,16 @@ def send_message(
 
 
 @router.get("/history/{session_id}")
-def get_chat_history(
+async def get_chat_history(
     session_id: str,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Get full chat history for a session"""
-    chat = ChatService.get_or_create_chat(session_id, db)
-    messages = db.query(ChatMessage).filter(
-        ChatMessage.chat_id == chat.id
-    ).all()
+    chat = await ChatService.get_or_create_chat(session_id, db)
+    result = await db.execute(
+        select(ChatMessage).filter(ChatMessage.chat_id == chat.id)
+    )
+    messages = result.scalars().all()
 
     return {
         "chat": chat,
@@ -94,12 +102,12 @@ def get_chat_history(
 
 
 @router.post("/transfer")
-def transfer_to_admin(
+async def transfer_to_admin(
     payload: TransferToAdminRequest,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Manually transfer chat to admin"""
-    chat = ChatService.transfer_to_admin(
+    chat = await ChatService.transfer_to_admin(
         chat_id=payload.chat_id,
         admin_id=payload.admin_id or "unassigned",
         reason=payload.reason,
@@ -115,19 +123,20 @@ def transfer_to_admin(
 
 
 @router.post("/admin/respond")
-def admin_respond(
+async def admin_respond(
     chat_id: int,
     admin_id: str,
     message: str,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Admin sends a response to a chat"""
-    chat = db.query(Chat).filter(Chat.id == chat_id).first()
+    result = await db.execute(select(Chat).filter(Chat.id == chat_id))
+    chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
     # Save admin message
-    admin_message = ChatService.save_message(
+    admin_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.ADMIN,
         content=message,
@@ -142,23 +151,23 @@ def admin_respond(
 
 
 @router.get("/admin/pending")
-def get_pending_chats(db: Session = Depends(get_db)):
+async def get_pending_chats(db: AsyncSession = Depends(get_db)):
     """Get all chats waiting for admin"""
-    chats = ChatService.get_pending_chats(db)
+    chats = await ChatService.get_pending_chats(db)
     return {"pending_chats": chats, "count": len(chats)}
 
 
 @router.get("/admin/assigned/{admin_id}")
-def get_admin_chats(admin_id: str, db: Session = Depends(get_db)):
+async def get_admin_chats(admin_id: str, db: AsyncSession = Depends(get_db)):
     """Get chats assigned to specific admin"""
-    chats = ChatService.get_admin_chats(admin_id, db)
+    chats = await ChatService.get_admin_chats(admin_id, db)
     return {"chats": chats, "count": len(chats)}
 
 
 @router.post("/close/{chat_id}")
-def close_chat(chat_id: int, db: Session = Depends(get_db)):
+async def close_chat(chat_id: int, db: AsyncSession = Depends(get_db)):
     """Close a chat session"""
-    chat = ChatService.close_chat(chat_id, db)
+    chat = await ChatService.close_chat(chat_id, db)
     return {
         "success": True,
         "chat_id": chat.id,

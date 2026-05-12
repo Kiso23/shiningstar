@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.models.chat import Chat, ChatMessage, ChatStatus, MessageType
 from app.schemas.chat import ChatMessageCreate
 from datetime import datetime
@@ -30,20 +31,23 @@ class ChatService:
     ]
 
     @staticmethod
-    def create_chat(session_id: str, db: Session) -> Chat:
+    async def create_chat(session_id: str, db: AsyncSession) -> Chat:
         """Create a new chat session"""
         chat = Chat(session_id=session_id)
         db.add(chat)
-        db.commit()
-        db.refresh(chat)
+        await db.commit()
+        await db.refresh(chat)
         return chat
 
     @staticmethod
-    def get_or_create_chat(session_id: str, db: Session) -> Chat:
+    async def get_or_create_chat(session_id: str, db: AsyncSession) -> Chat:
         """Get existing chat or create new one"""
-        chat = db.query(Chat).filter(Chat.session_id == session_id).first()
+        result = await db.execute(
+            select(Chat).filter(Chat.session_id == session_id)
+        )
+        chat = result.scalar_one_or_none()
         if not chat:
-            chat = ChatService.create_chat(session_id, db)
+            chat = await ChatService.create_chat(session_id, db)
         return chat
 
     @staticmethod
@@ -81,13 +85,13 @@ class ChatService:
         )
 
     @staticmethod
-    def save_message(
+    async def save_message(
         chat_id: int,
         message_type: str,
         content: str,
         is_sensitive: bool = False,
         requires_transfer: bool = False,
-        db: Session = None
+        db: AsyncSession = None
     ) -> ChatMessage:
         """Save a message to the database"""
         message = ChatMessage(
@@ -98,45 +102,57 @@ class ChatService:
             requires_transfer=requires_transfer
         )
         db.add(message)
-        db.commit()
-        db.refresh(message)
+        await db.commit()
+        await db.refresh(message)
         return message
 
     @staticmethod
-    def get_chat_history(chat_id: int, db: Session):
+    async def get_chat_history(chat_id: int, db: AsyncSession):
         """Get full chat history"""
-        chat = db.query(Chat).filter(Chat.id == chat_id).first()
-        messages = db.query(ChatMessage).filter(ChatMessage.chat_id == chat_id).all()
+        result = await db.execute(select(Chat).filter(Chat.id == chat_id))
+        chat = result.scalar_one_or_none()
+        result = await db.execute(
+            select(ChatMessage).filter(ChatMessage.chat_id == chat_id)
+        )
+        messages = result.scalars().all()
         return chat, messages
 
     @staticmethod
-    def transfer_to_admin(chat_id: int, admin_id: str, reason: str, db: Session) -> Chat:
+    async def transfer_to_admin(chat_id: int, admin_id: str, reason: str, db: AsyncSession) -> Chat:
         """Transfer chat to admin"""
-        chat = db.query(Chat).filter(Chat.id == chat_id).first()
+        result = await db.execute(select(Chat).filter(Chat.id == chat_id))
+        chat = result.scalar_one_or_none()
         if chat:
             chat.status = ChatStatus.TRANSFERRED
             chat.assigned_admin = admin_id
-            db.commit()
-            db.refresh(chat)
+            await db.commit()
+            await db.refresh(chat)
         return chat
 
     @staticmethod
-    def close_chat(chat_id: int, db: Session) -> Chat:
+    async def close_chat(chat_id: int, db: AsyncSession) -> Chat:
         """Close a chat session"""
-        chat = db.query(Chat).filter(Chat.id == chat_id).first()
+        result = await db.execute(select(Chat).filter(Chat.id == chat_id))
+        chat = result.scalar_one_or_none()
         if chat:
             chat.status = ChatStatus.CLOSED
             chat.closed_at = datetime.utcnow()
-            db.commit()
-            db.refresh(chat)
+            await db.commit()
+            await db.refresh(chat)
         return chat
 
     @staticmethod
-    def get_pending_chats(db: Session):
+    async def get_pending_chats(db: AsyncSession):
         """Get all chats waiting for admin"""
-        return db.query(Chat).filter(Chat.status == ChatStatus.TRANSFERRED).all()
+        result = await db.execute(
+            select(Chat).filter(Chat.status == ChatStatus.TRANSFERRED)
+        )
+        return result.scalars().all()
 
     @staticmethod
-    def get_admin_chats(admin_id: str, db: Session):
+    async def get_admin_chats(admin_id: str, db: AsyncSession):
         """Get chats assigned to specific admin"""
-        return db.query(Chat).filter(Chat.assigned_admin == admin_id).all()
+        result = await db.execute(
+            select(Chat).filter(Chat.assigned_admin == admin_id)
+        )
+        return result.scalars().all()

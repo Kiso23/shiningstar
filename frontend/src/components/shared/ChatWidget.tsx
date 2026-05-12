@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, X, MessageCircle, Loader } from 'lucide-react'
-import axios from 'axios'
+import client from '../../api/client'
 
 interface Message {
   id?: number
@@ -41,7 +41,7 @@ const ChatWidget = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post('/api/v1/chat/message', {
+      const response = await client.post('/chat/message', {
         content: input,
         session_id: sessionId,
         team_name: 'Team',
