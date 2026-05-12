@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, X, MessageCircle, Loader } from 'lucide-react'
+import { Send, X, MessageCircle, Loader, CheckCheck, Check } from 'lucide-react'
 import client from '../../api/client'
 
 interface Message {
@@ -8,6 +8,8 @@ interface Message {
   type: 'user' | 'ai' | 'admin'
   content: string
   timestamp?: string
+  read_status?: 'read' | 'unread'
+  sender_id?: string
 }
 
 const ChatWidget = () => {
@@ -15,9 +17,51 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random()}`)
+  const [sessionId, setSessionId] = useState<string>('')
   const [chatId, setChatId] = useState<number | null>(null)
+  const [isTyping, setIsTyping] = useState(false)
+  const [pollInterval, setPollInterval] = useState<ReturnType<typeof setInterval> | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Initialize sessionId from localStorage on mount
+  useEffect(() => {
+    const storedSessionId = localStorage.getItem('chat_session_id')
+    if (storedSessionId) {
+      setSessionId(storedSessionId)
+      // Restore chat history
+      restoreChatHistory(storedSessionId)
+    } else {
+      const newSessionId = `session_${Date.now()}_${Math.random()}`
+      setSessionId(newSessionId)
+      localStorage.setItem('chat_session_id', newSessionId)
+    }
+  }, [])
+
+  // Restore chat history from database
+  const restoreChatHistory = async (sid: string) => {
+    try {
+      const response = await client.get(`/chat/history/${sid}`)
+      if (response.data.messages && response.data.messages.length > 0) {
+        const restoredMessages = response.data.messages.map((msg: any) => ({
+          id: msg.id,
+          type: msg.message_type.toLowerCase() as 'user' | 'ai' | 'admin',
+          content: msg.content,
+          timestamp: new Date(msg.created_at).toLocaleTimeString(),
+          read_status: msg.read_status,
+          sender_id: msg.sender_id
+        }))
+        setMessages(restoredMessages)
+        setChatId(response.data.chat.id)
+        
+        // Start polling if chat was transferred to admin
+        if (response.data.chat.status === 'transferred') {
+          startPolling(response.data.chat.id)
+        }
+      }
+    } catch (error) {
+      console.error('Error restoring chat history:', error)
+    }
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -27,8 +71,70 @@ const ChatWidget = () => {
     scrollToBottom()
   }, [messages])
 
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollInterval) clearInterval(pollInterval)
+    }
+  }, [pollInterval])
+
+  const startPolling = (cid: number) => {
+    if (pollInterval) clearInterval(pollInterval)
+    
+    const interval = setInterval(async () => {
+      try {
+        const response = await client.get(`/chat/history/${sessionId}`)
+        const newMessages = response.data.messages
+
+        // Check for new messages
+        if (newMessages.length > messages.length) {
+          const restoredMessages = newMessages.map((msg: any) => ({
+            id: msg.id,
+            type: msg.message_type.toLowerCase() as 'user' | 'ai' | 'admin',
+            content: msg.content,
+            timestamp: new Date(msg.created_at).toLocaleTimeString(),
+            read_status: msg.read_status,
+            sender_id: msg.sender_id
+          }))
+          setMessages(restoredMessages)
+        }
+      } catch (error) {
+        console.error('Error polling for responses:', error)
+      }
+    }, 3000) // Poll every 3 seconds
+
+    setPollInterval(interval)
+
+    // Stop polling after 30 minutes
+    setTimeout(() => {
+      clearInterval(interval)
+      setPollInterval(null)
+    }, 30 * 60 * 1000)
+  }
+
+  const markMessagesAsRead = async () => {
+    if (!chatId) return
+    try {
+      await client.post(`/chat/chat/${chatId}/mark-all-read`)
+    } catch (error) {
+      console.error('Error marking messages as read:', error)
+    }
+  }
+
+  const sendTypingStatus = async (isTypingStatus: boolean) => {
+    if (!chatId) return
+    try {
+      await client.post('/chat/typing', {
+        chat_id: chatId,
+        is_typing: isTypingStatus
+      })
+    } catch (error) {
+      console.error('Error sending typing status:', error)
+    }
+  }
+
   const sendMessage = async () => {
-    if (!input.trim()) return
+    if (!input.trim() || !sessionId) return
 
     // Add user message
     const userMessage: Message = {
@@ -53,9 +159,12 @@ const ChatWidget = () => {
 
       // Add AI response
       const aiMessage: Message = {
+        id: response.data.ai_response.id,
         type: response.data.requires_transfer ? 'admin' : 'ai',
         content: response.data.ai_response.content,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
+        read_status: 'unread',
+        sender_id: response.data.ai_response.sender_id
       }
       setMessages(prev => [...prev, aiMessage])
 
@@ -69,12 +178,13 @@ const ChatWidget = () => {
           }
           setMessages(prev => [...prev, notificationMessage])
         }, 1000)
+        
+        // Start polling for admin responses
+        startPolling(response.data.chat_id)
       }
 
-      // Start polling for admin responses
-      if (response.data.requires_transfer) {
-        pollForAdminResponses(response.data.chat_id)
-      }
+      // Mark messages as read
+      await markMessagesAsRead()
     } catch (error) {
       console.error('Error sending message:', error)
       const errorMessage: Message = {
@@ -86,35 +196,6 @@ const ChatWidget = () => {
     } finally {
       setLoading(false)
     }
-  }
-
-  const pollForAdminResponses = (chatIdValue: number) => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const response = await client.get(`/chat/history/${sessionId}`)
-        const newMessages = response.data.messages
-
-        // Check for new admin messages
-        const adminMessages = newMessages.filter((msg: any) => msg.message_type === 'ADMIN')
-        const currentAdminMessages = messages.filter(msg => msg.type === 'admin')
-
-        if (adminMessages.length > currentAdminMessages.length) {
-          // New admin message received
-          const newAdminMsg = adminMessages[adminMessages.length - 1]
-          const message: Message = {
-            type: 'admin',
-            content: newAdminMsg.content,
-            timestamp: new Date().toLocaleTimeString()
-          }
-          setMessages(prev => [...prev, message])
-        }
-      } catch (error) {
-        console.error('Error polling for responses:', error)
-      }
-    }, 3000) // Poll every 3 seconds
-
-    // Stop polling after 5 minutes
-    setTimeout(() => clearInterval(pollInterval), 5 * 60 * 1000)
   }
 
   return (
@@ -173,7 +254,18 @@ const ChatWidget = () => {
                         : 'bg-gray-700 text-gray-100'
                     }`}
                   >
-                    {msg.content}
+                    <div className="flex items-end gap-2">
+                      <span>{msg.content}</span>
+                      {msg.type === 'user' && msg.read_status && (
+                        <span className="text-xs opacity-70">
+                          {msg.read_status === 'read' ? (
+                            <CheckCheck className="w-3 h-3" />
+                          ) : (
+                            <Check className="w-3 h-3" />
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -186,6 +278,18 @@ const ChatWidget = () => {
                 </div>
               )}
 
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-green-500/20 px-4 py-2 rounded-lg border border-green-500/30">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -194,7 +298,10 @@ const ChatWidget = () => {
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value)
+                  sendTypingStatus(e.target.value.length > 0)
+                }}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                 placeholder="Type your question..."
                 className="flex-1 bg-gray-800 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -203,7 +310,7 @@ const ChatWidget = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={sendMessage}
-                disabled={loading}
+                disabled={loading || !sessionId}
                 className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />

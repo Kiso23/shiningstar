@@ -203,7 +203,12 @@ export default function ChatSupportTab() {
                           : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                       }`}
                     >
-                      {msg.content}
+                      <div className="flex items-end gap-2">
+                        <span>{msg.content}</span>
+                        {msg.read_status === 'read' && (
+                          <span className="text-xs opacity-70">✓✓</span>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 ))
