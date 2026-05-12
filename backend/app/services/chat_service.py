@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.app.models.chat import Chat, ChatMessage, ChatStatus, MessageType
-from backend.app.schemas.chat import ChatMessageCreate
+from app.models.chat import Chat, ChatMessage, ChatStatus, MessageType
+from app.schemas.chat import ChatMessageCreate
 from datetime import datetime
 import re
 

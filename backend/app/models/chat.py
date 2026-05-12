@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Enum
 from sqlalchemy.sql import func
 from datetime import datetime
 import enum
-from backend.app.database import Base
+from app.database import Base
 
 
 class MessageType(str, enum.Enum):
