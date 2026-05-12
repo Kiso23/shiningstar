@@ -48,6 +48,7 @@ import app.models.admin  # noqa: F401
 import app.models.page_view  # noqa: F401
 import app.models.setting  # noqa: F401
 import app.models.otp  # noqa: F401
+import app.models.chat  # noqa: F401
 
 
 @asynccontextmanager
@@ -121,6 +122,7 @@ from app.routers import auth, registrations, admin  # noqa: E402
 from app.routers import matches, standings, analytics  # noqa: E402
 from app.routers import settings as settings_router  # noqa: E402
 from app.routers import password as password_router  # noqa: E402
+from app.routers import chat  # noqa: E402
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(password_router.router, prefix="/api/v1")
 app.include_router(registrations.router, prefix="/api/v1")
@@ -129,6 +131,7 @@ app.include_router(matches.router, prefix="/api/v1")
 app.include_router(standings.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(settings_router.router, prefix="/api/v1")
+app.include_router(chat.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["health"])
