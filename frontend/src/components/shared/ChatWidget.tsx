@@ -70,6 +70,11 @@ const ChatWidget = () => {
           setMessages(prev => [...prev, notificationMessage])
         }, 1000)
       }
+
+      // Start polling for admin responses
+      if (response.data.requires_transfer) {
+        pollForAdminResponses(response.data.chat_id)
+      }
     } catch (error) {
       console.error('Error sending message:', error)
       const errorMessage: Message = {
@@ -81,6 +86,35 @@ const ChatWidget = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const pollForAdminResponses = (chatIdValue: number) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await client.get(`/chat/history/${sessionId}`)
+        const newMessages = response.data.messages
+
+        // Check for new admin messages
+        const adminMessages = newMessages.filter((msg: any) => msg.message_type === 'ADMIN')
+        const currentAdminMessages = messages.filter(msg => msg.type === 'admin')
+
+        if (adminMessages.length > currentAdminMessages.length) {
+          // New admin message received
+          const newAdminMsg = adminMessages[adminMessages.length - 1]
+          const message: Message = {
+            type: 'admin',
+            content: newAdminMsg.content,
+            timestamp: new Date().toLocaleTimeString()
+          }
+          setMessages(prev => [...prev, message])
+        }
+      } catch (error) {
+        console.error('Error polling for responses:', error)
+      }
+    }, 3000) // Poll every 3 seconds
+
+    // Stop polling after 5 minutes
+    setTimeout(() => clearInterval(pollInterval), 5 * 60 * 1000)
   }
 
   return (
