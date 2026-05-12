@@ -49,3 +49,9 @@ class TransferToAdminRequest(BaseModel):
     chat_id: int
     reason: str
     admin_id: Optional[str] = None
+
+
+class AdminRespondRequest(BaseModel):
+    chat_id: int
+    admin_id: str
+    message: str

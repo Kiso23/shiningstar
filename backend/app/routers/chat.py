@@ -7,7 +7,8 @@ from app.schemas.chat import (
     ChatMessageResponse,
     ChatResponse,
     ChatHistoryResponse,
-    TransferToAdminRequest
+    TransferToAdminRequest,
+    AdminRespondRequest
 )
 from app.services.chat_service import ChatService
 from app.models.chat import MessageType, Chat, ChatMessage
@@ -124,13 +125,11 @@ async def transfer_to_admin(
 
 @router.post("/admin/respond")
 async def admin_respond(
-    chat_id: int,
-    admin_id: str,
-    message: str,
+    payload: AdminRespondRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """Admin sends a response to a chat"""
-    result = await db.execute(select(Chat).filter(Chat.id == chat_id))
+    result = await db.execute(select(Chat).filter(Chat.id == payload.chat_id))
     chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
@@ -139,7 +138,7 @@ async def admin_respond(
     admin_message = await ChatService.save_message(
         chat_id=chat.id,
         message_type=MessageType.ADMIN,
-        content=message,
+        content=payload.message,
         db=db
     )
 
