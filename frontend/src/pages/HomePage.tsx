@@ -6,6 +6,7 @@ import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
+import MusicPlayer from '../components/shared/MusicPlayer'
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
 // Mid dark:     #0e1a0e  (deep forest green-black)
@@ -586,6 +587,9 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* ══ MUSIC PLAYER ══ */}
+      <MusicPlayer src="/stadium-music.mp3" title="Stadium Rock" artist="Pufino" />
     </div>
   )
 }
