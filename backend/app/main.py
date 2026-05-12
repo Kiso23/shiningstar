@@ -35,6 +35,12 @@ async def _run_migrations() -> None:
             "ALTER TABLE matches ALTER COLUMN team_b_id DROP NOT NULL",
             # Add address column to teams
             "ALTER TABLE teams ADD COLUMN IF NOT EXISTS address VARCHAR(300)",
+            # Add new chat message columns for professional support features
+            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS sender_id VARCHAR(255)",
+            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS read_status VARCHAR(20) DEFAULT 'unread'",
+            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS read_at TIMESTAMP",
+            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS is_typing BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         ]:
             await conn.execute(__import__('sqlalchemy').text(sql))
     logger.info("Migrations complete.")
