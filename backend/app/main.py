@@ -35,12 +35,6 @@ async def _run_migrations() -> None:
             "ALTER TABLE matches ALTER COLUMN team_b_id DROP NOT NULL",
             # Add address column to teams
             "ALTER TABLE teams ADD COLUMN IF NOT EXISTS address VARCHAR(300)",
-            # Add new chat message columns for professional support features
-            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS sender_id VARCHAR(255)",
-            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS read_status VARCHAR(20) DEFAULT 'unread'",
-            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS read_at TIMESTAMP",
-            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS is_typing BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         ]:
             await conn.execute(__import__('sqlalchemy').text(sql))
     logger.info("Migrations complete.")
@@ -54,7 +48,6 @@ import app.models.admin  # noqa: F401
 import app.models.page_view  # noqa: F401
 import app.models.setting  # noqa: F401
 import app.models.otp  # noqa: F401
-import app.models.chat  # noqa: F401
 
 
 @asynccontextmanager
@@ -128,7 +121,6 @@ from app.routers import auth, registrations, admin  # noqa: E402
 from app.routers import matches, standings, analytics  # noqa: E402
 from app.routers import settings as settings_router  # noqa: E402
 from app.routers import password as password_router  # noqa: E402
-from app.routers import chat  # noqa: E402
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(password_router.router, prefix="/api/v1")
 app.include_router(registrations.router, prefix="/api/v1")
@@ -137,7 +129,6 @@ app.include_router(matches.router, prefix="/api/v1")
 app.include_router(standings.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(settings_router.router, prefix="/api/v1")
-app.include_router(chat.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["health"])
