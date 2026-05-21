@@ -10,9 +10,11 @@ from app.models.team import Team
 from app.schemas.player import PlayerCreate
 from app.schemas.team import TeamCreate, TeamResponse
 from app.services import registration_service, payment_service
+from app.services.razorpay_service import RazorpayService
 from app.services.email_service import send_registration_confirmation
 
 router = APIRouter(prefix="/registrations", tags=["registrations"])
+razorpay_service = RazorpayService()
 
 
 @router.post("", response_model=TeamResponse, status_code=status.HTTP_201_CREATED)
@@ -101,3 +103,55 @@ async def get_registration_status(
         "status": team.status,
         "team_name": team.team_name,
     }
+
+
+@router.post("/{registration_id}/razorpay-order", status_code=status.HTTP_201_CREATED)
+async def create_razorpay_order(
+    registration_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a Razorpay order for payment."""
+    team = await registration_service.get_team_by_registration_id(db, registration_id)
+    if team is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
+
+    try:
+        order = await razorpay_service.create_order(db, str(team.id))
+        return order
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.post("/{registration_id}/verify-payment", status_code=status.HTTP_200_OK)
+async def verify_razorpay_payment(
+    registration_id: str,
+    payment_data: dict,
+    db: AsyncSession = Depends(get_db),
+):
+    """Verify Razorpay payment signature."""
+    team = await registration_service.get_team_by_registration_id(db, registration_id)
+    if team is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
+
+    try:
+        is_valid = await razorpay_service.verify_payment(
+            db,
+            str(team.id),
+            payment_data.get("razorpay_order_id"),
+            payment_data.get("razorpay_payment_id"),
+            payment_data.get("razorpay_signature"),
+        )
+
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment verification failed",
+            )
+
+        return {
+            "message": "Payment verified successfully",
+            "status": "payment_verified",
+            "registration_id": registration_id,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

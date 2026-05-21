@@ -24,3 +24,4 @@ class Team(Base):
 
     players: Mapped[List["Player"]] = relationship(back_populates="team", cascade="all, delete-orphan")
     payment_proof: Mapped[Optional["PaymentProof"]] = relationship(back_populates="team", uselist=False, cascade="all, delete-orphan")
+    razorpay_payment: Mapped[Optional["RazorpayPayment"]] = relationship(back_populates="team", uselist=False, cascade="all, delete-orphan")
