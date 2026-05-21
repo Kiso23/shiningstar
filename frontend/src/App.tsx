@@ -10,6 +10,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import FixturesPage from './pages/FixturesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import LivePage from './pages/LivePage'
+import ContactPage from './pages/ContactPage'
 import ProtectedRoute from './components/shared/ProtectedRoute'
 import LogoWatermark from './components/shared/LogoWatermark'
 import SplashScreen from './components/shared/SplashScreen'
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/fixtures" element={<FixturesPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/live" element={<LivePage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
             <Route

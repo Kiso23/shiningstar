@@ -323,3 +323,107 @@ Fair play, discipline, and respect must be maintained as per AFA standards.
 © 2025 Shining Star United"""
         await _send(to_email, rules_subject, rules_html, rules_text,
                     rules_pdf_bytes, "SSU_Champions_Trophy_Rules_Regulations.pdf")
+
+
+
+async def send_contact_notification(
+    contact_name: str,
+    contact_email: str,
+    contact_phone: str,
+    subject: str,
+    message: str,
+) -> None:
+    """Send contact notification to admin."""
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@shiningstarunited.com")
+    
+    html_content = f"""
+      <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">📧 New Contact Message</h2>
+      <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+        A new message has been received from a player/team.
+      </p>
+      <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #2a2a2a;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;width:120px;">Name</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{contact_name}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Email</td>
+            <td style="padding:8px 0;color:#f97316;font-size:13px;"><a href="mailto:{contact_email}" style="color:#f97316;text-decoration:none;">{contact_email}</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Phone</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;"><a href="tel:{contact_phone}" style="color:#fff;text-decoration:none;">{contact_phone}</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Subject</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{subject}</td>
+          </tr>
+        </table>
+      </div>
+      <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+        <p style="margin:0 0 8px;color:#86efac;font-size:13px;font-weight:600;">Message:</p>
+        <p style="margin:0;color:#aaa;font-size:13px;line-height:1.6;white-space:pre-wrap;">{message}</p>
+      </div>
+      <p style="margin:0;color:#666;font-size:12px;">
+        Please reply to this message through the admin dashboard.
+      </p>
+    """
+
+    text_content = f"""New Contact Message — {TOURNAMENT_NAME}
+
+Name    : {contact_name}
+Email   : {contact_email}
+Phone   : {contact_phone}
+Subject : {subject}
+
+Message:
+{message}
+
+---
+Please reply through the admin dashboard.
+
+© 2025 Shining Star United"""
+
+    await _send(admin_email, f"📧 New Contact: {subject}", _base_html(html_content), text_content)
+
+
+async def send_contact_reply(
+    to_email: str,
+    contact_name: str,
+    subject: str,
+    admin_reply: str,
+) -> None:
+    """Send admin reply to contact message."""
+    html_content = f"""
+      <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">✅ Reply to Your Message</h2>
+      <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+        Hi <strong style="color:#fff;">{contact_name}</strong>, we have replied to your message.
+      </p>
+      <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #2a2a2a;">
+        <p style="margin:0 0 8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Subject</p>
+        <p style="margin:0 0 16px;color:#fff;font-size:14px;font-weight:600;">{subject}</p>
+      </div>
+      <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+        <p style="margin:0 0 8px;color:#86efac;font-size:13px;font-weight:600;">Admin Reply:</p>
+        <p style="margin:0;color:#aaa;font-size:13px;line-height:1.6;white-space:pre-wrap;">{admin_reply}</p>
+      </div>
+      <p style="margin:0;color:#666;font-size:12px;">
+        If you have any further questions, please contact us again through the contact form.
+      </p>
+    """
+
+    text_content = f"""Reply to Your Message — {TOURNAMENT_NAME}
+
+Hi {contact_name},
+
+We have replied to your message regarding: {subject}
+
+Admin Reply:
+{admin_reply}
+
+If you have further questions, please contact us again.
+
+© 2025 Shining Star United"""
+
+    await _send(to_email, f"✅ Reply: {subject}", _base_html(html_content), text_content)
