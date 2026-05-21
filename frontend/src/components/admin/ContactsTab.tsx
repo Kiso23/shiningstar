@@ -297,6 +297,21 @@ export default function ContactsTab() {
                 </div>
               )}
 
+              {/* Delete button for replied/closed contacts */}
+              {(selectedContact.status === 'closed' || selectedContact.admin_reply) && (
+                <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleDelete(selectedContact.id)}
+                    className="flex-1 px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 font-semibold hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <X className="w-4 h-4" />
+                    Delete Message
+                  </motion.button>
+                </div>
+              )}
+
               {/* Closed state */}
               {selectedContact.status === 'closed' && (
                 <div className="flex-1 flex items-center justify-center text-gray-500">
