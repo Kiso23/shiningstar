@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
-import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio } from 'lucide-react'
+import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
 // ── Color palette matched to stadium night video ──────────────────────────
@@ -110,7 +110,7 @@ export default function HomePage() {
         </div>
 
         <div className="hidden sm:flex items-center gap-1">
-          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }].map(({ label, path }) => (
+          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
               className="hover:text-orange-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
@@ -245,6 +245,7 @@ export default function HomePage() {
                 { icon: Calendar, label: 'Match Fixtures', sub: 'View all scheduled matches', path: '/fixtures', color: 'text-blue-400' },
                 { icon: Radio, label: 'Live Scores', sub: 'Real-time match updates', path: '/live', color: 'text-green-400' },
                 { icon: Trophy, label: 'Leaderboard', sub: 'Tournament standings', path: '/leaderboard', color: 'text-yellow-400' },
+                { icon: MessageSquare, label: 'Support', sub: 'Contact us with questions', path: '/contact', color: 'text-orange-400' },
               ].map(({ icon: Icon, label, sub, path, color }, i) => (
                 <motion.button key={label} whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
                   onClick={() => navigate(path)}
