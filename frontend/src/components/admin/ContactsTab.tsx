@@ -220,9 +220,20 @@ export default function ContactsTab() {
                     <h3 className="text-white font-bold text-lg">{selectedContact.name}</h3>
                     <p className="text-gray-500 text-sm mt-1">{selectedContact.subject}</p>
                   </div>
-                  <div className={`px-3 py-1 rounded-lg text-sm font-medium border flex items-center gap-2 ${getStatusColor(selectedContact.status)}`}>
-                    {getStatusIcon(selectedContact.status)}
-                    {selectedContact.status}
+                  <div className="flex items-center gap-2">
+                    <div className={`px-3 py-1 rounded-lg text-sm font-medium border flex items-center gap-2 ${getStatusColor(selectedContact.status)}`}>
+                      {getStatusIcon(selectedContact.status)}
+                      {selectedContact.status}
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleDelete(selectedContact.id)}
+                      className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+                      title="Delete this message"
+                    >
+                      <X className="w-4 h-4" />
+                    </motion.button>
                   </div>
                 </div>
 
@@ -265,49 +276,24 @@ export default function ContactsTab() {
                     placeholder="Type your reply here..."
                     className="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500/50 transition-colors resize-none mb-3"
                   />
-                  <div className="flex gap-2">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleReply}
-                      disabled={replyLoading || !replyText.trim()}
-                      className="flex-1 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {replyLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          Send Reply
-                        </>
-                      )}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleDelete(selectedContact.id)}
-                      className="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 font-semibold hover:bg-red-500/20 transition-colors"
-                    >
-                      Delete
-                    </motion.button>
-                  </div>
-                </div>
-              )}
-
-              {/* Delete button for replied/closed contacts */}
-              {(selectedContact.status === 'closed' || selectedContact.admin_reply) && (
-                <div className="flex gap-2">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => handleDelete(selectedContact.id)}
-                    className="flex-1 px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 font-semibold hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
+                    onClick={handleReply}
+                    disabled={replyLoading || !replyText.trim()}
+                    className="w-full py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <X className="w-4 h-4" />
-                    Delete Message
+                    {replyLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Send Reply
+                      </>
+                    )}
                   </motion.button>
                 </div>
               )}
