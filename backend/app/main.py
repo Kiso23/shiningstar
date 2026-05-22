@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime, timedelta
 
@@ -169,11 +169,37 @@ app.include_router(contact_router.router, prefix="/api/v1")
 app.include_router(player_recruitment_router.router, prefix="/api/v1")
 
 # Mount static files for uploads (logos, payment proofs, player photos)
-if os.path.exists(settings.UPLOAD_DIR):
-    app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+# This is a fallback - the /uploads/{file_path:path} endpoint above is the primary handler
+upload_dir_abs = os.path.abspath(settings.UPLOAD_DIR)
+if os.path.exists(upload_dir_abs):
+    try:
+        app.mount("/static/uploads", StaticFiles(directory=upload_dir_abs), name="static_uploads")
+        logger.info(f"Static files mounted at /static/uploads from {upload_dir_abs}")
+    except Exception as e:
+        logger.warning(f"Could not mount static files: {e}")
 
 
 @app.get("/health", tags=["health"])
 async def health_check():
     """Simple liveness probe."""
     return {"status": "ok"}
+
+
+@app.get("/uploads/{file_path:path}", tags=["files"])
+async def serve_upload(file_path: str):
+    """Serve uploaded files (photos, logos, payment proofs)."""
+    full_path = os.path.join(settings.UPLOAD_DIR, file_path)
+    
+    # Security: prevent directory traversal
+    full_path = os.path.abspath(full_path)
+    upload_dir = os.path.abspath(settings.UPLOAD_DIR)
+    if not full_path.startswith(upload_dir):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
+    if not os.path.exists(full_path):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
+    
+    if not os.path.isfile(full_path):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Not a file")
+    
+    return FileResponse(full_path, media_type="application/octet-stream")
