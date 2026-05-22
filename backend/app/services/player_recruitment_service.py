@@ -153,7 +153,11 @@ async def delete_player_recruitment(
     player_id: UUID | str,
 ) -> bool:
     """Delete player recruitment application"""
-    player = await get_player_recruitment_by_id(db, player_id)
+    # Get the actual model object, not the dict
+    result = await db.execute(
+        select(PlayerRecruitment).where(PlayerRecruitment.id == player_id)
+    )
+    player = result.scalars().first()
     if not player:
         return False
     
