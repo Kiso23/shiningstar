@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 from enum import Enum
+from uuid import UUID
 
 
 class PlayerPosition(str, Enum):
@@ -63,8 +64,7 @@ class PlayerRecruitmentResponse(PlayerRecruitmentCreate):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PlayerRecruitmentUpdate(BaseModel):
@@ -84,5 +84,4 @@ class PlayerRecruitmentList(BaseModel):
     status: PlayerRecruitmentStatus
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
