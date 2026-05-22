@@ -107,9 +107,13 @@ async def add_cache_headers(request: Request, call_next):
         elif "/settings" in request.url.path:
             response.headers["Cache-Control"] = "public, max-age=3600"  # 1 hour
     
-    # Add ETag for better cache validation
-    if response.status_code == 200 and request.method == "GET":
-        response.headers["ETag"] = f'"{hash(response.body)}"'
+    # Add ETag for better cache validation (only for responses with body)
+    if response.status_code == 200 and request.method == "GET" and hasattr(response, "body"):
+        try:
+            response.headers["ETag"] = f'"{hash(response.body)}"'
+        except Exception:
+            # Skip ETag if body is not accessible (streaming responses, etc.)
+            pass
     
     return response
 
