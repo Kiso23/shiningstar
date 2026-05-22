@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Phone, User, MapPin, Trophy, Send, Loader2, AlertCircle, CheckCircle, X, Clock, Eye, Trash2 } from 'lucide-react'
+import { Mail, Phone, User, MapPin, Trophy, Send, Loader2, AlertCircle, CheckCircle, X, Clock, Eye, Trash2, Database } from 'lucide-react'
 import { listPlayerRecruitments, getPlayerRecruitment, updatePlayerRecruitmentStatus, deletePlayerRecruitment, type PlayerRecruitmentResponse, type PlayerRecruitmentList } from '../../api/player_recruitment'
 
 export default function RecruitmentTab() {
@@ -11,6 +11,7 @@ export default function RecruitmentTab() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [useCache, setUseCache] = useState(true)
 
   // Load recruitments
   useEffect(() => {
@@ -32,8 +33,8 @@ export default function RecruitmentTab() {
 
   const handleSelectRecruitment = async (recruitment: PlayerRecruitmentList) => {
     try {
-      // Always fetch fresh data (skip cache) when selecting a player
-      const fullRecruitment = await getPlayerRecruitment(recruitment.id, true)
+      // Use cache setting to determine if we should skip cache
+      const fullRecruitment = await getPlayerRecruitment(recruitment.id, !useCache)
       setSelectedRecruitment(fullRecruitment)
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load application details')
@@ -121,7 +122,31 @@ export default function RecruitmentTab() {
       <div className="w-full lg:w-96 flex flex-col border-r border-white/5">
         {/* Header */}
         <div className="mb-4">
-          <h2 className="text-white font-bold mb-4">Player Applications</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-white font-bold">Player Applications</h2>
+            <div className="flex items-center gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setUseCache(!useCache)}
+                className={`flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  useCache
+                    ? 'bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30'
+                    : 'bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30'
+                }`}
+                title={useCache ? 'Cache enabled - click to disable' : 'Cache disabled - click to enable'}
+              >
+                <Database className="w-3 h-3" />
+                {useCache ? 'Cache ON' : 'Cache OFF'}
+              </motion.button>
+            </div>
+          </div>
+          
+          <p className="text-gray-500 text-xs mb-3">
+            {useCache 
+              ? '✓ Using cached data for faster loading' 
+              : '⚠ Fetching fresh data from server'}
+          </p>
           
           {/* Status filter */}
           <div className="flex gap-2 flex-wrap">
