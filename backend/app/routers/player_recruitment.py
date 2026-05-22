@@ -55,23 +55,32 @@ async def create_player_recruitment(
                 detail=f"Failed to upload photo: {str(e)}"
             )
     
-    # Create player recruitment record
-    player = await player_recruitment_service.create_player_recruitment(
-        db, data, photo_url
-    )
-    
-    # Send notification email to admin in background
-    background_tasks.add_task(
-        send_player_recruitment_notification,
-        player_name=player.full_name,
-        player_email=player.email,
-        player_phone=player.phone,
-        position=player.position.value,
-        age=player.age,
-        experience=player.years_of_experience,
-    )
-    
-    return player
+    try:
+        # Create player recruitment record
+        player = await player_recruitment_service.create_player_recruitment(
+            db, data, photo_url
+        )
+        
+        # Send notification email to admin in background
+        background_tasks.add_task(
+            send_player_recruitment_notification,
+            player_name=player.full_name,
+            player_email=player.email,
+            player_phone=player.phone,
+            position=player.position.value,
+            age=player.age,
+            experience=player.years_of_experience,
+        )
+        
+        return player
+    except Exception as e:
+        # Log the error and return a user-friendly message
+        import logging
+        logging.getLogger(__name__).error(f"Failed to create player recruitment: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to submit application. Please try again later."
+        )
 
 
 @router.get("/admin/applications", response_model=list[PlayerRecruitmentList])
