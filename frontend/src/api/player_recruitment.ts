@@ -58,12 +58,29 @@ export const submitPlayerRecruitment = async (
 ): Promise<PlayerRecruitmentResponse> => {
   const formData = new FormData()
   
-  // Add all form fields
-  Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      formData.append(key, String(value))
-    }
-  })
+  // Add all form fields - convert to proper types
+  formData.append('full_name', data.full_name)
+  formData.append('email', data.email)
+  formData.append('phone', data.phone)
+  formData.append('age', String(data.age))
+  if (data.date_of_birth) formData.append('date_of_birth', data.date_of_birth)
+  
+  formData.append('address', data.address)
+  formData.append('city', data.city)
+  formData.append('state', data.state)
+  if (data.postal_code) formData.append('postal_code', data.postal_code)
+  
+  formData.append('position', data.position)
+  if (data.jersey_number) formData.append('jersey_number', String(data.jersey_number))
+  if (data.height) formData.append('height', String(data.height))
+  if (data.weight) formData.append('weight', String(data.weight))
+  
+  formData.append('years_of_experience', String(data.years_of_experience))
+  if (data.previous_clubs) formData.append('previous_clubs', data.previous_clubs)
+  if (data.achievements) formData.append('achievements', data.achievements)
+  if (data.preferred_foot) formData.append('preferred_foot', data.preferred_foot)
+  if (data.injuries_or_concerns) formData.append('injuries_or_concerns', data.injuries_or_concerns)
+  if (data.additional_notes) formData.append('additional_notes', data.additional_notes)
   
   // Add photo if provided
   if (photo) {

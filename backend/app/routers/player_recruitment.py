@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 import os
 import uuid
@@ -22,7 +22,25 @@ router = APIRouter(prefix="/player-recruitment", tags=["player-recruitment"])
 
 @router.post("", response_model=PlayerRecruitmentResponse, status_code=status.HTTP_201_CREATED)
 async def create_player_recruitment(
-    data: PlayerRecruitmentCreate,
+    full_name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(...),
+    age: int = Form(...),
+    date_of_birth: str | None = Form(None),
+    address: str = Form(...),
+    city: str = Form(...),
+    state: str = Form(...),
+    postal_code: str | None = Form(None),
+    position: str = Form(...),
+    jersey_number: int | None = Form(None),
+    height: float | None = Form(None),
+    weight: float | None = Form(None),
+    years_of_experience: int = Form(...),
+    previous_clubs: str | None = Form(None),
+    achievements: str | None = Form(None),
+    preferred_foot: str | None = Form(None),
+    injuries_or_concerns: str | None = Form(None),
+    additional_notes: str | None = Form(None),
     photo: UploadFile | None = File(None),
     background_tasks: BackgroundTasks = BackgroundTasks(),
     db: AsyncSession = Depends(get_db),
@@ -56,6 +74,29 @@ async def create_player_recruitment(
             )
     
     try:
+        # Create PlayerRecruitmentCreate object from form data
+        data = PlayerRecruitmentCreate(
+            full_name=full_name,
+            email=email,
+            phone=phone,
+            age=age,
+            date_of_birth=date_of_birth,
+            address=address,
+            city=city,
+            state=state,
+            postal_code=postal_code,
+            position=position,
+            jersey_number=jersey_number,
+            height=height,
+            weight=weight,
+            years_of_experience=years_of_experience,
+            previous_clubs=previous_clubs,
+            achievements=achievements,
+            preferred_foot=preferred_foot,
+            injuries_or_concerns=injuries_or_concerns,
+            additional_notes=additional_notes,
+        )
+        
         # Create player recruitment record
         player = await player_recruitment_service.create_player_recruitment(
             db, data, photo_url
