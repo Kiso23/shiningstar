@@ -427,3 +427,78 @@ If you have further questions, please contact us again.
 © 2025 Shining Star United"""
 
     await _send(to_email, f"✅ Reply: {subject}", _base_html(html_content), text_content)
+
+
+async def send_player_recruitment_notification(
+    player_name: str,
+    player_email: str,
+    player_phone: str,
+    position: str,
+    age: int,
+    experience: int,
+) -> None:
+    """Send admin notification when player submits recruitment application."""
+    admin_email = os.getenv("ADMIN_EMAIL", settings.SMTP_FROM)
+    if not admin_email:
+        logger.warning("ADMIN_EMAIL not set, skipping player recruitment notification")
+        return
+
+    html_content = f"""
+      <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">🆕 New Player Application</h2>
+      <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+        A new player has applied to join Shining Star United FC.
+      </p>
+      <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #2a2a2a;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;width:140px;">Player Name</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{player_name}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Email</td>
+            <td style="padding:8px 0;color:#f97316;font-size:13px;">{player_email}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Phone</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;">{player_phone}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Position</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;text-transform:capitalize;">{position}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Age</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;">{age} years</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Experience</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;">{experience} years</td>
+          </tr>
+        </table>
+      </div>
+      <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+        <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
+          <strong>Action Required:</strong> Review the application in the admin dashboard and update the status (Reviewed, Shortlisted, Rejected, or Accepted).
+        </p>
+      </div>
+      <p style="margin:0;color:#666;font-size:12px;">
+        Log in to the admin dashboard to view the complete application details.
+      </p>
+    """
+
+    text_content = f"""New Player Application — {TOURNAMENT_NAME}
+
+A new player has applied to join Shining Star United FC.
+
+Player Name : {player_name}
+Email       : {player_email}
+Phone       : {player_phone}
+Position    : {position}
+Age         : {age} years
+Experience  : {experience} years
+
+Please review the application in the admin dashboard.
+
+© 2025 Shining Star United"""
+
+    await _send(admin_email, f"🆕 New Player Application: {player_name}", _base_html(html_content), text_content)

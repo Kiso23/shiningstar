@@ -11,6 +11,7 @@ import FixturesPage from './pages/FixturesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import LivePage from './pages/LivePage'
 import ContactPage from './pages/ContactPage'
+import PlayerRecruitmentPage from './pages/PlayerRecruitmentPage'
 import ProtectedRoute from './components/shared/ProtectedRoute'
 import LogoWatermark from './components/shared/LogoWatermark'
 import SplashScreen from './components/shared/SplashScreen'
@@ -50,6 +51,7 @@ export default function App() {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/live" element={<LivePage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/join" element={<PlayerRecruitmentPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
             <Route
