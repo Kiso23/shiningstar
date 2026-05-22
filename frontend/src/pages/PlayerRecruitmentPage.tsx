@@ -64,7 +64,7 @@ export default function PlayerRecruitmentPage() {
     setError(null)
 
     try {
-      await submitPlayerRecruitment(
+      const result = await submitPlayerRecruitment(
         {
           full_name: formData.full_name,
           email: formData.email,
@@ -90,8 +90,11 @@ export default function PlayerRecruitmentPage() {
       )
       setSubmitted(true)
       
-      // Redirect after 3 seconds
-      setTimeout(() => navigate('/'), 3000)
+      // Store the result for display
+      sessionStorage.setItem('playerRecruitmentResult', JSON.stringify(result))
+      
+      // Redirect after 4 seconds
+      setTimeout(() => navigate('/'), 4000)
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to submit application. Please try again.')
     } finally {
@@ -145,6 +148,21 @@ export default function PlayerRecruitmentPage() {
               <p className="text-gray-300 text-sm mb-4">
                 Thank you for applying to Shining Star United FC. We'll review your application and get back to you soon.
               </p>
+              
+              {/* Show submitted photo */}
+              {photoPreview && (
+                <div className="mb-4 flex justify-center">
+                  <img src={photoPreview} alt={formData.full_name} className="w-24 h-24 rounded-lg object-cover border-2 border-green-400" />
+                </div>
+              )}
+              
+              {/* Show submitted details */}
+              <div className="bg-black/30 rounded-lg p-4 mb-4 text-left">
+                <p className="text-gray-300 text-sm"><strong>Name:</strong> {formData.full_name}</p>
+                <p className="text-gray-300 text-sm"><strong>Position:</strong> {formData.position}</p>
+                <p className="text-gray-300 text-sm"><strong>Email:</strong> {formData.email}</p>
+              </div>
+              
               <p className="text-gray-500 text-xs">Redirecting to home...</p>
             </motion.div>
           )}

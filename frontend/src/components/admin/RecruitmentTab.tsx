@@ -255,7 +255,18 @@ export default function RecruitmentTab() {
               {selectedRecruitment.photo_url && (
                 <div className="mb-6 pb-4 border-b border-white/5">
                   <p className="text-gray-500 text-xs mb-2">Player Photo</p>
-                  <img src={selectedRecruitment.photo_url} alt={selectedRecruitment.full_name} className="w-32 h-32 rounded-lg object-cover" />
+                  <div className="relative">
+                    <img 
+                      src={selectedRecruitment.photo_url} 
+                      alt={selectedRecruitment.full_name} 
+                      className="w-32 h-32 rounded-lg object-cover border border-orange-500/30"
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23333" width="100" height="100"/%3E%3Ctext x="50" y="50" font-size="40" fill="%23666" text-anchor="middle" dy=".3em"%3E%3F%3C/text%3E%3C/svg%3E'
+                      }}
+                    />
+                  </div>
+                  <p className="text-gray-500 text-xs mt-2">{selectedRecruitment.photo_url}</p>
                 </div>
               )}
 

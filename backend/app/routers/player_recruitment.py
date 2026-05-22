@@ -51,23 +51,43 @@ async def create_player_recruitment(
     # Handle photo upload
     if photo:
         try:
+            # Validate file size
+            contents = await photo.read()
+            if len(contents) > settings.MAX_PLAYER_PHOTO_SIZE_BYTES:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Photo size must be less than 3 MB"
+                )
+            
+            # Validate MIME type
+            if photo.content_type and photo.content_type not in settings.ALLOWED_IMAGE_MIME_TYPES:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Only JPEG, PNG, and WebP images are allowed"
+                )
+            
             # Create uploads directory if it doesn't exist
             upload_dir = os.path.join(settings.UPLOAD_DIR, "player_photos")
             os.makedirs(upload_dir, exist_ok=True)
             
-            # Generate unique filename
-            file_ext = os.path.splitext(photo.filename)[1]
+            # Generate unique filename with proper extension
+            file_ext = os.path.splitext(photo.filename)[1].lower()
+            if not file_ext:
+                file_ext = ".jpg"
             unique_filename = f"{uuid.uuid4()}{file_ext}"
             file_path = os.path.join(upload_dir, unique_filename)
             
             # Save file
-            contents = await photo.read()
             with open(file_path, "wb") as f:
                 f.write(contents)
             
             # Store relative URL
             photo_url = f"/uploads/player_photos/{unique_filename}"
+        except HTTPException:
+            raise
         except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Photo upload error: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Failed to upload photo: {str(e)}"

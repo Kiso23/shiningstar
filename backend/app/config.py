@@ -15,7 +15,8 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     MAX_LOGO_SIZE_BYTES: int = 2 * 1024 * 1024        # 2 MB
     MAX_PAYMENT_PROOF_SIZE_BYTES: int = 5 * 1024 * 1024  # 5 MB
-    ALLOWED_IMAGE_MIME_TYPES: list[str] = ["image/jpeg", "image/png"]
+    MAX_PLAYER_PHOTO_SIZE_BYTES: int = 3 * 1024 * 1024  # 3 MB
+    ALLOWED_IMAGE_MIME_TYPES: list[str] = ["image/jpeg", "image/png", "image/jpg", "image/webp"]
 
     # CORS
     CORS_ORIGINS: list[str] = [
