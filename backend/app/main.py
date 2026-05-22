@@ -10,6 +10,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from datetime import datetime, timedelta
 
 from app.config import settings
 from app.database import create_tables, engine, AsyncSessionLocal
@@ -84,6 +85,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Cache middleware for GET requests
+@app.middleware("http")
+async def add_cache_headers(request: Request, call_next):
+    """Add cache headers to GET requests for better performance"""
+    response = await call_next(request)
+    
+    # Add cache headers for GET requests (except admin routes)
+    if request.method == "GET" and not request.url.path.startswith("/api/v1/admin"):
+        # Cache public endpoints for 5 minutes
+        if request.url.path.startswith("/api/v1/contact") and "admin" not in request.url.path:
+            response.headers["Cache-Control"] = "public, max-age=300"  # 5 minutes
+        # Cache fixtures, leaderboard, etc. for 15 minutes
+        elif any(path in request.url.path for path in ["/fixtures", "/leaderboard", "/standings", "/analytics"]):
+            response.headers["Cache-Control"] = "public, max-age=900"  # 15 minutes
+        # Cache settings for 1 hour
+        elif "/settings" in request.url.path:
+            response.headers["Cache-Control"] = "public, max-age=3600"  # 1 hour
+    
+    # Add ETag for better cache validation
+    if response.status_code == 200 and request.method == "GET":
+        response.headers["ETag"] = f'"{hash(response.body)}"'
+    
+    return response
 
 
 def _safe_str(v: Any) -> Any:

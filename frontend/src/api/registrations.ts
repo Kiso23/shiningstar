@@ -1,4 +1,5 @@
 import client from './client'
+import { cache, CACHE_TTL, cacheKeys } from '../utils/cache'
 
 export interface TeamCreateData {
   team_name: string
@@ -31,6 +32,8 @@ export interface TeamResponse {
 export async function createTeam(data: TeamCreateData, logo?: File): Promise<TeamResponse> {
   // Always send JSON — logo upload is handled separately if needed
   const res = await client.post('/registrations', data)
+  // Clear registrations cache when new team is created
+  cache.clear(cacheKeys.registrations())
   return res.data
 }
 
@@ -39,6 +42,8 @@ export async function submitPlayers(
   players: PlayerData[]
 ): Promise<void> {
   await client.post(`/registrations/${registrationId}/players`, players)
+  // Clear cache when players are submitted
+  cache.clear(cacheKeys.registration(registrationId))
 }
 
 export async function uploadPayment(
@@ -50,12 +55,24 @@ export async function uploadPayment(
   const res = await client.post(`/registrations/${registrationId}/payment`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
+  // Clear cache when payment is uploaded
+  cache.clear(cacheKeys.registration(registrationId))
   return res.data
 }
 
 export async function getStatus(
   registrationId: string
 ): Promise<{ registration_id: string; status: string; team_name: string }> {
+  const cacheKey = cacheKeys.registration(registrationId)
+  
+  // Check cache first
+  const cached = cache.get<{ registration_id: string; status: string; team_name: string }>(cacheKey)
+  if (cached) return cached
+
   const res = await client.get(`/registrations/${registrationId}/status`)
+  
+  // Cache the result for 5 minutes
+  cache.set(cacheKey, res.data, CACHE_TTL.MEDIUM)
+  
   return res.data
 }
