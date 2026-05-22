@@ -110,7 +110,7 @@ export default function HomePage() {
         </div>
 
         <div className="hidden sm:flex items-center gap-1">
-          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }].map(({ label, path }) => (
+          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
               className="hover:text-orange-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
@@ -246,6 +246,7 @@ export default function HomePage() {
                 { icon: Radio, label: 'Live Scores', sub: 'Real-time match updates', path: '/live', color: 'text-green-400' },
                 { icon: Trophy, label: 'Leaderboard', sub: 'Tournament standings', path: '/leaderboard', color: 'text-yellow-400' },
                 { icon: MessageSquare, label: 'Support', sub: 'Contact us with questions', path: '/contact', color: 'text-orange-400' },
+                { icon: Users, label: 'Join SSU', sub: 'Apply to join our club', path: '/join', color: 'text-purple-400' },
               ].map(({ icon: Icon, label, sub, path, color }, i) => (
                 <motion.button key={label} whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
                   onClick={() => navigate(path)}

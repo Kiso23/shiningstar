@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, LogOut, X, ClipboardList, Calendar, Radio, BarChart2, Settings, MessageSquare } from 'lucide-react'
+import { Star, LogOut, X, ClipboardList, Calendar, Radio, BarChart2, Settings, MessageSquare, Users } from 'lucide-react'
 import RegistrationTable from '../components/admin/RegistrationTable'
 import RegistrationDetail from '../components/admin/RegistrationDetail'
 import ExportButton from '../components/admin/ExportButton'
@@ -9,10 +9,11 @@ import LiveScoresTab from '../components/admin/LiveScoresTab'
 import AnalyticsTab from '../components/admin/AnalyticsTab'
 import SettingsTab from '../components/admin/SettingsTab'
 import ContactsTab from '../components/admin/ContactsTab'
+import RecruitmentTab from '../components/admin/RecruitmentTab'
 import { useAdminAuth } from '../hooks/useAdminAuth'
 import type { TeamResponse } from '../api/registrations'
 
-type Tab = 'registrations' | 'fixtures' | 'live' | 'analytics' | 'support' | 'settings'
+type Tab = 'registrations' | 'fixtures' | 'live' | 'analytics' | 'support' | 'recruitment' | 'settings'
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'registrations', label: 'Registrations', icon: <ClipboardList className="w-4 h-4" /> },
@@ -20,6 +21,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'live', label: 'Live Scores', icon: <Radio className="w-4 h-4" /> },
   { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="w-4 h-4" /> },
   { id: 'support', label: 'Support', icon: <MessageSquare className="w-4 h-4" /> },
+  { id: 'recruitment', label: 'Recruitment', icon: <Users className="w-4 h-4" /> },
   { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
 ]
 
@@ -173,6 +175,12 @@ export default function AdminDashboardPage() {
         {activeTab === 'support' && (
           <div className="overflow-y-auto h-full p-4 sm:p-6">
             <ContactsTab />
+          </div>
+        )}
+
+        {activeTab === 'recruitment' && (
+          <div className="overflow-y-auto h-full p-4 sm:p-6">
+            <RecruitmentTab />
           </div>
         )}
 

@@ -14,7 +14,7 @@ from app.schemas.player_recruitment import (
     PlayerRecruitmentList,
 )
 from app.services import player_recruitment_service
-from app.services.email_service import send_player_recruitment_notification
+from app.services.email_service import send_player_recruitment_notification, send_player_recruitment_status_update
 from app.config import settings
 
 router = APIRouter(prefix="/player-recruitment", tags=["player-recruitment"])
@@ -110,6 +110,7 @@ async def get_player_recruitment(
 async def update_player_recruitment_status(
     player_id: str,
     update_data: PlayerRecruitmentUpdate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     _admin: Admin = Depends(get_current_admin),
 ):
@@ -122,6 +123,16 @@ async def update_player_recruitment_status(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Player recruitment application not found"
         )
+    
+    # Send status update email in background
+    background_tasks.add_task(
+        send_player_recruitment_status_update,
+        to_email=player.email,
+        player_name=player.full_name,
+        position=player.position.value,
+        status=update_data.status.value,
+    )
+    
     return player
 
 

@@ -502,3 +502,98 @@ Please review the application in the admin dashboard.
 © 2025 Shining Star United"""
 
     await _send(admin_email, f"🆕 New Player Application: {player_name}", _base_html(html_content), text_content)
+
+
+async def send_player_recruitment_status_update(
+    to_email: str,
+    player_name: str,
+    position: str,
+    status: str,
+) -> None:
+    """Send email to player when recruitment status is updated."""
+    if status == "accepted":
+        subject = f"🎉 Congratulations! You've Been Accepted to Shining Star United FC"
+        status_badge = '<span style="background:#14532d;color:#4ade80;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Accepted</span>'
+        status_message = f"""
+          <h2 style="margin:0 0 8px;color:#4ade80;font-size:20px;">🎉 Welcome to SSU!</h2>
+          <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+            Congratulations <strong style="color:#fff;">{player_name}</strong>!
+            Your application to join Shining Star United FC as a <strong style="color:#f97316;">{position}</strong>
+            has been <strong style="color:#4ade80;">accepted</strong>!
+          </p>
+          <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+            <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
+              <strong>Next Steps:</strong><br/>
+              Please contact the club management to finalize your joining. We're excited to have you on the team! ⚽
+            </p>
+          </div>
+        """
+        text_status = "ACCEPTED — Congratulations! You've been accepted to join Shining Star United FC."
+    elif status == "shortlisted":
+        subject = f"📋 You've Been Shortlisted - Shining Star United FC"
+        status_badge = '<span style="background:#4c1d95;color:#d8b4fe;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Shortlisted</span>'
+        status_message = f"""
+          <h2 style="margin:0 0 8px;color:#d8b4fe;font-size:20px;">📋 Great News!</h2>
+          <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+            Hi <strong style="color:#fff;">{player_name}</strong>, your application for the position of
+            <strong style="color:#f97316;">{position}</strong> has been <strong style="color:#d8b4fe;">shortlisted</strong>!
+          </p>
+          <div style="background:#2a1c3a;border:1px solid #4a2d5a;border-radius:12px;padding:16px;margin-bottom:24px;">
+            <p style="margin:0;color:#e9d5ff;font-size:13px;line-height:1.6;">
+              We're impressed with your profile. You'll hear from us soon with the next steps.
+            </p>
+          </div>
+        """
+        text_status = "SHORTLISTED — Great news! Your application has been shortlisted."
+    elif status == "rejected":
+        subject = f"Application Status - Shining Star United FC"
+        status_badge = '<span style="background:#450a0a;color:#f87171;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Rejected</span>'
+        status_message = f"""
+          <h2 style="margin:0 0 8px;color:#f87171;font-size:20px;">Application Status</h2>
+          <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+            Hi <strong style="color:#fff;">{player_name}</strong>, thank you for applying to join Shining Star United FC.
+            Unfortunately, your application for the position of <strong style="color:#f97316;">{position}</strong>
+            has not been selected at this time.
+          </p>
+          <div style="background:#2a1c1c;border:1px solid #4a2d2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+            <p style="margin:0;color:#fca5a5;font-size:13px;line-height:1.6;">
+              We encourage you to apply again in the future. Keep improving your skills! ⚽
+            </p>
+          </div>
+        """
+        text_status = "REJECTED — Thank you for applying. We encourage you to try again in the future."
+    else:
+        return
+
+    html_content = f"""
+      {status_message}
+      <div style="background:#111;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #2a2a2a;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;width:140px;">Player Name</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{player_name}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Position</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;text-transform:capitalize;">{position}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#888;font-size:13px;">Status</td>
+            <td style="padding:8px 0;">{status_badge}</td>
+          </tr>
+        </table>
+      </div>
+    """
+
+    text_content = f"""Player Recruitment Status Update — {TOURNAMENT_NAME}
+
+Hi {player_name},
+
+{text_status}
+
+Position: {position}
+Status: {status.upper()}
+
+© 2025 Shining Star United"""
+
+    await _send(to_email, subject, _base_html(html_content), text_content)
