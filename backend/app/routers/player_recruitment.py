@@ -97,23 +97,23 @@ async def create_player_recruitment(
             additional_notes=additional_notes,
         )
         
-        # Create player recruitment record
-        player = await player_recruitment_service.create_player_recruitment(
+        # Create player recruitment record (returns dict)
+        player_dict = await player_recruitment_service.create_player_recruitment(
             db, data, photo_url
         )
         
         # Send notification email to admin in background
         background_tasks.add_task(
             send_player_recruitment_notification,
-            player_name=player.full_name,
-            player_email=player.email,
-            player_phone=player.phone,
-            position=player.position.value,
-            age=player.age,
-            experience=player.years_of_experience,
+            player_name=player_dict['full_name'],
+            player_email=player_dict['email'],
+            player_phone=player_dict['phone'],
+            position=player_dict['position'],
+            age=player_dict['age'],
+            experience=player_dict['years_of_experience'],
         )
         
-        return player
+        return player_dict
     except Exception as e:
         # Log the error and return a user-friendly message
         import logging
@@ -147,13 +147,13 @@ async def get_player_recruitment(
     _admin: Admin = Depends(get_current_admin),
 ):
     """Get a specific player recruitment application (admin only)."""
-    player = await player_recruitment_service.get_player_recruitment_by_id(db, player_id)
-    if not player:
+    player_dict = await player_recruitment_service.get_player_recruitment_by_id(db, player_id)
+    if not player_dict:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Player recruitment application not found"
         )
-    return player
+    return player_dict
 
 
 @router.patch("/admin/applications/{player_id}", response_model=PlayerRecruitmentResponse)
@@ -165,10 +165,10 @@ async def update_player_recruitment_status(
     _admin: Admin = Depends(get_current_admin),
 ):
     """Update player recruitment status (admin only)."""
-    player = await player_recruitment_service.update_player_recruitment_status(
+    player_dict = await player_recruitment_service.update_player_recruitment_status(
         db, player_id, update_data
     )
-    if not player:
+    if not player_dict:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Player recruitment application not found"
@@ -177,13 +177,13 @@ async def update_player_recruitment_status(
     # Send status update email in background
     background_tasks.add_task(
         send_player_recruitment_status_update,
-        to_email=player.email,
-        player_name=player.full_name,
-        position=player.position.value,
+        to_email=player_dict['email'],
+        player_name=player_dict['full_name'],
+        position=player_dict['position'],
         status=update_data.status.value,
     )
     
-    return player
+    return player_dict
 
 
 @router.delete("/admin/applications/{player_id}", status_code=status.HTTP_204_NO_CONTENT)
