@@ -168,16 +168,6 @@ app.include_router(settings_router.router, prefix="/api/v1")
 app.include_router(contact_router.router, prefix="/api/v1")
 app.include_router(player_recruitment_router.router, prefix="/api/v1")
 
-# Mount static files for uploads (logos, payment proofs, player photos)
-# This is a fallback - the /uploads/{file_path:path} endpoint above is the primary handler
-upload_dir_abs = os.path.abspath(settings.UPLOAD_DIR)
-if os.path.exists(upload_dir_abs):
-    try:
-        app.mount("/static/uploads", StaticFiles(directory=upload_dir_abs), name="static_uploads")
-        logger.info(f"Static files mounted at /static/uploads from {upload_dir_abs}")
-    except Exception as e:
-        logger.warning(f"Could not mount static files: {e}")
-
 
 @app.get("/health", tags=["health"])
 async def health_check():
@@ -203,3 +193,14 @@ async def serve_upload(file_path: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Not a file")
     
     return FileResponse(full_path, media_type="application/octet-stream")
+
+
+# Mount static files for uploads (logos, payment proofs, player photos)
+# This is a fallback - the /uploads/{file_path:path} endpoint above is the primary handler
+upload_dir_abs = os.path.abspath(settings.UPLOAD_DIR)
+if os.path.exists(upload_dir_abs):
+    try:
+        app.mount("/static/uploads", StaticFiles(directory=upload_dir_abs), name="static_uploads")
+        logger.info(f"Static files mounted at /static/uploads from {upload_dir_abs}")
+    except Exception as e:
+        logger.warning(f"Could not mount static files: {e}")
