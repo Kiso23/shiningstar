@@ -32,7 +32,8 @@ export default function RecruitmentTab() {
 
   const handleSelectRecruitment = async (recruitment: PlayerRecruitmentList) => {
     try {
-      const fullRecruitment = await getPlayerRecruitment(recruitment.id)
+      // Always fetch fresh data (skip cache) when selecting a player
+      const fullRecruitment = await getPlayerRecruitment(recruitment.id, true)
       setSelectedRecruitment(fullRecruitment)
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load application details')

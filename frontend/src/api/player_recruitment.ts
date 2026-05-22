@@ -125,13 +125,16 @@ export const listPlayerRecruitments = async (
 }
 
 export const getPlayerRecruitment = async (
-  playerId: string
+  playerId: string,
+  skipCache: boolean = false
 ): Promise<PlayerRecruitmentResponse> => {
   const cacheKey = `player-recruitment:${playerId}`
   
-  // Check cache first
-  const cached = cache.get<PlayerRecruitmentResponse>(cacheKey)
-  if (cached) return cached
+  // Check cache first (unless explicitly skipped)
+  if (!skipCache) {
+    const cached = cache.get<PlayerRecruitmentResponse>(cacheKey)
+    if (cached) return cached
+  }
 
   const response = await client.get(`/player-recruitment/admin/applications/${playerId}`)
   
@@ -150,9 +153,15 @@ export const updatePlayerRecruitmentStatus = async (
     updateData
   )
   
-  // Invalidate caches when recruitment is updated
+  // Invalidate all related caches when recruitment is updated
   cache.clear(`player-recruitment:${playerId}`)
-  cache.clear('player-recruitment:list')
+  cache.clear('player-recruitment:list:all:all')
+  cache.clear('player-recruitment:list:pending:all')
+  cache.clear('player-recruitment:list:reviewed:all')
+  cache.clear('player-recruitment:list:shortlisted:all')
+  cache.clear('player-recruitment:list:accepted:all')
+  cache.clear('player-recruitment:list:rejected:all')
+  cache.clear('player-recruitment:count:all:all')
   
   return response.data
 }
@@ -160,9 +169,15 @@ export const updatePlayerRecruitmentStatus = async (
 export const deletePlayerRecruitment = async (playerId: string): Promise<void> => {
   await client.delete(`/player-recruitment/admin/applications/${playerId}`)
   
-  // Invalidate caches when recruitment is deleted
+  // Invalidate all related caches when recruitment is deleted
   cache.clear(`player-recruitment:${playerId}`)
-  cache.clear('player-recruitment:list')
+  cache.clear('player-recruitment:list:all:all')
+  cache.clear('player-recruitment:list:pending:all')
+  cache.clear('player-recruitment:list:reviewed:all')
+  cache.clear('player-recruitment:list:shortlisted:all')
+  cache.clear('player-recruitment:list:accepted:all')
+  cache.clear('player-recruitment:list:rejected:all')
+  cache.clear('player-recruitment:count:all:all')
 }
 
 export const getPlayerRecruitmentsCount = async (
@@ -185,4 +200,17 @@ export const getPlayerRecruitmentsCount = async (
   cache.set(cacheKey, response.data, CACHE_TTL.MEDIUM)
   
   return response.data
+}
+
+// Clear all player recruitment caches
+export const clearPlayerRecruitmentCache = (): void => {
+  cache.clear('player-recruitment:list:all:all')
+  cache.clear('player-recruitment:list:pending:all')
+  cache.clear('player-recruitment:list:reviewed:all')
+  cache.clear('player-recruitment:list:shortlisted:all')
+  cache.clear('player-recruitment:list:accepted:all')
+  cache.clear('player-recruitment:list:rejected:all')
+  cache.clear('player-recruitment:count:all:all')
+  // Clear all individual player caches
+  cache.clearAll()
 }
