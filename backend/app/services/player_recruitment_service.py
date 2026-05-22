@@ -1,16 +1,48 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from uuid import UUID
+from datetime import datetime
 
 from app.models.player_recruitment import PlayerRecruitment, PlayerRecruitmentStatus
 from app.schemas.player_recruitment import PlayerRecruitmentCreate, PlayerRecruitmentUpdate
+
+
+def _player_to_dict(player: PlayerRecruitment) -> dict:
+    """Convert PlayerRecruitment model to dict with UUID as string"""
+    return {
+        'id': str(player.id),
+        'full_name': player.full_name,
+        'email': player.email,
+        'phone': player.phone,
+        'age': player.age,
+        'date_of_birth': player.date_of_birth,
+        'address': player.address,
+        'city': player.city,
+        'state': player.state,
+        'postal_code': player.postal_code,
+        'position': player.position.value,
+        'jersey_number': player.jersey_number,
+        'height': player.height,
+        'weight': player.weight,
+        'years_of_experience': player.years_of_experience,
+        'previous_clubs': player.previous_clubs,
+        'achievements': player.achievements,
+        'preferred_foot': player.preferred_foot,
+        'injuries_or_concerns': player.injuries_or_concerns,
+        'additional_notes': player.additional_notes,
+        'photo_url': player.photo_url,
+        'status': player.status.value,
+        'admin_notes': player.admin_notes,
+        'created_at': player.created_at,
+        'updated_at': player.updated_at,
+    }
 
 
 async def create_player_recruitment(
     db: AsyncSession,
     data: PlayerRecruitmentCreate,
     photo_url: str | None = None,
-) -> PlayerRecruitment:
+) -> dict:
     """Create a new player recruitment application"""
     player = PlayerRecruitment(
         full_name=data.full_name,
@@ -37,18 +69,21 @@ async def create_player_recruitment(
     db.add(player)
     await db.commit()
     await db.refresh(player)
-    return player
+    
+    # Convert to dict with UUID as string
+    return _player_to_dict(player)
 
 
 async def get_player_recruitment_by_id(
     db: AsyncSession,
     player_id: UUID | str,
-) -> PlayerRecruitment | None:
+) -> dict | None:
     """Get player recruitment by ID"""
     result = await db.execute(
         select(PlayerRecruitment).where(PlayerRecruitment.id == player_id)
     )
-    return result.scalars().first()
+    player = result.scalars().first()
+    return _player_to_dict(player) if player else None
 
 
 async def list_player_recruitments(
@@ -57,7 +92,7 @@ async def list_player_recruitments(
     limit: int = 50,
     status_filter: str | None = None,
     position_filter: str | None = None,
-) -> list[PlayerRecruitment]:
+) -> list[dict]:
     """List player recruitment applications with optional filters"""
     query = select(PlayerRecruitment)
     
@@ -69,7 +104,8 @@ async def list_player_recruitments(
     
     query = query.order_by(PlayerRecruitment.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(query)
-    return result.scalars().all()
+    players = result.scalars().all()
+    return [_player_to_dict(p) for p in players]
 
 
 async def get_player_recruitments_count(
@@ -94,9 +130,12 @@ async def update_player_recruitment_status(
     db: AsyncSession,
     player_id: UUID | str,
     update_data: PlayerRecruitmentUpdate,
-) -> PlayerRecruitment | None:
+) -> dict | None:
     """Update player recruitment status (admin only)"""
-    player = await get_player_recruitment_by_id(db, player_id)
+    result = await db.execute(
+        select(PlayerRecruitment).where(PlayerRecruitment.id == player_id)
+    )
+    player = result.scalars().first()
     if not player:
         return None
     
@@ -106,7 +145,7 @@ async def update_player_recruitment_status(
     
     await db.commit()
     await db.refresh(player)
-    return player
+    return _player_to_dict(player)
 
 
 async def delete_player_recruitment(

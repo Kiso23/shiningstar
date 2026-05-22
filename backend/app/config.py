@@ -18,7 +18,11 @@ class Settings(BaseSettings):
     ALLOWED_IMAGE_MIME_TYPES: list[str] = ["image/jpeg", "image/png"]
 
     # CORS
-    CORS_ORIGINS: list[str] = ["http://localhost:5173"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:5173",
+        "https://shiningstarunited.netlify.app",
+        "https://www.shiningstarunited.netlify.app",
+    ]
 
     # SMTP Email (all optional — emails are skipped if SMTP_HOST is not set)
     SMTP_HOST: str = ""
