@@ -5,10 +5,16 @@ from datetime import datetime
 
 from app.models.player_recruitment import PlayerRecruitment, PlayerRecruitmentStatus
 from app.schemas.player_recruitment import PlayerRecruitmentCreate, PlayerRecruitmentUpdate
+from app.config import settings
 
 
 def _player_to_dict(player: PlayerRecruitment) -> dict:
     """Convert PlayerRecruitment model to dict with UUID as string"""
+    # Construct full photo URL if photo_url exists
+    photo_url = player.photo_url
+    if photo_url and not photo_url.startswith("http"):
+        photo_url = f"{settings.API_BASE_URL}{photo_url}"
+    
     return {
         'id': str(player.id),
         'full_name': player.full_name,
@@ -30,7 +36,7 @@ def _player_to_dict(player: PlayerRecruitment) -> dict:
         'preferred_foot': player.preferred_foot,
         'injuries_or_concerns': player.injuries_or_concerns,
         'additional_notes': player.additional_notes,
-        'photo_url': player.photo_url,
+        'photo_url': photo_url,
         'status': player.status.value,
         'admin_notes': player.admin_notes,
         'created_at': player.created_at,

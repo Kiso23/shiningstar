@@ -24,6 +24,9 @@ class Settings(BaseSettings):
         "https://shiningstarunited.netlify.app",
         "https://www.shiningstarunited.netlify.app",
     ]
+    
+    # API Base URL for constructing full URLs
+    API_BASE_URL: str = "https://shiningstar.onrender.com"
 
     # SMTP Email (all optional — emails are skipped if SMTP_HOST is not set)
     SMTP_HOST: str = ""
