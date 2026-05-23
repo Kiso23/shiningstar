@@ -6,7 +6,7 @@ from typing import Any
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from app.config import settings
 from app.database import create_tables, engine, AsyncSessionLocal
 from app.services.backup_service import start_daily_backup_scheduler
+from app.services.redis_cache import init_cache, close_cache
 
 
 async def _run_migrations() -> None:
@@ -65,13 +66,19 @@ async def lifespan(app: FastAPI):
     os.makedirs(os.path.join(settings.UPLOAD_DIR, "payment_proofs"), exist_ok=True)
     os.makedirs(os.path.join(settings.UPLOAD_DIR, "player_photos"), exist_ok=True)
 
+    # Initialize Redis cache
+    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    await init_cache(redis_url)
+
     # Start daily DB backup scheduler (emails admin every 24h)
     backup_email = os.getenv("BACKUP_EMAIL", settings.SMTP_FROM)
     if backup_email and settings.SMTP_HOST:
         start_daily_backup_scheduler(AsyncSessionLocal, backup_email)
 
     yield
-    # Shutdown: nothing to clean up for now
+    
+    # Shutdown: close Redis connection
+    await close_cache()
 
 
 app = FastAPI(
