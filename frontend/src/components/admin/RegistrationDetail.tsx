@@ -340,32 +340,32 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
         ))}
       </div>
 
-      {/* Players accordion */}
-      {detail.players.length > 0 && (
-        <div className="glass-card overflow-hidden">
-          <button
-            onClick={() => setShowPlayers(!showPlayers)}
-            className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
-          >
-            <span className="text-white font-medium text-sm">
-              Player Roster ({detail.players.length})
-            </span>
-            {showPlayers ? (
-              <ChevronUp className="w-4 h-4 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-            )}
-          </button>
-          <AnimatePresence>
-            {showPlayers && (
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                exit={{ height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="px-4 pb-4 space-y-2">
-                  {detail.players
+      {/* Players accordion - show for all registrations */}
+      <div className="glass-card overflow-hidden">
+        <button
+          onClick={() => setShowPlayers(!showPlayers)}
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
+        >
+          <span className="text-white font-medium text-sm">
+            Player Roster ({detail.players?.length || 0})
+          </span>
+          {showPlayers ? (
+            <ChevronUp className="w-4 h-4 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-400" />
+          )}
+        </button>
+        <AnimatePresence>
+          {showPlayers && (
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: 'auto' }}
+              exit={{ height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="px-4 pb-4 space-y-2">
+                {detail.players && detail.players.length > 0 ? (
+                  detail.players
                     .sort((a, b) => a.position_index - b.position_index)
                     .map((p, i) => (
                       <div key={p.id} className="flex items-center gap-3 py-2 border-t border-white/5">
@@ -381,13 +381,17 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
                         </span>
                         <span className="text-gray-500 text-xs">Age {p.age}</span>
                       </div>
-                    ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+                    ))
+                ) : (
+                  <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                    No players added yet
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Payment proof — fetched with JWT via Axios, displayed as blob URL */}
       {detail.payment_proof && (

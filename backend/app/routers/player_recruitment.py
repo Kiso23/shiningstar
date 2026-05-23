@@ -123,21 +123,22 @@ async def create_player_recruitment(
         )
         
         # Send notification email to admin in background
-        background_tasks.add_task(
-            send_player_recruitment_notification,
-            player_name=player_dict['full_name'],
-            player_email=player_dict['email'],
-            player_phone=player_dict['phone'],
-            position=player_dict['position'],
-            age=player_dict['age'],
-            experience=player_dict['years_of_experience'],
-        )
+        if player_dict and isinstance(player_dict, dict):
+            background_tasks.add_task(
+                send_player_recruitment_notification,
+                player_name=player_dict.get('full_name', ''),
+                player_email=player_dict.get('email', ''),
+                player_phone=player_dict.get('phone', ''),
+                position=player_dict.get('position', ''),
+                age=player_dict.get('age', 0),
+                experience=player_dict.get('years_of_experience', 0),
+            )
         
         return player_dict
     except Exception as e:
         # Log the error and return a user-friendly message
         import logging
-        logging.getLogger(__name__).error(f"Failed to create player recruitment: {str(e)}")
+        logging.getLogger(__name__).error(f"Failed to create player recruitment: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to submit application. Please try again later."
