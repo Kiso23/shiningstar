@@ -141,9 +141,12 @@ def get_cache() -> Optional[RedisCache]:
     return _cache
 
 
-async def init_cache(redis_url: str = "redis://localhost:6379/0") -> None:
-    """Initialize the global cache instance."""
+async def init_cache(redis_url: str | None = None) -> None:
+    """Initialize the global cache instance. Only connects if redis_url is provided."""
     global _cache
+    if not redis_url:
+        logger.info("Redis URL not provided, caching disabled")
+        return
     _cache = RedisCache(redis_url)
     await _cache.connect()
 

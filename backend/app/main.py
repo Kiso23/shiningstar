@@ -66,9 +66,12 @@ async def lifespan(app: FastAPI):
     os.makedirs(os.path.join(settings.UPLOAD_DIR, "payment_proofs"), exist_ok=True)
     os.makedirs(os.path.join(settings.UPLOAD_DIR, "player_photos"), exist_ok=True)
 
-    # Initialize Redis cache
-    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    await init_cache(redis_url)
+    # Initialize Redis cache (only if REDIS_URL is provided)
+    redis_url = os.getenv("REDIS_URL")
+    if redis_url:
+        await init_cache(redis_url)
+    else:
+        logger.info("REDIS_URL not set, Redis caching disabled")
 
     # Start daily DB backup scheduler (emails admin every 24h)
     backup_email = os.getenv("BACKUP_EMAIL", settings.SMTP_FROM)
