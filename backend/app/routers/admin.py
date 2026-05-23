@@ -289,3 +289,36 @@ async def delete_registration(
     await db.commit()
     
     return None
+
+
+@router.post("/registrations/{registration_id}/send-reminder", status_code=status.HTTP_200_OK)
+async def send_registration_reminder(
+    registration_id: str,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Send a reminder email to the team manager to continue registration."""
+    result = await db.execute(
+        select(Team).where(Team.registration_id == registration_id)
+    )
+    team = result.scalar_one_or_none()
+    
+    if team is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Registration not found"
+        )
+    
+    # Send reminder email in background
+    from app.services.email_service import send_registration_reminder_email
+    background_tasks.add_task(
+        send_registration_reminder_email,
+        to_email=team.contact_email,
+        team_name=team.team_name,
+        manager_name=team.manager_name,
+        registration_id=team.registration_id,
+        status=team.status,
+    )
+    
+    return {"message": "Reminder email sent successfully"}

@@ -63,3 +63,7 @@ export function getExportUrl(format: 'csv' | 'xlsx'): string {
 export async function deleteRegistration(registrationId: string): Promise<void> {
   await client.delete(`/admin/registrations/${registrationId}`)
 }
+
+export async function sendRegistrationReminder(registrationId: string): Promise<void> {
+  await client.post(`/admin/registrations/${registrationId}/send-reminder`)
+}

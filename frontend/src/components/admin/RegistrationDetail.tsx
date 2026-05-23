@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2, CheckCircle, XCircle, User, Phone, Mail,
-  Users, Calendar, Image, AlertCircle, ChevronDown, ChevronUp, Trash2, Download, MapPin
+  Users, Calendar, Image, AlertCircle, ChevronDown, ChevronUp, Trash2, Download, MapPin, Bell
 } from 'lucide-react'
-import { getRegistrationDetail, updateStatus, deleteRegistration } from '../../api/admin'
+import { getRegistrationDetail, updateStatus, deleteRegistration, sendRegistrationReminder } from '../../api/admin'
 import type { TeamDetail } from '../../api/admin'
 import { extractErrorMessage } from '../../api/errors'
 import StatusBadge from './StatusBadge'
@@ -22,8 +22,10 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [reminderLoading, setReminderLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [showPlayers, setShowPlayers] = useState(false)
   const [proofBlobUrl, setProofBlobUrl] = useState<string | null>(null)
   const [proofError, setProofError] = useState(false)
@@ -92,6 +94,22 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
       setShowDeleteConfirm(false)
     } finally {
       setDeleteLoading(false)
+    }
+  }
+
+  const handleSendReminder = async () => {
+    if (!detail) return
+    setReminderLoading(true)
+    setError(null)
+    setSuccessMessage(null)
+    try {
+      await sendRegistrationReminder(registrationId)
+      setSuccessMessage('Reminder email sent successfully to the team manager!')
+      setTimeout(() => setSuccessMessage(null), 4000)
+    } catch (err: any) {
+      setError(extractErrorMessage(err, 'Failed to send reminder email.'))
+    } finally {
+      setReminderLoading(false)
     }
   }
 
@@ -263,7 +281,22 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
           <h2 className="text-xl font-bold text-white">{detail.team_name}</h2>
           <p className="text-gray-400 text-sm font-mono">{detail.registration_id}</p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSendReminder}
+            disabled={reminderLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 transition-colors text-xs font-semibold"
+            title="Send reminder email to team manager"
+          >
+            {reminderLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Bell className="w-3.5 h-3.5" />
+            )}
+            Reminder
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -448,6 +481,17 @@ export default function RegistrationDetail({ registrationId, onStatusChange, onD
         >
           <AlertCircle className="w-4 h-4" />
           {error}
+        </motion.div>
+      )}
+
+      {successMessage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm"
+        >
+          <CheckCircle className="w-4 h-4" />
+          {successMessage}
         </motion.div>
       )}
 

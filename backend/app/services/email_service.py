@@ -597,3 +597,62 @@ Status: {status.upper()}
 © 2025 Shining Star United"""
 
     await _send(to_email, subject, _base_html(html_content), text_content)
+
+
+async def send_registration_reminder_email(
+    to_email: str,
+    team_name: str,
+    manager_name: str,
+    registration_id: str,
+    status: str,
+) -> None:
+    """Send reminder email to team manager to continue registration."""
+    subject = f"📋 Registration Reminder — {team_name} | {TOURNAMENT_NAME}"
+    
+    status_message = ""
+    if status == "pending":
+        status_message = "Your team registration is still pending. Please submit your payment to complete the registration process."
+    elif status == "payment_submitted":
+        status_message = "We received your payment submission. Our team is reviewing it. Please wait for approval."
+    else:
+        status_message = "Please continue with your team registration process."
+    
+    html_content = f"""
+      <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">📋 Registration Reminder</h2>
+      <p style="margin:0 0 24px;color:#aaa;font-size:14px;">
+        Hi <strong style="color:#fff;">{manager_name}</strong>, this is a friendly reminder about your team registration.
+      </p>
+      <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+        <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
+          <strong>Team:</strong> {team_name}<br/>
+          <strong>Registration ID:</strong> {registration_id}<br/>
+          <strong>Current Status:</strong> {status.upper()}
+        </p>
+      </div>
+      <div style="background:#2a1c1c;border:1px solid #4a2d2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+        <p style="margin:0;color:#fca5a5;font-size:13px;line-height:1.6;">
+          {status_message}
+        </p>
+      </div>
+      <p style="margin:0;color:#666;font-size:12px;">
+        If you have any questions, please contact us through the support system.
+      </p>
+    """
+
+    text_content = f"""Registration Reminder — {TOURNAMENT_NAME}
+
+Hi {manager_name},
+
+This is a friendly reminder about your team registration.
+
+Team: {team_name}
+Registration ID: {registration_id}
+Current Status: {status.upper()}
+
+{status_message}
+
+If you have any questions, please contact us.
+
+© 2025 Shining Star United"""
+
+    await _send(to_email, subject, _base_html(html_content), text_content)
