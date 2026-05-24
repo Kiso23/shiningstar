@@ -2,17 +2,12 @@ import { useState, useEffect } from 'react';
 import { LogIn, UserPlus, Play, Sparkles, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BoomerangVideoBg from '../components/BoomerangVideoBg';
-import { trackVisit } from '../api/analytics';
 
 const BG_VIDEO = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4';
 
-export default function HomePage() {
+export default function LandingPage() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    trackVisit('home');
-  }, []);
 
   useEffect(() => {
     if (menuOpen) {
