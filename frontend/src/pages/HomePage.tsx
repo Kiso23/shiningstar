@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
-import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare } from 'lucide-react'
+import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare, Menu, X } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
 // ── Color palette matched to stadium night video ──────────────────────────
@@ -33,6 +33,7 @@ const STEPS = [
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const [targetDate, setTargetDate] = useState<Date>(TOURNAMENT.startDate)
   const [bannerLine1, setBannerLine1] = useState('Shining Star United FC')
@@ -109,19 +110,32 @@ export default function HomePage() {
           </span>
         </div>
 
-        <div className="flex items-center gap-1">
+        {/* Desktop Navigation */}
+        <div className="hidden sm:flex items-center gap-1">
           {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
-              className="hover:text-orange-400 text-xs sm:text-sm font-medium transition-colors px-1.5 sm:px-2 py-1.5 rounded-lg hover:bg-white/5">
+              className="hover:text-orange-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
               {label}
             </button>
           ))}
           <button onClick={() => navigate('/live')}
-            className="flex items-center gap-1 text-green-400 hover:text-green-300 text-xs sm:text-sm font-medium transition-colors px-1.5 sm:px-2 py-1.5 rounded-lg hover:bg-white/5">
+            className="flex items-center gap-1.5 text-green-400 hover:text-green-300 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />Live
           </button>
         </div>
+
+        {/* Mobile Hamburger Menu Button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="sm:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/10 transition-colors"
+        >
+          {mobileMenuOpen ? (
+            <X style={{ color: textMain }} className="w-6 h-6" />
+          ) : (
+            <Menu style={{ color: textMain }} className="w-6 h-6" />
+          )}
+        </button>
 
         <div className="flex items-center gap-2">
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -131,6 +145,38 @@ export default function HomePage() {
           </motion.button>
         </div>
       </motion.nav>
+
+      {/* Mobile Menu Dropdown */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: mobileMenuOpen ? 1 : 0, y: mobileMenuOpen ? 0 : -10 }}
+        transition={{ duration: 0.2 }}
+        className={`fixed top-16 left-0 right-0 z-40 sm:hidden ${mobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        style={{ backgroundColor: 'rgba(8,12,8,0.95)', borderBottomColor: border }}
+      >
+        <div className="border-b" style={{ borderBottomColor: border }}>
+          {[
+            { label: 'Fixtures', path: '/fixtures', icon: Calendar },
+            { label: 'Leaderboard', path: '/leaderboard', icon: Trophy },
+            { label: 'Support', path: '/contact', icon: MessageSquare },
+            { label: 'Join SSU', path: '/join', icon: Users },
+            { label: 'Live Scores', path: '/live', icon: Radio },
+          ].map(({ label, path, icon: Icon }) => (
+            <button
+              key={label}
+              onClick={() => {
+                navigate(path)
+                setMobileMenuOpen(false)
+              }}
+              style={{ borderTopColor: border, color: textMain }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors border-t first:border-t-0"
+            >
+              <Icon className="w-5 h-5 text-orange-400 shrink-0" />
+              <span className="font-medium text-sm">{label}</span>
+            </button>
+          ))}
+        </div>
+      </motion.div>
 
       {/* ══ MARQUEE NOTIFICATION ══ */}
       <div className="fixed top-14 left-0 right-0 z-40 w-full">
