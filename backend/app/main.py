@@ -90,7 +90,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware - use specific allowed origins
+# CORS middleware - use specific allowed origins from config
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,  # Use specific origins from config
