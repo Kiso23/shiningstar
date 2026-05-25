@@ -254,7 +254,7 @@ export default function RegisterPage() {
             >
               {currentStep === 1 && <TeamDetailsStep key="step1" onNext={goNext} />}
               {currentStep === 2 && <PlayerDetailsStep key="step2" onNext={goNext} onBack={goBack} />}
-              {currentStep === 3 && <PaymentStep key="step3" onNext={handleComplete} onBack={goBack} />}
+              {currentStep === 3 && <PaymentStep key="step3" onNext={handleComplete} />}
             </motion.div>
           </AnimatePresence>
 

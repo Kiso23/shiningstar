@@ -11,8 +11,7 @@ import MarqueeNotification from '../components/shared/MarqueeNotification'
 // Mid dark:     #0e1a0e  (deep forest green-black)
 // Card bg:      #111f11  (dark green-tinted surface)
 // Border:       rgba(255,255,255,0.06)
-// Accent warm:  #f97316  (orange — matches floodlight warmth)
-// Accent green: #22c55e  (pitch green)
+// Accent green: #22c55e  (pitch green / grass color)
 // Text primary: #f0f4f0  (off-white with green tint)
 // Text muted:   #6b7a6b  (muted green-grey)
 
@@ -104,9 +103,9 @@ export default function HomePage() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 backdrop-blur-xl border-b transition-colors duration-300"
       >
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="SSU" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-orange-500 shrink-0" />
+          <img src="/logo.png" alt="SSU" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-green-500 shrink-0" />
           <span style={{ color: textMain }} className="font-black text-sm sm:text-base hidden sm:block tracking-wide">
-            SHINING STAR <span className="text-orange-500">UNITED</span>
+            SHINING STAR <span className="text-green-500">UNITED</span>
           </span>
         </div>
 
@@ -115,7 +114,7 @@ export default function HomePage() {
           {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
-              className="hover:text-orange-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
+              className="hover:text-green-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
               {label}
             </button>
           ))}
@@ -140,7 +139,7 @@ export default function HomePage() {
         <div className="flex items-center gap-2">
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/register')}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg transition-colors whitespace-nowrap">
+            className="bg-green-500 hover:bg-green-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg transition-colors whitespace-nowrap">
             Register
           </motion.button>
         </div>
@@ -171,7 +170,7 @@ export default function HomePage() {
               style={{ borderTopColor: border, color: textMain }}
               className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors border-t first:border-t-0"
             >
-              <Icon className="w-5 h-5 text-orange-400 shrink-0" />
+              <Icon className="w-5 h-5 text-green-400 shrink-0" />
               <span className="font-medium text-sm">{label}</span>
             </button>
           ))}
@@ -183,8 +182,8 @@ export default function HomePage() {
         <MarqueeNotification
           message="Refund Policy: Cancel at least 4 days before tournament start for full refund. Cancellations within 4 days are not eligible for refund. Registration fee ₹801 via UPI. Bring Aadhaar or PAN card for verification."
           backgroundColor="rgba(249, 115, 22, 0.12)"
-          textColor="#f97316"
-          iconColor="#f97316"
+          textColor="#22c55e"
+          iconColor="#22c55e"
         />
       </div>
 
@@ -209,36 +208,36 @@ export default function HomePage() {
           {/* Left */}
           <div className="flex-1 max-w-xl w-full text-center lg:text-left">
             <motion.p initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-              className="text-orange-400 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4">
+              className="text-green-400 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4">
               ★ Welcome
             </motion.p>
 
             <motion.h1 initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
               className="text-4xl sm:text-6xl lg:text-7xl font-black leading-none mb-4 sm:mb-6 uppercase"
               style={{ color: textMain }}>
-              {heroLine1}<br />{heroLine2}<br /><span className="text-orange-500">{heroLine3}</span>
+              {heroLine1}<br />{heroLine2}<br /><span className="text-green-500">{heroLine3}</span>
             </motion.h1>
 
             <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-              className="mb-4 sm:mb-6 px-4 py-3 border-l-4 border-orange-500 rounded-r-xl text-left"
-              style={{ backgroundColor: 'rgba(249,115,22,0.1)' }}>
+              className="mb-4 sm:mb-6 px-4 py-3 border-l-4 border-green-500 rounded-r-xl text-left"
+              style={{ backgroundColor: 'rgba(34,197,94,0.1)' }}>
               <p style={{ color: textMain }} className="font-bold text-sm leading-relaxed">{bannerLine1}</p>
-              <p className="text-orange-400 font-semibold text-xs sm:text-sm">{bannerLine2}</p>
+              <p className="text-green-400 font-semibold text-xs sm:text-sm">{bannerLine2}</p>
             </motion.div>
 
 
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start">
-              <motion.button whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(249,115,22,0.5)' }} whileTap={{ scale: 0.95 }}
+              <motion.button whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(34,197,94,0.5)' }} whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/register')}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
                 Register Your Team <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/fixtures')}
                 style={{ borderColor: border, color: textMain }}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 border font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base hover:border-orange-500/50 hover:bg-white/5">
+                className="w-full sm:w-auto flex items-center justify-center gap-2 border font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base hover:border-green-500/50 hover:bg-white/5">
                 View Fixtures
               </motion.button>
             </motion.div>
@@ -250,8 +249,8 @@ export default function HomePage() {
               style={{ backgroundColor: bgCard, borderColor: border }}
               className="border rounded-2xl p-4 sm:p-5 backdrop-blur-sm">
               <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                <p className="text-orange-400 font-bold text-xs tracking-widest uppercase">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <p className="text-green-400 font-bold text-xs tracking-widest uppercase">
                   {started ? 'Tournament is Live!' : 'Tournament Starts In'}
                 </p>
               </div>
@@ -282,7 +281,7 @@ export default function HomePage() {
                 { icon: Calendar, label: 'Match Fixtures', sub: 'View all scheduled matches', path: '/fixtures', color: 'text-blue-400' },
                 { icon: Radio, label: 'Live Scores', sub: 'Real-time match updates', path: '/live', color: 'text-green-400' },
                 { icon: Trophy, label: 'Leaderboard', sub: 'Tournament standings', path: '/leaderboard', color: 'text-yellow-400' },
-                { icon: MessageSquare, label: 'Support', sub: 'Contact us with questions', path: '/contact', color: 'text-orange-400' },
+                { icon: MessageSquare, label: 'Support', sub: 'Contact us with questions', path: '/contact', color: 'text-green-400' },
                 { icon: Users, label: 'Join SSU', sub: 'Apply to join our club', path: '/join', color: 'text-purple-400' },
               ].map(({ icon: Icon, label, sub, path, color }, i) => (
                 <motion.button key={label} whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
@@ -306,11 +305,11 @@ export default function HomePage() {
       </section>
 
       {/* ══ STATS BAR ══ */}
-      <section style={{ backgroundColor: '#f97316' }} className="py-4 px-4 sm:px-6">
+      <section style={{ backgroundColor: '#22c55e' }} className="py-4 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-3 gap-2 sm:gap-8 text-center">
           {[{ val: `${TOURNAMENT.maxTeams}`, label: 'Teams' }, { val: '8', label: 'Days' }, { val: '₹801', label: 'Entry' }].map(({ val, label }) => (            <div key={label}>
               <p className="text-lg sm:text-2xl font-black text-white">{val}</p>
-              <p className="text-orange-200 text-xs font-medium uppercase tracking-wider">{label}</p>
+              <p className="text-green-100 text-xs font-medium uppercase tracking-wider">{label}</p>
             </div>
           ))}
         </div>
@@ -320,7 +319,7 @@ export default function HomePage() {
       <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
-            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Tournament Info</p>
+            <p className="text-green-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Tournament Info</p>
             <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">Details</h2>
           </motion.div>
 
@@ -329,7 +328,7 @@ export default function HomePage() {
               { icon: Calendar, label: 'Dates', value: TOURNAMENT.date, accent: '#3b82f6' },
               { icon: MapPin, label: 'Venue', value: TOURNAMENT.venue, accent: '#22c55e' },
               { icon: Users, label: 'Max Teams', value: `${TOURNAMENT.maxTeams} Teams`, accent: '#a855f7' },
-              { icon: Trophy, label: 'Entry Fee', value: '₹801 per team', accent: '#f97316' },
+              { icon: Trophy, label: 'Entry Fee', value: '₹801 per team', accent: '#22c55e' },
             ].map(({ icon: Icon, label, value, accent }, i) => (
               <motion.div key={label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 style={{ backgroundColor: bgCard, borderColor: border, borderLeftColor: accent, borderLeftWidth: 3 }}
@@ -345,14 +344,14 @@ export default function HomePage() {
 
           {/* Prizes */}
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Awards</p>
+            <p className="text-green-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Awards</p>
             <h3 style={{ color: textMain }} className="text-3xl font-black uppercase mb-2">Tournament Prizes</h3>
             <p style={{ color: textMute }} className="text-sm mb-8">Money, Trophy &amp; Certificate</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
                 { emoji: '🥇', label: 'Winner', amount: '₹8,000', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)' },
                 { emoji: '🥈', label: 'Runner Up', amount: '₹4,000', color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.25)' },
-                { emoji: '🏅', label: 'Player of the Tournament', amount: '₹500', color: '#f97316', bg: 'rgba(249,115,22,0.1)', border: 'rgba(249,115,22,0.25)' },
+                { emoji: '🏅', label: 'Player of the Tournament', amount: '₹500', color: '#22c55e', bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.25)' },
                 { emoji: '🧤', label: 'Best Goalkeeper', amount: '₹500', color: '#22c55e', bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.25)' },
               ].map(({ emoji, label, amount, color, bg, border }, i) => (
                 <motion.div key={label}
@@ -375,20 +374,20 @@ export default function HomePage() {
       <section style={{ backgroundColor: bg }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
-            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Process</p>
+            <p className="text-green-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Process</p>
             <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">How to Register</h2>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {STEPS.map(({ n, title, desc }, i) => (
               <motion.div key={n} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="relative group">
-                <div style={{ backgroundColor: bgCard, borderColor: border }} className="p-6 rounded-xl border hover:border-orange-500/40 transition-colors h-full">
-                  <div className="text-6xl font-black text-orange-500/20 group-hover:text-orange-500/40 transition-colors mb-4 leading-none">{n}</div>
+                <div style={{ backgroundColor: bgCard, borderColor: border }} className="p-6 rounded-xl border hover:border-green-500/40 transition-colors h-full">
+                  <div className="text-6xl font-black text-green-500/20 group-hover:text-green-500/40 transition-colors mb-4 leading-none">{n}</div>
                   <h3 style={{ color: textMain }} className="font-bold mb-2">{title}</h3>
                   <p style={{ color: textMute }} className="text-sm">{desc}</p>
                 </div>
                 {i < STEPS.length - 1 && (
                   <div className="hidden lg:flex absolute top-1/2 -right-3 z-10">
-                    <ChevronRight className="w-5 h-5 text-orange-500/40" />
+                    <ChevronRight className="w-5 h-5 text-green-500/40" />
                   </div>
                 )}
               </motion.div>
@@ -401,7 +400,7 @@ export default function HomePage() {
       <section style={{ backgroundColor: bg }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12 text-center">
-            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Our Club</p>
+            <p className="text-green-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Our Club</p>
             <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">The Team</h2>
             <p style={{ color: textMute }} className="mt-3 text-sm max-w-xl mx-auto">
               Shining Star United FC — representing Hamren with pride on every pitch.
@@ -432,14 +431,14 @@ export default function HomePage() {
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   {/* Orange accent line */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-orange-500" />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500" />
                 </div>
                 <div className="p-4 flex items-center justify-between">
                   <div>
                     <p style={{ color: textMain }} className="font-bold text-sm">{caption}</p>
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{ backgroundColor: 'rgba(249,115,22,0.15)', color: '#f97316' }}>
+                    style={{ backgroundColor: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
                     ⚽ SSU FC
                   </div>
                 </div>
@@ -453,7 +452,7 @@ export default function HomePage() {
       <section style={{ backgroundColor: bgMid }} className="py-20 px-6 transition-colors duration-300">
         <div className="max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
-            <p className="text-orange-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Official</p>
+            <p className="text-green-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Official</p>
             <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">Rules & Regulations</h2>
             <p style={{ color: textMute }} className="mt-2 text-sm">SSU Champions Trophy — As per Assam Football Association / AIFF Guidelines</p>
           </motion.div>
@@ -478,7 +477,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
                 style={{ backgroundColor: 'rgba(17,31,17,0.7)', borderColor: border }}
                 className="p-4 rounded-xl border flex gap-3">
-                <span className="text-2xl font-black text-orange-500/30 leading-none shrink-0 w-8">{num}</span>
+                <span className="text-2xl font-black text-green-500/30 leading-none shrink-0 w-8">{num}</span>
                 <div>
                   <p style={{ color: textMain }} className="font-bold text-sm mb-1">{title}</p>
                   <p style={{ color: textMute }} className="text-xs leading-relaxed">{body}</p>
@@ -489,9 +488,9 @@ export default function HomePage() {
 
           {/* Note */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}
-            className="mt-6 p-4 rounded-xl border border-orange-500/30 text-center"
-            style={{ backgroundColor: 'rgba(249,115,22,0.08)' }}>
-            <p className="text-orange-400 font-bold text-sm">
+            className="mt-6 p-4 rounded-xl border border-green-500/30 text-center"
+            style={{ backgroundColor: 'rgba(34,197,94,0.08)' }}>
+            <p className="text-green-400 font-bold text-sm">
               ⚽ Fair play, discipline, and respect must be maintained as per AFA standards. Thank you!
             </p>
           </motion.div>
@@ -514,7 +513,7 @@ export default function HomePage() {
               { no: '04', name: 'Sarlongki Teron Kongkat', role: 'Asst. General Secretary', phone: '+91 69010 29070', color: '#8b5cf6' },
               { no: '05', name: 'Sarmon Lekthe', role: 'Finance Secretary', phone: '+91 81189 28552', color: '#14b8a6' },
               { no: '06', name: 'Bimol Ingti', role: 'Treasurer', phone: '+91 70860 27229', color: '#22c55e' },
-              { no: '07', name: 'Jalinson Phangcho', role: 'Manager', phone: '+91 99575 51560', color: '#f97316' },
+              { no: '07', name: 'Jalinson Phangcho', role: 'Manager', phone: '+91 99575 51560', color: '#22c55e' },
               { no: '08', name: 'Timothy Tokbi', role: 'Operation Manager', phone: '+91 70860 49705', color: '#06b6d4' },
               { no: '09', name: 'Birlong Kro', role: 'Medical Officer / Physio', phone: '+91 76378 35932', color: '#10b981' },
               { no: '10', name: 'Sarlongki Teron', role: 'IT Officer', phone: '+91 84730 10850', color: '#a78bfa' },
@@ -559,17 +558,17 @@ export default function HomePage() {
             <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.4, 0.2] }} transition={{ duration: 5, repeat: Infinity }}
               className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
             <div className="relative z-10">
-              <p className="text-orange-200 font-bold text-xs tracking-[0.3em] uppercase mb-3">Don't Miss Out</p>
+              <p className="text-green-100 font-bold text-xs tracking-[0.3em] uppercase mb-3">Don't Miss Out</p>
               <h2 className="text-4xl sm:text-5xl font-black text-white uppercase mb-4">Ready to Compete?</h2>
-              <p className="text-orange-100 text-lg mb-8 max-w-xl mx-auto">
+              <p className="text-green-100 text-lg mb-8 max-w-xl mx-auto">
                 Registration closes <strong>{TOURNAMENT.deadline}</strong>. Don't miss your chance to compete!
               </p>
               <motion.button whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(255,255,255,0.3)' }} whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/register')}
-                className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-white text-orange-600 font-black text-lg hover:bg-orange-50 transition-colors shadow-2xl">
+                className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-white text-green-600 font-black text-lg hover:bg-orange-50 transition-colors shadow-2xl">
                 Register Now <ArrowRight className="w-5 h-5" />
               </motion.button>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-orange-200 text-sm">
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-green-100 text-sm">
                 {['Free to browse', 'Instant confirmation', 'Secure payment'].map((t) => (
                   <div key={t} className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4" />{t}</div>
                 ))}
@@ -583,7 +582,7 @@ export default function HomePage() {
       <footer style={{ backgroundColor: '#050a05', borderTopColor: border }} className="border-t py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
+            <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-green-500/40" />
             <div>
               <p style={{ color: textMain }} className="font-bold text-sm">Shining Star United</p>
               <p style={{ color: textMute }} className="text-xs">© 2025 All rights reserved. Developed by Sarlongki Teron</p>
@@ -591,9 +590,9 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-6 text-sm">
             {[['Fixtures', '/fixtures'], ['Leaderboard', '/leaderboard'], ['Live', '/live']].map(([label, path]) => (
-              <button key={label} onClick={() => navigate(path)} style={{ color: textMute }} className="hover:text-orange-400 transition-colors">{label}</button>
+              <button key={label} onClick={() => navigate(path)} style={{ color: textMute }} className="hover:text-green-400 transition-colors">{label}</button>
             ))}
-            <a href="/admin/login" style={{ color: textMute }} className="hover:text-orange-400 transition-colors">Admin</a>
+            <a href="/admin/login" style={{ color: textMute }} className="hover:text-green-400 transition-colors">Admin</a>
           </div>
           {/* Social links */}
           <div className="flex items-center gap-3">

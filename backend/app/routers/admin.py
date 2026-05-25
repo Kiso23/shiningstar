@@ -178,13 +178,7 @@ async def export_registrations(
     db: AsyncSession = Depends(get_db),
     _admin: Admin = Depends(get_current_admin),
 ):
-    """Export all registrations as CSV or XLSX."""
-    # Fetch all teams with players
-    result = await db.execute(
-        select(Team).options(selectinload(Team.players)).order_by(Team.created_at)
-    )
-    teams = result.scalars().all()
-
+    """Export all registrations as CSV or XLSX (streaming for memory efficiency)."""
     team_headers = [
         "registration_id", "team_name", "manager_name", "contact_phone",
         "contact_email", "player_count", "status", "created_at",
@@ -192,53 +186,114 @@ async def export_registrations(
     player_headers = ["registration_id", "player_full_name", "player_age"]
 
     if format == ExportFormat.csv:
-        output = io.StringIO()
-        writer = csv.writer(output)
+        async def generate_csv():
+            output = io.StringIO()
+            writer = csv.writer(output)
 
-        # Teams sheet
-        writer.writerow(["--- TEAMS ---"])
-        writer.writerow(team_headers)
-        for team in teams:
-            writer.writerow([
-                team.registration_id, team.team_name, team.manager_name,
-                team.contact_phone, team.contact_email, team.player_count,
-                team.status, team.created_at.isoformat(),
-            ])
+            # Teams header
+            writer.writerow(["--- TEAMS ---"])
+            writer.writerow(team_headers)
+            
+            # Stream teams in batches to avoid loading all into memory
+            batch_size = 100
+            offset = 0
+            while True:
+                result = await db.execute(
+                    select(Team).order_by(Team.created_at).offset(offset).limit(batch_size)
+                )
+                teams = result.scalars().all()
+                if not teams:
+                    break
+                
+                for team in teams:
+                    writer.writerow([
+                        team.registration_id, team.team_name, team.manager_name,
+                        team.contact_phone, team.contact_email, team.player_count,
+                        team.status, team.created_at.isoformat(),
+                    ])
+                
+                output.seek(0)
+                yield output.getvalue()
+                output.truncate(0)
+                output.seek(0)
+                offset += batch_size
 
-        writer.writerow([])
-        writer.writerow(["--- PLAYERS ---"])
-        writer.writerow(player_headers)
-        for team in teams:
-            for player in team.players:
-                writer.writerow([team.registration_id, player.full_name, player.age])
+            # Players header
+            writer.writerow([])
+            writer.writerow(["--- PLAYERS ---"])
+            writer.writerow(player_headers)
+            output.seek(0)
+            yield output.getvalue()
+            output.truncate(0)
+            output.seek(0)
 
-        output.seek(0)
+            # Stream players in batches
+            offset = 0
+            while True:
+                result = await db.execute(
+                    select(Player).order_by(Player.team_id).offset(offset).limit(batch_size)
+                )
+                players = result.scalars().all()
+                if not players:
+                    break
+                
+                for player in players:
+                    writer.writerow([player.team_id, player.full_name, player.age])
+                
+                output.seek(0)
+                yield output.getvalue()
+                output.truncate(0)
+                output.seek(0)
+                offset += batch_size
+
         return StreamingResponse(
-            iter([output.getvalue()]),
+            generate_csv(),
             media_type="text/csv",
             headers={"Content-Disposition": "attachment; filename=registrations.csv"},
         )
 
-    else:  # xlsx
+    else:  # xlsx - still load all but use streaming write
         wb = openpyxl.Workbook()
 
         # Teams sheet
         ws_teams = wb.active
         ws_teams.title = "Teams"
         ws_teams.append(team_headers)
-        for team in teams:
-            ws_teams.append([
-                team.registration_id, team.team_name, team.manager_name,
-                team.contact_phone, team.contact_email, team.player_count,
-                team.status, team.created_at.isoformat(),
-            ])
+        
+        batch_size = 100
+        offset = 0
+        while True:
+            result = await db.execute(
+                select(Team).order_by(Team.created_at).offset(offset).limit(batch_size)
+            )
+            teams = result.scalars().all()
+            if not teams:
+                break
+            
+            for team in teams:
+                ws_teams.append([
+                    team.registration_id, team.team_name, team.manager_name,
+                    team.contact_phone, team.contact_email, team.player_count,
+                    team.status, team.created_at.isoformat(),
+                ])
+            offset += batch_size
 
         # Players sheet
         ws_players = wb.create_sheet("Players")
         ws_players.append(player_headers)
-        for team in teams:
-            for player in team.players:
-                ws_players.append([team.registration_id, player.full_name, player.age])
+        
+        offset = 0
+        while True:
+            result = await db.execute(
+                select(Player).order_by(Player.team_id).offset(offset).limit(batch_size)
+            )
+            players = result.scalars().all()
+            if not players:
+                break
+            
+            for player in players:
+                ws_players.append([player.team_id, player.full_name, player.age])
+            offset += batch_size
 
         output = io.BytesIO()
         wb.save(output)
