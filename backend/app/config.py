@@ -1,5 +1,6 @@
 from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -44,6 +45,38 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore",
     )
+
+    @field_validator('SECRET_KEY')
+    @classmethod
+    def validate_secret_key(cls, v: str) -> str:
+        """Validate SECRET_KEY is set and has minimum length."""
+        if not v or len(v) < 32:
+            raise ValueError('SECRET_KEY must be set and at least 32 characters long')
+        return v
+
+    @field_validator('DATABASE_URL')
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
+        """Validate DATABASE_URL is set."""
+        if not v:
+            raise ValueError('DATABASE_URL must be set')
+        return v
+
+    @field_validator('SMTP_PORT')
+    @classmethod
+    def validate_smtp_port(cls, v: int) -> int:
+        """Validate SMTP_PORT is in valid range."""
+        if v < 1 or v > 65535:
+            raise ValueError('SMTP_PORT must be between 1 and 65535')
+        return v
+
+    @field_validator('ACCESS_TOKEN_EXPIRE_MINUTES')
+    @classmethod
+    def validate_token_expiry(cls, v: int) -> int:
+        """Validate ACCESS_TOKEN_EXPIRE_MINUTES is positive."""
+        if v <= 0:
+            raise ValueError('ACCESS_TOKEN_EXPIRE_MINUTES must be positive')
+        return v
 
 
 settings = Settings()

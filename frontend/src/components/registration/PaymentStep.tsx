@@ -5,8 +5,7 @@ import FileUpload from '../shared/FileUpload'
 import { uploadPayment } from '../../api/registrations'
 import { extractErrorMessage } from '../../api/errors'
 import { useRegistrationStore } from '../../store/registrationStore'
-
-const UPI_ID = 'sarlongkisarlongki143@okhdfcbank'
+import client from '../../api/client'
 
 interface Props {
   onNext: () => void
@@ -21,9 +20,27 @@ export default function PaymentStep({ onNext }: Props) {
   const [copied, setCopied] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const [redirectCountdown, setRedirectCountdown] = useState(3)
+  const [upiId, setUpiId] = useState<string>('sarlongkisarlongki143@okhdfcbank')
+  const [loadingUpi, setLoadingUpi] = useState(true)
+
+  // Fetch UPI ID from settings on mount
+  useEffect(() => {
+    const fetchUpiId = async () => {
+      try {
+        const response = await client.get('/settings/upi-id')
+        setUpiId(response.data.upi_id)
+      } catch (err) {
+        console.error('Failed to fetch UPI ID:', err)
+        // Use default if fetch fails
+      } finally {
+        setLoadingUpi(false)
+      }
+    }
+    fetchUpiId()
+  }, [])
 
   const copyUpiId = () => {
-    navigator.clipboard.writeText(UPI_ID)
+    navigator.clipboard.writeText(upiId)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -195,12 +212,13 @@ export default function PaymentStep({ onNext }: Props) {
               </div>
               <div className="mt-4 flex items-center justify-center gap-2">
                 <code className="text-green-400 font-mono text-sm bg-green-500/10 px-3 py-1.5 rounded-lg">
-                  {UPI_ID}
+                  {loadingUpi ? 'Loading...' : upiId}
                 </code>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={copyUpiId}
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+                  disabled={loadingUpi}
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Copy UPI ID"
                 >
                   <AnimatePresence mode="wait">

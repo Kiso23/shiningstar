@@ -35,7 +35,9 @@ export default function ContactPage() {
       // Redirect after 3 seconds
       setTimeout(() => navigate('/'), 3000)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to send message. Please try again.')
+      const errorMessage = err.response?.data?.detail || 'Failed to send message. Please try again.'
+      setError(typeof errorMessage === 'string' ? errorMessage : 'An error occurred while sending your message.')
+      console.error('Contact form error:', err)
     } finally {
       setLoading(false)
     }

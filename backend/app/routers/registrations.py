@@ -46,6 +46,13 @@ async def submit_players(
     db: AsyncSession = Depends(get_db),
 ):
     """Step 2: Submit player roster for a registration."""
+    # Validate registration_id format (SSU-YYYYMMDD-XXXXXX)
+    if not registration_id.startswith("SSU-") or len(registration_id) != 21:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid registration ID format. Expected format: SSU-YYYYMMDD-XXXXXX"
+        )
+    
     team = await registration_service.get_team_by_registration_id(db, registration_id)
     if team is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
@@ -67,6 +74,13 @@ async def upload_payment(
     db: AsyncSession = Depends(get_db),
 ):
     """Step 3: Upload payment proof screenshot."""
+    # Validate registration_id format (SSU-YYYYMMDD-XXXXXX)
+    if not registration_id.startswith("SSU-") or len(registration_id) != 21:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid registration ID format. Expected format: SSU-YYYYMMDD-XXXXXX"
+        )
+    
     # Load team with payment_proof relationship eagerly
     result = await db.execute(
         select(Team)

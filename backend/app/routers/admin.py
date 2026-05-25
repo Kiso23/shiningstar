@@ -36,6 +36,18 @@ async def list_registrations(
     _admin: Admin = Depends(get_current_admin),
 ):
     """List all registrations with pagination, filtering, and search."""
+    # Validate pagination parameters
+    if page < 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Page must be >= 1"
+        )
+    if page_size < 1 or page_size > 100:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Page size must be between 1 and 100"
+        )
+    
     query = select(Team)
 
     if status_filter:

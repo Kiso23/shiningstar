@@ -17,6 +17,7 @@ DEFAULT_BANNER_LINE2 = "Football Tournament"
 DEFAULT_HERO_LINE1 = "Shining"
 DEFAULT_HERO_LINE2 = "Star"
 DEFAULT_HERO_LINE3 = "United FC"
+DEFAULT_UPI_ID = "sarlongkisarlongki143@okhdfcbank"
 
 
 class TournamentDateUpdate(BaseModel):
@@ -44,6 +45,15 @@ class AllSettingsResponse(BaseModel):
     hero_line1: str
     hero_line2: str
     hero_line3: str
+    upi_id: str
+
+
+class UpiIdResponse(BaseModel):
+    upi_id: str
+
+
+class UpiIdUpdate(BaseModel):
+    upi_id: str
 
 
 # ── Public: get tournament start date ────────────────────────────────────────
@@ -107,6 +117,7 @@ async def get_all_settings(db: AsyncSession = Depends(get_db)):
         hero_line1=rows.get("hero_line1", DEFAULT_HERO_LINE1),
         hero_line2=rows.get("hero_line2", DEFAULT_HERO_LINE2),
         hero_line3=rows.get("hero_line3", DEFAULT_HERO_LINE3),
+        upi_id=rows.get("upi_id", DEFAULT_UPI_ID),
     )
 
 
@@ -179,3 +190,46 @@ async def update_hero(
 
     await db.commit()
     return HeroResponse(hero_line1=body.hero_line1, hero_line2=body.hero_line2, hero_line3=body.hero_line3)
+
+
+# ── Public: get UPI ID ───────────────────────────────────────────────────────
+
+@router.get("/upi-id", response_model=UpiIdResponse)
+async def get_upi_id(db: AsyncSession = Depends(get_db)):
+    """Public — returns the UPI ID for payment."""
+    result = await db.execute(
+        select(Setting).where(Setting.key == "upi_id")
+    )
+    setting = result.scalar_one_or_none()
+    return UpiIdResponse(
+        upi_id=setting.value if setting else DEFAULT_UPI_ID
+    )
+
+
+# ── Admin: update UPI ID ─────────────────────────────────────────────────────
+
+@router.put("/upi-id", response_model=UpiIdResponse)
+async def update_upi_id(
+    body: UpiIdUpdate,
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Admin-only — update the UPI ID for payment."""
+    if not body.upi_id or "@" not in body.upi_id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid UPI ID format. Must be in format: username@bank",
+        )
+    
+    result = await db.execute(
+        select(Setting).where(Setting.key == "upi_id")
+    )
+    setting = result.scalar_one_or_none()
+
+    if setting:
+        setting.value = body.upi_id
+    else:
+        db.add(Setting(key="upi_id", value=body.upi_id))
+
+    await db.commit()
+    return UpiIdResponse(upi_id=body.upi_id)

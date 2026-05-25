@@ -34,6 +34,7 @@ async def store_payment_proof(
     """
     Validate, store, and record a payment proof file.
     Follows write-then-update pattern: deletes file on DB failure.
+    Provides specific error messages for different failure types.
     """
     file_bytes = await file.read()
     mime_type = file.content_type or "application/octet-stream"
@@ -42,21 +43,21 @@ async def store_payment_proof(
     if len(file_bytes) > settings.MAX_PAYMENT_PROOF_SIZE_BYTES:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size exceeds maximum allowed size of {settings.MAX_PAYMENT_PROOF_SIZE_BYTES} bytes.",
+            detail=f"File size exceeds maximum allowed size of {settings.MAX_PAYMENT_PROOF_SIZE_BYTES} bytes. Please upload a smaller image.",
         )
 
     # Validate MIME type
     if mime_type not in settings.ALLOWED_IMAGE_MIME_TYPES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Only JPEG and PNG images are accepted.",
+            detail=f"Invalid file type '{mime_type}'. Only JPEG and PNG images are accepted.",
         )
 
     # Check if payment proof already exists
     if team.payment_proof is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Payment proof already submitted for this registration.",
+            detail="Payment proof already submitted for this registration. Contact support to update it.",
         )
 
     dest_dir = os.path.join(settings.UPLOAD_DIR, "payment_proofs")
@@ -64,26 +65,50 @@ async def store_payment_proof(
 
     try:
         # Step 1: Write file to filesystem
-        file_path = save_file(dest_dir, str(team.id), file_bytes, file.filename or "proof.jpg")
+        try:
+            file_path = save_file(dest_dir, str(team.id), file_bytes, file.filename or "proof.jpg")
+        except OSError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to save payment proof file. Please try again later.",
+            )
 
         # Step 2: Insert PaymentProof record
-        proof = PaymentProof(
-            team_id=team.id,
-            file_path=file_path,
-            original_filename=file.filename or "proof.jpg",
-            mime_type=mime_type,
-            file_size_bytes=len(file_bytes),
-        )
-        db.add(proof)
-        await db.flush()
+        try:
+            proof = PaymentProof(
+                team_id=team.id,
+                file_path=file_path,
+                original_filename=file.filename or "proof.jpg",
+                mime_type=mime_type,
+                file_size_bytes=len(file_bytes),
+            )
+            db.add(proof)
+            await db.flush()
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to record payment proof in database. Please try again.",
+            )
 
         # Step 3: Update team status
-        team.status = RegistrationStatus.payment_submitted.value
-        await db.flush()
+        try:
+            team.status = RegistrationStatus.payment_submitted.value
+            await db.flush()
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to update registration status. Please try again.",
+            )
         
         # Step 4: Commit transaction to persist changes
-        await db.commit()
-        await db.refresh(proof)
+        try:
+            await db.commit()
+            await db.refresh(proof)
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to finalize payment submission. Please try again.",
+            )
         return proof
 
     except HTTPException:
@@ -92,8 +117,11 @@ async def store_payment_proof(
             delete_file(file_path)
         await db.rollback()
         raise
-    except Exception:
+    except Exception as e:
         if file_path:
             delete_file(file_path)
         await db.rollback()
-        raise
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred while processing your payment proof. Please try again.",
+        )

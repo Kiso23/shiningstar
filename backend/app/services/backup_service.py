@@ -56,7 +56,16 @@ async def send_backup_email(session_factory: async_sessionmaker, to_email: str) 
     """Export DB and send as email attachment."""
     try:
         data = await export_db_to_json(session_factory)
-        json_str = json.dumps(data, indent=2, ensure_ascii=False)
+        
+        # Validate JSON before sending
+        try:
+            json_str = json.dumps(data, indent=2, ensure_ascii=False)
+            # Verify it can be parsed back
+            json.loads(json_str)
+        except (json.JSONDecodeError, TypeError) as e:
+            logger.error(f"❌ Backup JSON validation failed: {e}")
+            raise ValueError(f"Failed to serialize backup data: {e}")
+        
         date_str = datetime.utcnow().strftime("%Y-%m-%d")
 
         from app.services.email_service import _send, _base_html

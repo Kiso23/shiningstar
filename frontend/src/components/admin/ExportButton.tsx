@@ -12,7 +12,12 @@ export default function ExportButton() {
     const url = `${base}/admin/export?format=${format}`
     // Use fetch to download with auth header
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => res.blob())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Export failed with status ${res.status}`)
+        }
+        return res.blob()
+      })
       .then((blob) => {
         const a = document.createElement('a')
         a.href = URL.createObjectURL(blob)
@@ -20,7 +25,13 @@ export default function ExportButton() {
         a.click()
         URL.revokeObjectURL(a.href)
       })
-    setOpen(false)
+      .catch((err) => {
+        console.error('Export error:', err)
+        alert(`Failed to export ${format.toUpperCase()}. Please try again.`)
+      })
+      .finally(() => {
+        setOpen(false)
+      })
   }
 
   return (

@@ -22,14 +22,28 @@ database_url = database_url.rstrip('?').rstrip('&')
 
 connect_args = {"ssl": "require"} if ssl_required else {}
 
+# Get pool configuration from environment or use defaults
+import os
+pool_size = int(os.getenv("DB_POOL_SIZE", "20"))
+max_overflow = int(os.getenv("DB_MAX_OVERFLOW", "10"))
+pool_recycle = int(os.getenv("DB_POOL_RECYCLE", "3600"))
+
+# Validate pool configuration
+if pool_size < 1:
+    raise ValueError("DB_POOL_SIZE must be at least 1")
+if max_overflow < 0:
+    raise ValueError("DB_MAX_OVERFLOW must be non-negative")
+if pool_recycle < 60:
+    raise ValueError("DB_POOL_RECYCLE must be at least 60 seconds")
+
 engine = create_async_engine(
     database_url,
     echo=False,
     connect_args=connect_args,
-    pool_size=20,  # Increase pool size for better concurrency
-    max_overflow=10,  # Allow overflow connections
+    pool_size=pool_size,  # Configurable pool size
+    max_overflow=max_overflow,  # Allow overflow connections
     pool_pre_ping=True,  # Test connections before using them
-    pool_recycle=3600,  # Recycle connections every hour
+    pool_recycle=pool_recycle,  # Recycle connections periodically
 )
 
 AsyncSessionLocal = async_sessionmaker(

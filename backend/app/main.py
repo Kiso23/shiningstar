@@ -104,7 +104,10 @@ app.add_middleware(
 # Cache middleware for GET requests
 @app.middleware("http")
 async def add_cache_headers(request: Request, call_next):
-    """Add cache headers to GET requests for better performance"""
+    """Add cache headers to GET requests for better performance and log requests"""
+    # Log incoming request
+    logger.debug(f"{request.method} {request.url.path}")
+    
     response = await call_next(request)
     
     # Add cache headers for GET requests (except admin routes)
@@ -127,6 +130,9 @@ async def add_cache_headers(request: Request, call_next):
             # Skip ETag if body is not accessible (streaming responses, etc.)
             pass
     
+    # Log response status
+    logger.debug(f"{request.method} {request.url.path} -> {response.status_code}")
+    
     return response
 
 
@@ -147,6 +153,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     Custom handler that safely serialises Pydantic validation errors.
     The default FastAPI handler crashes on multipart requests that contain
     binary file bytes (UnicodeDecodeError when encoding error details).
+    All errors use "detail" field for consistency.
     """
     safe_errors = []
     for err in exc.errors():

@@ -106,9 +106,14 @@ def _send_via_brevo(to: str, subject: str, html: str, text: str, attachment_byte
         method="POST",
     )
 
-    with urllib.request.urlopen(req, timeout=30) as response:
-        response.read()
-        logger.info("✅ Email sent via Brevo to %s: %s", to, subject)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            response.read()
+            logger.info("✅ Email sent via Brevo to %s: %s", to, subject)
+    except urllib.error.URLError as e:
+        logger.error("❌ Email failed to %s (network error): %s", to, e)
+    except Exception as e:
+        logger.error("❌ Email failed to %s: %s", to, e)
 
 
 async def _send(to: str, subject: str, html: str, text: str, attachment_bytes: bytes = None, attachment_name: str = None) -> None:
@@ -334,12 +339,22 @@ async def send_contact_notification(
     message: str,
 ) -> None:
     """Send contact notification to admin."""
+    import html
+    from app.utils.sanitize import sanitize_text
+    
     admin_email = os.getenv("ADMIN_EMAIL", "admin@shiningstarunited.com")
     
     # Validate admin email is set
     if not admin_email:
         logger.warning("ADMIN_EMAIL not set, skipping contact notification")
         return
+    
+    # HTML-escape user input to prevent XSS in emails
+    safe_name = html.escape(contact_name)
+    safe_email = html.escape(contact_email)
+    safe_phone = html.escape(contact_phone)
+    safe_subject = html.escape(subject)
+    safe_message = html.escape(message)
     
     html_content = f"""
       <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">📧 New Contact Message</h2>
@@ -350,25 +365,25 @@ async def send_contact_notification(
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="padding:8px 0;color:#888;font-size:13px;width:120px;">Name</td>
-            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{contact_name}</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{safe_name}</td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#888;font-size:13px;">Email</td>
-            <td style="padding:8px 0;color:#f97316;font-size:13px;"><a href="mailto:{contact_email}" style="color:#f97316;text-decoration:none;">{contact_email}</a></td>
+            <td style="padding:8px 0;color:#f97316;font-size:13px;"><a href="mailto:{safe_email}" style="color:#f97316;text-decoration:none;">{safe_email}</a></td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#888;font-size:13px;">Phone</td>
-            <td style="padding:8px 0;color:#fff;font-size:13px;"><a href="tel:{contact_phone}" style="color:#fff;text-decoration:none;">{contact_phone}</a></td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;"><a href="tel:{safe_phone}" style="color:#fff;text-decoration:none;">{safe_phone}</a></td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#888;font-size:13px;">Subject</td>
-            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{subject}</td>
+            <td style="padding:8px 0;color:#fff;font-size:13px;font-weight:600;">{safe_subject}</td>
           </tr>
         </table>
       </div>
       <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
         <p style="margin:0 0 8px;color:#86efac;font-size:13px;font-weight:600;">Message:</p>
-        <p style="margin:0;color:#aaa;font-size:13px;line-height:1.6;white-space:pre-wrap;">{message}</p>
+        <p style="margin:0;color:#aaa;font-size:13px;line-height:1.6;white-space:pre-wrap;">{safe_message}</p>
       </div>
       <p style="margin:0;color:#666;font-size:12px;">
         Please reply to this message through the admin dashboard.
@@ -377,20 +392,20 @@ async def send_contact_notification(
 
     text_content = f"""New Contact Message — {TOURNAMENT_NAME}
 
-Name    : {contact_name}
-Email   : {contact_email}
-Phone   : {contact_phone}
-Subject : {subject}
+Name    : {safe_name}
+Email   : {safe_email}
+Phone   : {safe_phone}
+Subject : {safe_subject}
 
 Message:
-{message}
+{safe_message}
 
 ---
 Please reply through the admin dashboard.
 
 © 2025 Shining Star United"""
 
-    await _send(admin_email, f"📧 New Contact: {subject}", _base_html(html_content), text_content)
+    await _send(admin_email, f"📧 New Contact: {safe_subject}", _base_html(html_content), text_content)
 
 
 async def send_contact_reply(
