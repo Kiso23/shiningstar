@@ -1,81 +1,85 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background circle for contrast -->
-  <circle cx="100" cy="100" r="95" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.3"/>
+  <!-- Outer circle border -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#1a1a1a" stroke-width="2"/>
   
-  <!-- Top text arc -->
+  <!-- Main white circle -->
+  <circle cx="100" cy="100" r="90" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="3"/>
+  
+  <!-- Inner circle -->
+  <circle cx="100" cy="100" r="80" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="2"/>
+  
+  <!-- Top left boot -->
+  <g transform="translate(45, 35)">
+    <path d="M 5 0 L 15 0 L 18 8 L 15 15 L 5 15 L 2 8 Z" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="8" y="5" width="6" height="8" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Top right boot -->
+  <g transform="translate(140, 35)">
+    <path d="M 5 0 L 15 0 L 18 8 L 15 15 L 5 15 L 2 8 Z" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="8" y="5" width="6" height="8" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Bottom left boot -->
+  <g transform="translate(45, 150)">
+    <path d="M 5 0 L 15 0 L 18 8 L 15 15 L 5 15 L 2 8 Z" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="8" cy="12" r="1.5" fill="#1a1a1a"/>
+    <circle cx="14" cy="12" r="1.5" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Bottom right boot -->
+  <g transform="translate(140, 150)">
+    <path d="M 5 0 L 15 0 L 18 8 L 15 15 L 5 15 L 2 8 Z" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="8" cy="12" r="1.5" fill="#1a1a1a"/>
+    <circle cx="14" cy="12" r="1.5" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Top curved text path -->
   <defs>
-    <path id="topArc" d="M 40,100 A 60,60 0 0,1 160,100" fill="none"/>
-    <path id="bottomArc" d="M 160,100 A 60,60 0 0,1 40,100" fill="none"/>
+    <path id="topCurve" d="M 50,100 A 50,50 0 0,1 150,100" fill="none"/>
+    <path id="bottomCurve" d="M 150,100 A 50,50 0 0,1 50,100" fill="none"/>
   </defs>
   
   <!-- Top text: SHINING STAR UNITED -->
-  <text font-size="16" font-weight="bold" letter-spacing="2" fill="#f0f4f0">
-    <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+  <text font-family="Arial, sans-serif" font-size="14" font-weight="bold" letter-spacing="1" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="0.5">
+    <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
       SHINING STAR UNITED
     </textPath>
   </text>
   
-  <!-- Main circle -->
-  <circle cx="100" cy="100" r="55" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="3"/>
+  <!-- Bottom text: HAMREN -->
+  <text font-family="Arial, sans-serif" font-size="14" font-weight="bold" letter-spacing="1" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="0.5">
+    <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
+      HAMREN
+    </textPath>
+  </text>
   
-  <!-- Inner circle -->
-  <circle cx="100" cy="100" r="48" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="2"/>
-  
-  <!-- Stars inside circle -->
+  <!-- Five stars in circle -->
   <!-- Top left star -->
-  <g transform="translate(80, 75)">
-    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  <g transform="translate(75, 75)">
+    <polygon points="0,-7 2.1,-2.1 7,-0.7 2.8,2.8 4.2,8 0,4.2 -4.2,8 -2.8,2.8 -7,-0.7 -2.1,-2.1" fill="#1a1a1a"/>
   </g>
   
   <!-- Top right star -->
-  <g transform="translate(120, 75)">
-    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  <g transform="translate(125, 75)">
+    <polygon points="0,-7 2.1,-2.1 7,-0.7 2.8,2.8 4.2,8 0,4.2 -4.2,8 -2.8,2.8 -7,-0.7 -2.1,-2.1" fill="#1a1a1a"/>
   </g>
   
-  <!-- Center star -->
-  <g transform="translate(100, 95)">
+  <!-- Center star (larger) -->
+  <g transform="translate(100, 100)">
     <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
   </g>
   
   <!-- Bottom left star -->
-  <g transform="translate(80, 115)">
-    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  <g transform="translate(75, 125)">
+    <polygon points="0,-7 2.1,-2.1 7,-0.7 2.8,2.8 4.2,8 0,4.2 -4.2,8 -2.8,2.8 -7,-0.7 -2.1,-2.1" fill="#1a1a1a"/>
   </g>
   
   <!-- Bottom right star -->
-  <g transform="translate(120, 115)">
-    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  <g transform="translate(125, 125)">
+    <polygon points="0,-7 2.1,-2.1 7,-0.7 2.8,2.8 4.2,8 0,4.2 -4.2,8 -2.8,2.8 -7,-0.7 -2.1,-2.1" fill="#1a1a1a"/>
   </g>
   
   <!-- Estd. 2015 text -->
-  <text x="100" y="135" font-size="10" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Estd. 2015</text>
-  
-  <!-- Bottom text: HAMREN -->
-  <text x="100" y="165" font-size="14" font-weight="bold" letter-spacing="1" text-anchor="middle" fill="#f0f4f0">HAMREN</text>
-  
-  <!-- Top left boot/shoe -->
-  <g transform="translate(35, 60) rotate(-45)">
-    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
-    <rect x="2" y="8" width="8" height="8" fill="#1a1a1a"/>
-  </g>
-  
-  <!-- Top right boot/shoe -->
-  <g transform="translate(165, 60) rotate(45)">
-    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
-    <rect x="2" y="8" width="8" height="8" fill="#1a1a1a"/>
-  </g>
-  
-  <!-- Bottom left boot/shoe -->
-  <g transform="translate(35, 140) rotate(45)">
-    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
-    <circle cx="3" cy="18" r="1.5" fill="#1a1a1a"/>
-    <circle cx="9" cy="18" r="1.5" fill="#1a1a1a"/>
-  </g>
-  
-  <!-- Bottom right boot/shoe -->
-  <g transform="translate(165, 140) rotate(-45)">
-    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
-    <circle cx="3" cy="18" r="1.5" fill="#1a1a1a"/>
-    <circle cx="9" cy="18" r="1.5" fill="#1a1a1a"/>
-  </g>
+  <text x="100" y="138" font-family="Arial, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Estd. 2015</text>
 </svg>
