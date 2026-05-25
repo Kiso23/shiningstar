@@ -19,7 +19,7 @@ function PasswordField({ value, onChange, placeholder }: { value: string; onChan
       <button
         type="button"
         onClick={() => setShow((v) => !v)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-400 transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-green-400 transition-colors"
         tabIndex={-1}
       >
         {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -136,7 +136,7 @@ export default function SettingsTab() {
   return (
     <div className="space-y-6 max-w-xl">
       <div className="flex items-center gap-2">
-        <Settings className="w-5 h-5 text-orange-400" />
+        <Settings className="w-5 h-5 text-green-400" />
         <h2 className="text-white font-bold text-lg">Site Settings</h2>
       </div>
 
@@ -168,7 +168,7 @@ export default function SettingsTab() {
 
             {dateValue && (
               <p className="text-gray-500 text-xs mt-2">
-                Countdown target: <span className="text-orange-400 font-medium">
+                Countdown target: <span className="text-green-400 font-medium">
                   {new Date(dateValue).toLocaleString('en-IN', {
                     weekday: 'long', year: 'numeric', month: 'long',
                     day: 'numeric', hour: '2-digit', minute: '2-digit',
@@ -210,7 +210,7 @@ export default function SettingsTab() {
           className="glass-card p-6 space-y-4"
         >
           <div className="flex items-center gap-2">
-            <Type className="w-4 h-4 text-orange-400" />
+            <Type className="w-4 h-4 text-green-400" />
             <h3 className="text-white font-semibold">Hero Title (Big Text)</h3>
           </div>
           <p className="text-gray-500 text-sm">The large title on the homepage hero section.</p>
@@ -220,7 +220,7 @@ export default function SettingsTab() {
             <p className="text-white font-black text-2xl uppercase leading-tight">
               {heroLine1 || 'Line 1'}<br />
               {heroLine2 || 'Line 2'}<br />
-              <span className="text-orange-500">{heroLine3 || 'Line 3'}</span>
+              <span className="text-green-500">{heroLine3 || 'Line 3'}</span>
             </p>
           </div>
 
@@ -262,15 +262,15 @@ export default function SettingsTab() {
           className="glass-card p-6 space-y-4"
         >
           <div className="flex items-center gap-2">
-            <Type className="w-4 h-4 text-orange-400" />
+            <Type className="w-4 h-4 text-green-400" />
             <h3 className="text-white font-semibold">Homepage Banner Text</h3>
           </div>
           <p className="text-gray-500 text-sm">This appears on the hero section of the homepage.</p>
 
           {/* Live preview */}
-          <div className="px-4 py-3 border-l-4 border-orange-500 bg-orange-500/10 rounded-r-xl">
+          <div className="px-4 py-3 border-l-4 border-green-500 bg-green-500/10 rounded-r-xl">
             <p className="text-white font-bold text-sm">{bannerLine1 || 'Line 1'}</p>
-            <p className="text-orange-400 font-semibold text-xs">{bannerLine2 || 'Line 2'}</p>
+            <p className="text-green-400 font-semibold text-xs">{bannerLine2 || 'Line 2'}</p>
           </div>
 
           <div>
@@ -321,7 +321,7 @@ export default function SettingsTab() {
           className="glass-card p-6 space-y-4"
         >
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-orange-400" />
+            <Lock className="w-4 h-4 text-green-400" />
             <h3 className="text-white font-semibold">Change Password</h3>
           </div>
           <div>
