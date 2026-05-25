@@ -109,22 +109,16 @@ export default function HomePage() {
           </span>
         </div>
 
-        <div className="hidden sm:flex items-center gap-1">
+        <div className="flex items-center gap-1">
           {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
-              className="hover:text-orange-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
+              className="hover:text-orange-400 text-xs sm:text-sm font-medium transition-colors px-1.5 sm:px-2 py-1.5 rounded-lg hover:bg-white/5">
               {label}
             </button>
           ))}
           <button onClick={() => navigate('/live')}
-            className="flex items-center gap-1.5 text-green-400 hover:text-green-300 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />Live
-          </button>
-        </div>
-
-        <div className="flex sm:hidden items-center gap-2">
-          <button onClick={() => navigate('/live')} className="flex items-center gap-1 text-green-400 text-xs font-medium px-2 py-1.5">
+            className="flex items-center gap-1 text-green-400 hover:text-green-300 text-xs sm:text-sm font-medium transition-colors px-1.5 sm:px-2 py-1.5 rounded-lg hover:bg-white/5">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />Live
           </button>
         </div>
