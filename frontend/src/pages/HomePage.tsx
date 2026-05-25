@@ -50,7 +50,9 @@ export default function HomePage() {
       setHeroLine1(s.hero_line1 || 'Shining')
       setHeroLine2(s.hero_line2 || 'Star')
       setHeroLine3(s.hero_line3 || 'United FC')
-    }).catch(() => {})
+    }).catch((err) => {
+      console.error('Failed to load settings:', err)
+    })
   }, [])
 
   const [countdown, setCountdown] = useState({ days: 0, hrs: 0, mins: 0, secs: 0 })

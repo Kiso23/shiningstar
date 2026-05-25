@@ -29,7 +29,8 @@ export async function updateTournamentDate(tournament_start: string): Promise<To
 }
 
 export async function getAllSettings(): Promise<AllSettingsResponse> {
-  const res = await client.get('/settings/all')
+  // Add cache-busting query parameter to force fresh data
+  const res = await client.get('/settings/all?t=' + Date.now())
   return res.data
 }
 
