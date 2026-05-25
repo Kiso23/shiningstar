@@ -15,6 +15,7 @@ function PasswordField({ value, onChange, placeholder }: { value: string; onChan
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder || '••••••••'}
         className="input-field pr-10 mt-1"
+        autoComplete="off"
       />
       <button
         type="button"
@@ -164,6 +165,7 @@ export default function SettingsTab() {
               value={dateValue}
               onChange={(e) => setDateValue(e.target.value)}
               className="input-field mt-1"
+              autoComplete="off"
             />
 
             {dateValue && (
@@ -226,18 +228,39 @@ export default function SettingsTab() {
 
           <div>
             <label className="label">Line 1 (white)</label>
-            <input type="text" value={heroLine1} onChange={(e) => setHeroLine1(e.target.value)}
-              placeholder="e.g. Shining" className="input-field mt-1" maxLength={30} />
+            <input 
+              type="text" 
+              value={heroLine1} 
+              onChange={(e) => setHeroLine1(e.target.value)}
+              placeholder="e.g. Shining" 
+              className="input-field mt-1" 
+              maxLength={30}
+              autoComplete="off"
+            />
           </div>
           <div>
             <label className="label">Line 2 (white)</label>
-            <input type="text" value={heroLine2} onChange={(e) => setHeroLine2(e.target.value)}
-              placeholder="e.g. Star" className="input-field mt-1" maxLength={30} />
+            <input 
+              type="text" 
+              value={heroLine2} 
+              onChange={(e) => setHeroLine2(e.target.value)}
+              placeholder="e.g. Star" 
+              className="input-field mt-1" 
+              maxLength={30}
+              autoComplete="off"
+            />
           </div>
           <div>
-            <label className="label">Line 3 (orange)</label>
-            <input type="text" value={heroLine3} onChange={(e) => setHeroLine3(e.target.value)}
-              placeholder="e.g. United FC" className="input-field mt-1" maxLength={30} />
+            <label className="label">Line 3 (green)</label>
+            <input 
+              type="text" 
+              value={heroLine3} 
+              onChange={(e) => setHeroLine3(e.target.value)}
+              placeholder="e.g. United FC" 
+              className="input-field mt-1" 
+              maxLength={30}
+              autoComplete="off"
+            />
           </div>
 
           {heroError && (
@@ -282,6 +305,7 @@ export default function SettingsTab() {
               placeholder="e.g. Shining Star United FC"
               className="input-field mt-1"
               maxLength={80}
+              autoComplete="off"
             />
           </div>
           <div>
@@ -293,6 +317,7 @@ export default function SettingsTab() {
               placeholder="e.g. Football Tournament"
               className="input-field mt-1"
               maxLength={80}
+              autoComplete="off"
             />
           </div>
 
