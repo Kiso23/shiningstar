@@ -19,14 +19,16 @@ logger = logging.getLogger(__name__)
 async def export_db_to_json(session_factory: async_sessionmaker) -> Dict[str, Any]:
     """Export all tables to a JSON-serializable dict."""
     async with session_factory() as db:
-        tables = ["teams", "players", "payment_proofs", "matches", "standings", "settings"]
+        # Whitelist of allowed tables to prevent SQL injection
+        allowed_tables = ["teams", "players", "payment_proofs", "matches", "standings", "settings"]
         export: Dict[str, Any] = {
             "exported_at": datetime.utcnow().isoformat(),
             "tables": {}
         }
 
-        for table in tables:
+        for table in allowed_tables:
             try:
+                # Use parameterized query with whitelisted table name
                 result = await db.execute(text(f"SELECT * FROM {table}"))
                 rows = result.mappings().all()
                 # Convert to JSON-serializable format

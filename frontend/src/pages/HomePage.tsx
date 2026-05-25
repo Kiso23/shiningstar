@@ -42,6 +42,8 @@ export default function HomePage() {
   const [heroLine3, setHeroLine3] = useState('United FC')
   const [showToast, setShowToast] = useState(false)
 
+  const [settingsError, setSettingsError] = useState(false)
+
   useEffect(() => {
     getAllSettings().then((s) => {
       setTargetDate(new Date(s.tournament_start))
@@ -50,13 +52,17 @@ export default function HomePage() {
       setHeroLine1(s.hero_line1 || 'Shining')
       setHeroLine2(s.hero_line2 || 'Star')
       setHeroLine3(s.hero_line3 || 'United FC')
+      setSettingsError(false)
     }).catch((err) => {
       console.error('Failed to load settings:', err)
+      setSettingsError(true)
+      // Keep default values if settings fail to load
     })
   }, [])
 
   const [countdown, setCountdown] = useState({ days: 0, hrs: 0, mins: 0, secs: 0 })
   const [started, setStarted] = useState(false)
+  
   useEffect(() => {
     const calc = () => {
       const diff = targetDate.getTime() - Date.now()
@@ -71,6 +77,7 @@ export default function HomePage() {
     }
     setCountdown(calc())
     const t = setInterval(() => setCountdown(calc()), 1000)
+    // Cleanup interval on unmount or when targetDate changes
     return () => clearInterval(t)
   }, [targetDate])
 

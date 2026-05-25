@@ -336,6 +336,11 @@ async def send_contact_notification(
     """Send contact notification to admin."""
     admin_email = os.getenv("ADMIN_EMAIL", "admin@shiningstarunited.com")
     
+    # Validate admin email is set
+    if not admin_email:
+        logger.warning("ADMIN_EMAIL not set, skipping contact notification")
+        return
+    
     html_content = f"""
       <h2 style="margin:0 0 8px;color:#fff;font-size:20px;">📧 New Contact Message</h2>
       <p style="margin:0 0 24px;color:#aaa;font-size:14px;">

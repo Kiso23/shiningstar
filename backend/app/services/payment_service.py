@@ -80,6 +80,9 @@ async def store_payment_proof(
         # Step 3: Update team status
         team.status = RegistrationStatus.payment_submitted.value
         await db.flush()
+        
+        # Step 4: Commit transaction to persist changes
+        await db.commit()
         await db.refresh(proof)
         return proof
 
@@ -87,8 +90,10 @@ async def store_payment_proof(
         # Clean up file if DB operations failed
         if file_path:
             delete_file(file_path)
+        await db.rollback()
         raise
     except Exception:
         if file_path:
             delete_file(file_path)
+        await db.rollback()
         raise

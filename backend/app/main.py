@@ -90,10 +90,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware - allow all origins for now to debug
+# CORS middleware - use specific allowed origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins temporarily
+    allow_origins=settings.CORS_ORIGINS,  # Use specific origins from config
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
