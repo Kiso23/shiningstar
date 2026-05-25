@@ -148,9 +148,7 @@ export default function SettingsTab() {
         </div>
       ) : (
         <>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="glass-card p-6 space-y-5"
         >
           <div>
@@ -187,9 +185,7 @@ export default function SettingsTab() {
             </div>
           )}
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={handleSave}
             disabled={saving || !dateValue}
             className="btn-primary w-full"
@@ -201,14 +197,11 @@ export default function SettingsTab() {
             ) : (
               <><Save className="w-4 h-4" /> Save Settings</>
             )}
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
 
         {/* Hero Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="glass-card p-6 space-y-4"
         >
           <div className="flex items-center gap-2">
@@ -268,20 +261,18 @@ export default function SettingsTab() {
               <AlertCircle className="w-4 h-4 shrink-0" />{heroError}
             </div>
           )}
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-            onClick={handleSaveHero} disabled={heroSaving || !heroLine1.trim()}
+          <button
+            onClick={handleSaveHero} 
+            disabled={heroSaving || !heroLine1.trim()}
             className="btn-primary w-full">
             {heroSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
               : heroSaved ? <><CheckCircle className="w-4 h-4" /> Saved!</>
               : <><Save className="w-4 h-4" /> Save Hero Title</>}
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
 
         {/* Banner Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <div
           className="glass-card p-6 space-y-4"
         >
           <div className="flex items-center gap-2">
@@ -326,9 +317,7 @@ export default function SettingsTab() {
               <AlertCircle className="w-4 h-4 shrink-0" />{bannerError}
             </div>
           )}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={handleSaveBanner}
             disabled={bannerSaving || !bannerLine1.trim()}
             className="btn-primary w-full"
@@ -336,13 +325,10 @@ export default function SettingsTab() {
             {bannerSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
               : bannerSaved ? <><CheckCircle className="w-4 h-4" /> Saved!</>
               : <><Save className="w-4 h-4" /> Save Banner</>}
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
 
-        {/* Change Password */}        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        {/* Change Password */}        <div
           className="glass-card p-6 space-y-4"
         >
           <div className="flex items-center gap-2">
@@ -366,9 +352,7 @@ export default function SettingsTab() {
               <AlertCircle className="w-4 h-4 shrink-0" />{passError}
             </div>
           )}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={handleChangePassword}
             disabled={passLoading || !currentPass || !newPass || !confirmPass}
             className="btn-primary w-full"
@@ -376,8 +360,8 @@ export default function SettingsTab() {
             {passLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Changing...</>
               : passSaved ? <><CheckCircle className="w-4 h-4" /> Password Changed!</>
               : <><Lock className="w-4 h-4" /> Change Password</>}
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
         </>
       )}
     </div>
