@@ -1,69 +1,81 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
-  <!-- Background circle -->
-  <circle cx="200" cy="200" r="190" fill="#1a2744" stroke="#fff" stroke-width="4"/>
-  <circle cx="200" cy="200" r="160" fill="none" stroke="#fff" stroke-width="3"/>
-  <circle cx="200" cy="200" r="120" fill="#0f1a33" stroke="#fff" stroke-width="3"/>
-  <circle cx="200" cy="200" r="90" fill="#1a2744" stroke="#fff" stroke-width="2"/>
-
-  <!-- Crossed hockey sticks / batons -->
-  <!-- Left stick -->
-  <g transform="rotate(-45, 200, 200)">
-    <rect x="80" y="185" width="240" height="30" rx="8" fill="#1a2744" stroke="#fff" stroke-width="2"/>
-    <rect x="80" y="185" width="50" height="30" rx="8" fill="#2a3a5c"/>
-    <ellipse cx="80" cy="200" rx="20" ry="15" fill="#2a3a5c" stroke="#fff" stroke-width="2"/>
-  </g>
-  <!-- Right stick -->
-  <g transform="rotate(45, 200, 200)">
-    <rect x="80" y="185" width="240" height="30" rx="8" fill="#1a2744" stroke="#fff" stroke-width="2"/>
-    <rect x="80" y="185" width="50" height="30" rx="8" fill="#2a3a5c"/>
-    <ellipse cx="80" cy="200" rx="20" ry="15" fill="#2a3a5c" stroke="#fff" stroke-width="2"/>
-  </g>
-
-  <!-- Red and white ribbon bands -->
-  <rect x="30" y="185" width="340" height="18" rx="4" fill="#cc1a1a" opacity="0.9"/>
-  <rect x="30" y="203" width="340" height="14" rx="4" fill="#fff" opacity="0.9"/>
-  <rect x="30" y="217" width="340" height="18" rx="4" fill="#1a2744" opacity="0.9"/>
-
-  <!-- Inner dark circle -->
-  <circle cx="200" cy="200" r="88" fill="#0f1a33"/>
-  <circle cx="200" cy="200" r="85" fill="none" stroke="#fff" stroke-width="2"/>
-
-  <!-- 5 stars pattern (like the image: 2 top, 1 middle, 2 bottom) -->
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for contrast -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Top text arc -->
+  <defs>
+    <path id="topArc" d="M 40,100 A 60,60 0 0,1 160,100" fill="none"/>
+    <path id="bottomArc" d="M 160,100 A 60,60 0 0,1 40,100" fill="none"/>
+  </defs>
+  
+  <!-- Top text: SHINING STAR UNITED -->
+  <text font-size="16" font-weight="bold" letter-spacing="2" fill="#f0f4f0">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+      SHINING STAR UNITED
+    </textPath>
+  </text>
+  
+  <!-- Main circle -->
+  <circle cx="100" cy="100" r="55" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="3"/>
+  
+  <!-- Inner circle -->
+  <circle cx="100" cy="100" r="48" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="2"/>
+  
+  <!-- Stars inside circle -->
   <!-- Top left star -->
-  <polygon points="155,155 160,170 175,170 163,179 168,194 155,185 142,194 147,179 135,170 150,170"
-           fill="#fff"/>
+  <g transform="translate(80, 75)">
+    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  </g>
+  
   <!-- Top right star -->
-  <polygon points="245,155 250,170 265,170 253,179 258,194 245,185 232,194 237,179 225,170 240,170"
-           fill="#fff"/>
-  <!-- Middle star (larger) -->
-  <polygon points="200,160 207,180 228,180 212,192 218,212 200,200 182,212 188,192 172,180 193,180"
-           fill="#fff"/>
+  <g transform="translate(120, 75)">
+    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Center star -->
+  <g transform="translate(100, 95)">
+    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  </g>
+  
   <!-- Bottom left star -->
-  <polygon points="163,210 168,225 183,225 171,234 176,249 163,240 150,249 155,234 143,225 158,225"
-           fill="#fff"/>
+  <g transform="translate(80, 115)">
+    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  </g>
+  
   <!-- Bottom right star -->
-  <polygon points="237,210 242,225 257,225 245,234 250,249 237,240 224,249 229,234 217,225 232,225"
-           fill="#fff"/>
-
+  <g transform="translate(120, 115)">
+    <polygon points="0,-8 2.4,-2.4 8,-0.8 3.2,3.2 4.8,9.2 0,5.6 -4.8,9.2 -3.2,3.2 -8,-0.8 -2.4,-2.4" fill="#1a1a1a"/>
+  </g>
+  
   <!-- Estd. 2015 text -->
-  <text x="200" y="268" text-anchor="middle" font-family="Georgia, serif" font-size="14"
-        font-weight="bold" fill="#fff" letter-spacing="1">Estd. 2015</text>
-
-  <!-- SHINING STAR arc text (top) -->
-  <path id="topArc" d="M 60,200 A 140,140 0 0,1 340,200" fill="none"/>
-  <text font-family="Arial Black, sans-serif" font-size="22" font-weight="900" fill="#1a2744" letter-spacing="3">
-    <textPath href="#topArc" startOffset="10%">SHINING STAR</textPath>
-  </text>
-
-  <!-- UNITED arc text -->
-  <path id="midArc" d="M 90,200 A 110,110 0 0,1 310,200" fill="none"/>
-  <text font-family="Arial Black, sans-serif" font-size="18" font-weight="900" fill="#1a2744" letter-spacing="4">
-    <textPath href="#midArc" startOffset="18%">· UNITED ·</textPath>
-  </text>
-
-  <!-- HAMREN arc text (bottom) -->
-  <path id="bottomArc" d="M 55,210 A 145,145 0 0,0 345,210" fill="none"/>
-  <text font-family="Arial Black, sans-serif" font-size="24" font-weight="900" fill="#1a2744" letter-spacing="5">
-    <textPath href="#bottomArc" startOffset="22%">HAMREN</textPath>
-  </text>
+  <text x="100" y="135" font-size="10" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Estd. 2015</text>
+  
+  <!-- Bottom text: HAMREN -->
+  <text x="100" y="165" font-size="14" font-weight="bold" letter-spacing="1" text-anchor="middle" fill="#f0f4f0">HAMREN</text>
+  
+  <!-- Top left boot/shoe -->
+  <g transform="translate(35, 60) rotate(-45)">
+    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="2" y="8" width="8" height="8" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Top right boot/shoe -->
+  <g transform="translate(165, 60) rotate(45)">
+    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="2" y="8" width="8" height="8" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Bottom left boot/shoe -->
+  <g transform="translate(35, 140) rotate(45)">
+    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
+    <circle cx="3" cy="18" r="1.5" fill="#1a1a1a"/>
+    <circle cx="9" cy="18" r="1.5" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- Bottom right boot/shoe -->
+  <g transform="translate(165, 140) rotate(-45)">
+    <rect x="0" y="0" width="12" height="20" rx="2" fill="#e8e8e8" stroke="#1a1a1a" stroke-width="2"/>
+    <circle cx="3" cy="18" r="1.5" fill="#1a1a1a"/>
+    <circle cx="9" cy="18" r="1.5" fill="#1a1a1a"/>
+  </g>
 </svg>

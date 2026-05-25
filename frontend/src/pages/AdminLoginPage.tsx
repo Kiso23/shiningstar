@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
             className="inline-block mb-4"
           >
             <img
-              src="/logo.png"
+              src="/logo.svg"
               alt="Shining Star United"
               className="w-20 h-20 rounded-full object-cover border-2 border-orange-500/40 mx-auto"
             />

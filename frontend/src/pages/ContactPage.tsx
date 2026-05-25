@@ -55,7 +55,7 @@ export default function ContactPage() {
           <span className="text-sm">Back to Home</span>
         </motion.button>
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
+          <img src="/logo.svg" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
           <span className="font-bold text-white text-sm hidden sm:block">Shining Star United</span>
         </div>
       </motion.header>
