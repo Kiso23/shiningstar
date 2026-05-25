@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
+        "https://ssufc.netlify.app",
+        "https://www.ssufc.netlify.app",
         "https://shiningstarunited.netlify.app",
         "https://www.shiningstarunited.netlify.app",
     ]
