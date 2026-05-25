@@ -89,7 +89,7 @@ export default function LivePage() {
             <span className="hidden sm:inline">Refresh</span>
           </motion.button>
           <img
-            src="/logo.png"
+            src="/logo.svg"
             alt="Shining Star United"
             className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
           />

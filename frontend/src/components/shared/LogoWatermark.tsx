@@ -10,7 +10,7 @@ export default function LogoWatermark() {
       aria-hidden="true"
     >
       <img
-        src="/logo.png"
+        src="/logo.svg"
         alt=""
         style={{
           position: 'absolute',

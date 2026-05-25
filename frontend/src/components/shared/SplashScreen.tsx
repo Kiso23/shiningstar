@@ -54,7 +54,7 @@ export default function SplashScreen({ onDone }: Props) {
               transition={{ type: 'spring', stiffness: 200, damping: 18, delay: 0.1 }}
             >
               <img
-                src="/logo.png"
+                src="/logo.svg"
                 alt="Shining Star United"
                 className="w-24 h-24 rounded-full object-cover border-4 border-orange-500 shadow-2xl shadow-orange-500/40"
               />

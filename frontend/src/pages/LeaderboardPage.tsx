@@ -57,7 +57,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
         <img
-          src="/logo.png"
+          src="/logo.svg"
           alt="Shining Star United"
           className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
         />

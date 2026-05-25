@@ -45,7 +45,7 @@ export default function AdminDashboardPage() {
       >
         <div className="flex items-center gap-3">
           <img
-            src="/logo.png"
+            src="/logo.svg"
             alt="Shining Star United Hamren"
             className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
           />
