@@ -82,7 +82,10 @@ export default function SettingsTab() {
       // Send exactly what the user typed — no UTC conversion
       await updateTournamentDate(dateValue + ':00')
       setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
+      // Refresh the page to show updated settings
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
     } catch (err: any) {
       console.error('Error saving tournament date:', err)
       setError(err?.response?.data?.detail || 'Failed to save. Please try again.')
@@ -113,7 +116,10 @@ export default function SettingsTab() {
     try {
       await updateBanner(bannerLine1.trim(), bannerLine2.trim())
       setBannerSaved(true)
-      setTimeout(() => setBannerSaved(false), 3000)
+      // Refresh the page to show updated settings
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
     } catch (err: any) {
       console.error('Error saving banner:', err)
       setBannerError(err?.response?.data?.detail || 'Failed to save banner.')
@@ -128,7 +134,10 @@ export default function SettingsTab() {
     try {
       await updateHero(heroLine1.trim(), heroLine2.trim(), heroLine3.trim())
       setHeroSaved(true)
-      setTimeout(() => setHeroSaved(false), 3000)
+      // Refresh the page to show updated settings
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
     } catch (err: any) {
       console.error('Error saving hero:', err)
       setHeroError(err?.response?.data?.detail || 'Failed to save hero title.')

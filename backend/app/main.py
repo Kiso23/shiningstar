@@ -115,9 +115,9 @@ async def add_cache_headers(request: Request, call_next):
         # Cache fixtures, leaderboard, etc. for 15 minutes
         elif any(path in request.url.path for path in ["/fixtures", "/leaderboard", "/standings", "/analytics"]):
             response.headers["Cache-Control"] = "public, max-age=900"  # 15 minutes
-        # Cache settings for 1 hour
+        # Don't cache settings - they should always be fresh
         elif "/settings" in request.url.path:
-            response.headers["Cache-Control"] = "public, max-age=3600"  # 1 hour
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     
     # Add ETag for better cache validation (only for responses with body)
     if response.status_code == 200 and request.method == "GET" and hasattr(response, "body"):
