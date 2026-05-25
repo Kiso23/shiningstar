@@ -103,7 +103,7 @@ export default function HomePage() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 backdrop-blur-xl border-b transition-colors duration-300"
       >
         <div className="flex items-center gap-2">
-          <img src="/logo.svg" alt="SSU" className="w-8 h-8 sm:w-10 sm:h-10 object-contain border-2 border-green-500 shrink-0" />
+          <img src="/logo.png" alt="SSU" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-green-500 shrink-0" />
           <span style={{ color: textMain }} className="font-black text-sm sm:text-base hidden sm:block tracking-wide">
             SHINING STAR <span className="text-green-500">UNITED</span>
           </span>
@@ -582,7 +582,7 @@ export default function HomePage() {
       <footer style={{ backgroundColor: '#050a05', borderTopColor: border }} className="border-t py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-green-500/40" />
+            <img src="/logo.png" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-green-500/40" />
             <div>
               <p style={{ color: textMain }} className="font-bold text-sm">Shining Star United</p>
               <p style={{ color: textMute }} className="text-xs">© 2025 All rights reserved. Developed by Sarlongki Teron</p>

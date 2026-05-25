@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <img src="/logo.svg" alt="SSU" className="w-16 h-16 rounded-full object-cover border-2 border-orange-500/40 mx-auto mb-4" />
+          <img src="/logo.png" alt="SSU" className="w-16 h-16 rounded-full object-cover border-2 border-orange-500/40 mx-auto mb-4" />
           <h1 className="text-2xl font-black text-white">Reset Password</h1>
           <p className="text-gray-500 text-sm mt-1">Admin Portal · Shining Star United</p>
         </div>

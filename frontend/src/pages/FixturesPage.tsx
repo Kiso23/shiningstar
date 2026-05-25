@@ -69,7 +69,7 @@ export default function FixturesPage() {
           </div>
         </div>
         <img
-          src="/logo.svg"
+          src="/logo.png"
           alt="Shining Star United"
           className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
         />
