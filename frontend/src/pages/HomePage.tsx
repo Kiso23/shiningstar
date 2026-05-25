@@ -186,10 +186,7 @@ export default function HomePage() {
               <p className="text-orange-400 font-semibold text-xs sm:text-sm">{bannerLine2}</p>
             </motion.div>
 
-            <motion.p initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
-              style={{ color: textMute }} className="text-sm sm:text-base mb-6 sm:mb-8 leading-relaxed">
-              {TOURNAMENT.date} · {TOURNAMENT.venue}. Up to {TOURNAMENT.maxTeams} teams compete for the championship title.
-            </motion.p>
+
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start">
