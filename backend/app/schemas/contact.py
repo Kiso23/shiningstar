@@ -1,14 +1,24 @@
 import uuid
 from datetime import datetime
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
+from pydantic import BaseModel, Field, EmailStr, ConfigDict, field_validator
 
 
 class ContactCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
-    phone: str = Field(..., pattern=r"^\d{10}$")
+    phone: str = Field(..., min_length=10, max_length=20)
     subject: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=10, max_length=5000)
+    
+    @field_validator('phone')
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        """Validate phone number - must contain at least 10 digits."""
+        # Remove common separators and spaces
+        digits_only = ''.join(c for c in v if c.isdigit())
+        if len(digits_only) < 10:
+            raise ValueError('Phone number must contain at least 10 digits')
+        return v
 
 
 class ContactResponse(BaseModel):

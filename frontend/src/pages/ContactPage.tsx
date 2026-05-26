@@ -148,12 +148,12 @@ export default function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="10-digit phone number"
-                      pattern="^\d{10}$"
+                      placeholder="10-digit phone number (e.g., 9876543210)"
                       required
                       className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500/50 transition-colors"
                     />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">Accepts formats: 9876543210, 98-765-43210, +91 98765 43210</p>
                 </div>
 
                 {/* Subject */}
