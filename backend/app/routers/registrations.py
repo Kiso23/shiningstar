@@ -57,10 +57,13 @@ async def submit_players(
     if team is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
 
-    if len(players) != team.player_count:
+    # Allow 11 required players + up to 7 optional players (total 11-18)
+    min_players = 11
+    max_players = 18
+    if len(players) < min_players or len(players) > max_players:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Expected {team.player_count} players, got {len(players)}",
+            detail=f"Expected {min_players}-{max_players} players, got {len(players)}",
         )
 
     await registration_service.create_players(db, team.id, players)

@@ -8,7 +8,7 @@ class ContactCreate(BaseModel):
     email: EmailStr
     phone: str = Field(..., min_length=10, max_length=20)
     subject: str = Field(..., min_length=1, max_length=200)
-    message: str = Field(..., min_length=10, max_length=5000)
+    message: str = Field(..., min_length=5, max_length=5000)  # Changed from 10 to 5 for flexibility
     
     @field_validator('phone')
     @classmethod
