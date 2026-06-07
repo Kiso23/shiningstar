@@ -23,16 +23,7 @@ export default function Footer() {
         { label: 'Terms of Service', href: '#' },
       ]
     },
-    {
-      title: 'Other Links',
-      links: [
-        { label: 'Holiday List', href: '#' },
-        { label: 'Events', href: '#' },
-        { label: 'Results', href: '#' },
-        { label: 'News', href: '#' },
-        { label: 'FAQ', href: '#' },
-      ]
-    },
+
     {
       title: 'Follow Us On',
       links: [
@@ -52,7 +43,7 @@ export default function Footer() {
     <footer style={{ backgroundColor: bgDark, borderTopColor: border }} className="border-t py-16 px-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
           
           {/* Logo Section */}
           <motion.div
@@ -77,7 +68,7 @@ export default function Footer() {
           </motion.div>
 
           {/* Footer Link Sections */}
-          {footerSections.slice(0, 2).map((section, idx) => (
+          {footerSections.slice(0, 1).map((section, idx) => (
             <motion.div
               key={section.title}
               initial={{ opacity: 0, y: 20 }}
