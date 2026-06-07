@@ -1,9 +1,36 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Facebook, Instagram } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 export default function Footer() {
   const navigate = useNavigate()
+  const mapRef = useRef<HTMLDivElement>(null)
+  
+  // Initialize map on mount
+  useEffect(() => {
+    if (!mapRef.current) return
+    
+    // Hamren Rongbong Ronghang Playground coordinates (approximate)
+    const lat = 25.9124
+    const lng = 91.8298
+    
+    // Create map HTML with OpenStreetMap
+    mapRef.current.innerHTML = `
+      <div style="width: 100%; height: 100%; border-radius: 12px; overflow: hidden;">
+        <iframe 
+          width="100%" 
+          height="100%" 
+          frameborder="0" 
+          style="border:0" 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3575.0542050542053!2d91.82980000000001!3d25.912400000000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375a5e5f5e5f5e5f%3A0x5e5f5e5f5e5f5e5f!2sRongbong%20Ronghang%20Playground!5e0!3m2!1sen!2sin!4v1234567890" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    `
+  }, [])
   
   // Color variables matching HomePage
   const bg = '#080c08'
@@ -149,7 +176,26 @@ export default function Footer() {
         {/* Divider */}
         <div style={{ borderTopColor: border }} className="border-t my-4 sm:my-8" />
 
-        {/* Contact Section */}
+        {/* Map Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-4 sm:mb-12"
+        >
+          <h3 style={{ color: textMain }} className="font-black text-xs uppercase tracking-wide mb-3 sm:mb-4">Venue Location</h3>
+          <div 
+            ref={mapRef}
+            className="w-full h-64 rounded-2xl overflow-hidden border"
+            style={{ borderColor: border, backgroundColor: 'rgba(0,0,0,0.3)' }}
+          />
+          <p style={{ color: textMute }} className="text-xs mt-2">
+            Rongbong Ronghang Playground, Hamren, Assam
+          </p>
+        </motion.div>
+
+        {/* Divider */}
+        <div style={{ borderTopColor: border }} className="border-t my-4 sm:my-8" />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
