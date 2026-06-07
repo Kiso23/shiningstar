@@ -11,24 +11,21 @@ export default function Footer() {
   useEffect(() => {
     if (!mapRef.current) return
     
-    // Hamren Rongbong Ronghang Playground coordinates (approximate)
-    const lat = 25.9124
-    const lng = 91.8298
+    // Rongbong Ronghang Playground, Hamren, Assam
+    // Coordinates: 26.1805°N, 91.8298°E
+    const embedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3577.8524567890123!2d91.82980!3d26.18050!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1sRongbong%20Ronghang%20Playground!2s26.18050%2C91.82980!5e0!3m2!1sen!2sin!4v1624512000000`
     
-    // Create map HTML with OpenStreetMap
     mapRef.current.innerHTML = `
-      <div style="width: 100%; height: 100%; border-radius: 12px; overflow: hidden;">
-        <iframe 
-          width="100%" 
-          height="100%" 
-          frameborder="0" 
-          style="border:0" 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3575.0542050542053!2d91.82980000000001!3d25.912400000000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375a5e5f5e5f5e5f%3A0x5e5f5e5f5e5f5e5f!2sRongbong%20Ronghang%20Playground!5e0!3m2!1sen!2sin!4v1234567890" 
-          allowfullscreen="" 
-          loading="lazy" 
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      </div>
+      <iframe 
+        width="100%" 
+        height="100%" 
+        frameborder="0" 
+        style="border:0; border-radius: 12px;" 
+        src="${embedUrl}" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
     `
   }, [])
   
