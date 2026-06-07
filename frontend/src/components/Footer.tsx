@@ -17,7 +17,6 @@ export default function Footer() {
       title: 'Acts and Policies',
       links: [
         { label: 'Tournament Regulation', href: '#' },
-        { label: 'University Act', href: '#' },
         { label: 'Refund Policy', href: '#' },
         { label: 'Privacy Policy', href: '#' },
         { label: 'Terms of Service', href: '#' },
