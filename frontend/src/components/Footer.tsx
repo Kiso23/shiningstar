@@ -11,9 +11,9 @@ export default function Footer() {
   useEffect(() => {
     if (!mapRef.current) return
     
-    // Rongbong Ronghang Playground, Hamren, Assam
-    // Coordinates: 26.1805°N, 91.8298°E
-    const embedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3577.8524567890123!2d91.82980!3d26.18050!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1sRongbong%20Ronghang%20Playground!2s26.18050%2C91.82980!5e0!3m2!1sen!2sin!4v1624512000000`
+    // Rongbong Ronghang Playground, Old Hamren, Hamren, Assam 782486, India
+    // Coordinates: 26.181089, 91.829803
+    const embedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3577.1234567890!2d91.829803!3d26.181089!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1sRongbong%20Ronghang%20Playground!2s26.181089%2C91.829803!5e0!3m2!1sen!2sin!4v1700000000000`
     
     mapRef.current.innerHTML = `
       <iframe 
