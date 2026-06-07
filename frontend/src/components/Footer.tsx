@@ -182,8 +182,12 @@ export default function Footer() {
           <h3 style={{ color: textMain }} className="font-black text-xs uppercase tracking-wide mb-3 sm:mb-4">Venue Location</h3>
           <div 
             ref={mapRef}
-            className="w-full h-64 rounded-2xl overflow-hidden border"
-            style={{ borderColor: border, backgroundColor: 'rgba(0,0,0,0.3)' }}
+            className="w-full rounded-2xl overflow-hidden border"
+            style={{ 
+              borderColor: border, 
+              backgroundColor: 'rgba(0,0,0,0.3)',
+              height: '200px'
+            }}
           />
           <p style={{ color: textMute }} className="text-xs mt-2">
             Rongbong Ronghang Playground, Hamren, Assam
