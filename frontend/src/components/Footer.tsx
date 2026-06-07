@@ -40,30 +40,30 @@ export default function Footer() {
   ]
 
   return (
-    <footer style={{ backgroundColor: bgDark, borderTopColor: border }} className="border-t py-16 px-6 transition-colors duration-300">
+    <footer style={{ backgroundColor: bgDark, borderTopColor: border }} className="border-t py-8 sm:py-16 px-4 sm:px-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-12">
           
           {/* Logo Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-2"
           >
-            <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="SSU" className="w-10 h-10 rounded-full object-cover border-2 border-green-500/40" />
+            <div className="flex items-center gap-2">
+              <img src="/logo.svg" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-green-500/40" />
               <div>
-                <p style={{ color: textMain }} className="font-black text-base">SHINING STAR</p>
+                <p style={{ color: textMain }} className="font-black text-sm">SHINING STAR</p>
                 <p className="text-green-400 font-bold text-xs">UNITED FC</p>
               </div>
             </div>
-            <p style={{ color: textMute }} className="text-xs leading-relaxed">
+            <p style={{ color: textMute }} className="text-xs leading-relaxed hidden sm:block">
               Representing Hamren with pride. A community-driven football club committed to excellence and fair play.
             </p>
             <p style={{ color: textMute }} className="text-xs font-medium">
-              © 2025 Shining Star United FC. All rights reserved.
+              © 2025 SSU FC
             </p>
           </motion.div>
 
@@ -75,10 +75,10 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: (idx + 1) * 0.1 }}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-2"
             >
-              <h3 style={{ color: textMain }} className="font-black text-sm uppercase tracking-wide">{section.title}</h3>
-              <ul className="flex flex-col gap-2">
+              <h3 style={{ color: textMain }} className="font-black text-xs uppercase tracking-wide">{section.title}</h3>
+              <ul className="flex flex-col gap-1">
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <a
@@ -100,22 +100,22 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-2"
           >
-            <h3 style={{ color: textMain }} className="font-black text-sm uppercase tracking-wide">Follow Us</h3>
-            <div className="flex items-center gap-3">
+            <h3 style={{ color: textMain }} className="font-black text-xs uppercase tracking-wide">Follow Us</h3>
+            <div className="flex items-center gap-2">
               <a
                 href="https://www.facebook.com/share/g/17jJ3n6gXt/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:scale-110"
+                className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 hover:scale-110"
                 style={{
                   backgroundColor: 'rgba(24,119,242,0.15)',
                   border: '1px solid rgba(24,119,242,0.3)',
                 }}
                 title="Facebook"
               >
-                <svg className="w-5 h-5" fill="#1877f2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="#1877f2" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
               </a>
@@ -123,14 +123,14 @@ export default function Footer() {
                 href="https://www.instagram.com/shiningstarunitedfc_official?igsh=Y2NiYzBiOTh4MmM%3D&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:scale-110"
+                className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 hover:scale-110"
                 style={{
                   backgroundColor: 'rgba(225,48,108,0.15)',
                   border: '1px solid rgba(225,48,108,0.3)',
                 }}
                 title="Instagram"
               >
-                <svg className="w-5 h-5" fill="url(#ig-gradient-footer)" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="url(#ig-gradient-footer)" viewBox="0 0 24 24">
                   <defs>
                     <linearGradient id="ig-gradient-footer" x1="0%" y1="100%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#f09433" />
@@ -144,37 +144,34 @@ export default function Footer() {
                 </svg>
               </a>
             </div>
-            <div className="text-xs mt-2">
-              <p style={{ color: textMute }} className="mb-2">Connect with us on social media</p>
-            </div>
           </motion.div>
         </div>
 
         {/* Divider */}
-        <div style={{ borderTopColor: border }} className="border-t my-8" />
+        <div style={{ borderTopColor: border }} className="border-t my-4 sm:my-8" />
 
         {/* Contact Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12"
+          className="mb-4 sm:mb-12"
         >
-          <h3 style={{ color: textMain }} className="font-black text-sm uppercase tracking-wide mb-6">Contact Us</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <h3 style={{ color: textMain }} className="font-black text-xs uppercase tracking-wide mb-3 sm:mb-6">Contact Us</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
             {contactInfo.map(({ icon: Icon, label, value, color }) => (
-              <div key={label} className="flex items-start gap-4">
+              <div key={label} className="flex items-start gap-2 sm:gap-4">
                 <div
-                  className="flex items-center justify-center w-10 h-10 rounded-lg shrink-0 mt-0.5"
+                  className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0 mt-0"
                   style={{ backgroundColor: `${color}20`, borderColor: `${color}40`, borderWidth: 1 }}
                 >
-                  <Icon className="w-5 h-5" style={{ color }} />
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p style={{ color: textMute }} className="text-xs font-semibold uppercase tracking-wider mb-1">
+                  <p style={{ color: textMute }} className="text-xs font-semibold uppercase tracking-wider mb-0.5">
                     {label}
                   </p>
-                  <p style={{ color: textMain }} className="text-sm font-medium">
+                  <p style={{ color: textMain }} className="text-xs sm:text-sm font-medium">
                     {label === 'Email' ? (
                       <a href={`mailto:${value}`} className="hover:text-green-400 transition-colors">
                         {value}
@@ -194,19 +191,19 @@ export default function Footer() {
         </motion.div>
 
         {/* Divider */}
-        <div style={{ borderTopColor: border }} className="border-t my-8" />
+        <div style={{ borderTopColor: border }} className="border-t my-4 sm:my-8" />
 
         {/* Bottom Section */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 text-xs"
         >
-          <p style={{ color: textMute }}>
-            Developed and maintained by <span className="text-green-400 font-semibold">Sarlongki Teron (SDE)</span>
+          <p style={{ color: textMute }} className="text-xs">
+            Built by <span className="text-green-400 font-semibold">Sarlongki Teron</span>
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6 flex-wrap">
             {[
               { label: 'Fixtures', path: '/fixtures' },
               { label: 'Leaderboard', path: '/leaderboard' },
@@ -217,7 +214,7 @@ export default function Footer() {
                 key={label}
                 onClick={() => navigate(path)}
                 style={{ color: textMute }}
-                className="hover:text-green-400 transition-colors duration-200"
+                className="hover:text-green-400 transition-colors duration-200 text-xs"
               >
                 {label}
               </button>
