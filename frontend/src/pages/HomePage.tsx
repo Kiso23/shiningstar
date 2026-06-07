@@ -416,10 +416,11 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[
-            { src: '/team1.jpg', caption: 'Shining Star United FC' },
+              { src: '/team1.jpg', caption: 'Shining Star United FC' },
               { src: '/team2.jpg', caption: 'Shining Star United FC' },
+              { src: '/team3.jpg', caption: 'Shining Star United FC' },
             ].map(({ src, caption }, i) => (
               <motion.div
                 key={src}
