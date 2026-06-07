@@ -526,7 +526,7 @@ export default function HomePage() {
               { no: '07', name: 'Jalinson Phangcho', role: 'Manager', phone: '+91 99575 51560', color: '#22c55e' },
               { no: '08', name: 'Timothy Tokbi', role: 'Operation Manager', phone: '+91 70860 49705', color: '#06b6d4' },
               { no: '09', name: 'Birlong Kro', role: 'Medical Officer / Physio', phone: '+91 76378 35932', color: '#10b981' },
-              { no: '10', name: 'Sarlongki Teron', role: 'IT Officer', phone: '+91 84730 10850', color: '#a78bfa' },
+              { no: '10', name: 'Sarlongki Teron', role: 'SDE', phone: '+91 84730 10850', color: '#a78bfa' },
             ].map(({ no, name, role, phone, color }, i) => (
               <motion.div
                 key={no}
