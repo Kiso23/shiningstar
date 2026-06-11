@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { Video, VideoOff, ArrowLeft, Copy, Check } from 'lucide-react'
 
-const MEETING_LINK = 'https://meet.google.com/YOUR_MEETING_CODE' // Replace with your Google Meet link
+const MEETING_LINK = 'https://meet.google.com/pxa-oidm-fqk'
 
 export default function MeetingPage() {
   const navigate = useNavigate()
