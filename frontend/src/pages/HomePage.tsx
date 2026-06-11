@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
-import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare, Menu, X } from 'lucide-react'
+import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare, Menu, X, Video } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
 import Footer from '../components/Footer'
@@ -121,7 +121,7 @@ export default function HomePage() {
 
         {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center gap-1">
-          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
+          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Meeting', path: '/meeting' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
               className="hover:text-green-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
@@ -167,6 +167,7 @@ export default function HomePage() {
           {[
             { label: 'Fixtures', path: '/fixtures', icon: Calendar },
             { label: 'Leaderboard', path: '/leaderboard', icon: Trophy },
+            { label: 'Meeting', path: '/meeting', icon: Video },
             { label: 'Support', path: '/contact', icon: MessageSquare },
             { label: 'Join SSU', path: '/join', icon: Users },
             { label: 'Live Scores', path: '/live', icon: Radio },

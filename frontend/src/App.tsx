@@ -12,6 +12,7 @@ import LeaderboardPage from './pages/LeaderboardPage'
 import LivePage from './pages/LivePage'
 import ContactPage from './pages/ContactPage'
 import PlayerRecruitmentPage from './pages/PlayerRecruitmentPage'
+import MeetingPage from './pages/MeetingPage'
 import ProtectedRoute from './components/shared/ProtectedRoute'
 import LogoWatermark from './components/shared/LogoWatermark'
 import SplashScreen from './components/shared/SplashScreen'
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="/live" element={<LivePage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/join" element={<PlayerRecruitmentPage />} />
+            <Route path="/meeting" element={<MeetingPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
             <Route
