@@ -17,11 +17,11 @@ import Footer from '../components/Footer'
 // Text muted:   #6b7a6b  (muted green-grey)
 
 const TOURNAMENT = {
-  date: 'July 8, 2026',
+  date: 'July 15, 2026',
   venue: 'Rongbong Ronghang Playground',
   maxTeams: 32,
   deadline: 'June 30, 2026',
-  startDate: new Date('2026-07-08T08:00:00'),
+  startDate: new Date('2026-07-15T08:00:00'),
 }
 
 const STEPS = [
