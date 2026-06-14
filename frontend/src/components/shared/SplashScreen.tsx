@@ -47,11 +47,11 @@ export default function SplashScreen({ onDone }: Props) {
           />
 
           {/* Welcome Image */}
-          <motion.div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <motion.div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
             <motion.img
               src="/welcome-splash.png"
               alt="SSU Welcome"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain sm:object-cover"
               initial={{ scale: 1 }}
               animate={{ scale: dragY < -150 ? 1.08 : 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -59,7 +59,7 @@ export default function SplashScreen({ onDone }: Props) {
 
             {/* Gradient Overlay - fade out on drag */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"
+              className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10"
               animate={{ opacity: dragY < -150 ? 0.1 : 1 }}
             />
           </motion.div>
