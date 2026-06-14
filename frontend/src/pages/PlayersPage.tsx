@@ -22,48 +22,7 @@ interface PlayerCard {
   }
 }
 
-const SAMPLE_PLAYERS: PlayerCard[] = [
-  {
-    id: 1,
-    name: 'Thekphrong Hanse',
-    position: 'ST',
-    number: 9,
-    rating: 87,
-    team: 'SSU FC',
-    image: '/logo.svg',
-    stats: { pace: 88, shooting: 85, passing: 78, dribbling: 82, defense: 45, physical: 80 }
-  },
-  {
-    id: 2,
-    name: 'Diamond Tokbi',
-    position: 'MF',
-    number: 10,
-    rating: 84,
-    team: 'SSU FC',
-    image: '/logo.svg',
-    stats: { pace: 85, shooting: 80, passing: 86, dribbling: 84, defense: 55, physical: 78 }
-  },
-  {
-    id: 3,
-    name: 'Jeffry Timung',
-    position: 'DF',
-    number: 4,
-    rating: 82,
-    team: 'SSU FC',
-    image: '/logo.svg',
-    stats: { pace: 80, shooting: 50, passing: 75, dribbling: 60, defense: 88, physical: 85 }
-  },
-  {
-    id: 4,
-    name: 'Sarmon Lekthe',
-    position: 'GK',
-    number: 1,
-    rating: 85,
-    team: 'SSU FC',
-    image: '/logo.svg',
-    stats: { pace: 60, shooting: 30, passing: 70, dribbling: 50, defense: 82, physical: 88 }
-  },
-]
+const SAMPLE_PLAYERS: PlayerCard[] = []
 
 export default function PlayersPage() {
   const navigate = useNavigate()

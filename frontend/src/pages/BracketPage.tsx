@@ -14,14 +14,9 @@ interface Match {
   status: 'pending' | 'live' | 'completed'
 }
 
-const BRACKET_DATA = {
-  semifinals: [
-    { id: 1, team1: 'SSU FC', team2: 'Highland Eagles', score1: 2, score2: 1, winner: 'SSU FC', status: 'completed' as const },
-    { id: 2, team1: 'Dragon Force', team2: 'Phoenix United', score1: 1, score2: 1, status: 'live' as const },
-  ],
-  finals: [
-    { id: 3, team1: 'SSU FC', team2: 'TBD', status: 'pending' as const },
-  ],
+const BRACKET_DATA: { semifinals: Match[]; finals: Match[] } = {
+  semifinals: [],
+  finals: [],
 }
 
 export default function BracketPage() {
@@ -187,9 +182,20 @@ export default function BracketPage() {
                 Semifinals
               </h2>
               <div className="space-y-6">
-                {BRACKET_DATA.semifinals.map((match) => (
-                  <MatchCard key={match.id} match={match} round="Semi-Final" />
-                ))}
+                {BRACKET_DATA.semifinals.length > 0 ? (
+                  BRACKET_DATA.semifinals.map((match) => (
+                    <MatchCard key={match.id} match={match} round="Semi-Final" />
+                  ))
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{ backgroundColor: bgCard, borderColor: border }}
+                    className="border rounded-2xl p-8 text-center"
+                  >
+                    <p style={{ color: textMute }}>Bracket not yet available</p>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
 
@@ -213,9 +219,20 @@ export default function BracketPage() {
                 Finals
               </h2>
               <div className="space-y-6">
-                {BRACKET_DATA.finals.map((match) => (
-                  <MatchCard key={match.id} match={match} round="Final" />
-                ))}
+                {BRACKET_DATA.finals.length > 0 ? (
+                  BRACKET_DATA.finals.map((match) => (
+                    <MatchCard key={match.id} match={match} round="Final" />
+                  ))
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{ backgroundColor: bgCard, borderColor: border }}
+                    className="border rounded-2xl p-8 text-center"
+                  >
+                    <p style={{ color: textMute }}>Bracket not yet available</p>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           </div>
