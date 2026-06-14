@@ -10,11 +10,11 @@ export default function SplashScreen({ onDone }: Props) {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    // Auto-dismiss after 6 seconds
+    // Auto-dismiss after 15 seconds
     const timer = setTimeout(() => {
       setDismissed(true)
       setTimeout(onDone, 300)
-    }, 6000)
+    }, 15000)
     return () => clearTimeout(timer)
   }, [onDone])
 
@@ -63,7 +63,7 @@ export default function SplashScreen({ onDone }: Props) {
               className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-green-500 to-green-400"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: 6, ease: 'linear' }}
+              transition={{ duration: 15, ease: 'linear' }}
               style={{ originX: 0 }}
             />
 
