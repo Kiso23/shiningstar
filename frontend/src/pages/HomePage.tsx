@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { trackVisit } from '../api/analytics'
 import { getAllSettings } from '../api/settings'
-import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare, Menu, X, Video } from 'lucide-react'
+import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare, Menu, X, Video, Star, Award, Target } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
 import Footer from '../components/Footer'
@@ -284,6 +284,9 @@ export default function HomePage() {
                 { icon: Calendar, label: 'Match Fixtures', sub: 'View all scheduled matches', path: '/fixtures', color: 'text-blue-400' },
                 { icon: Radio, label: 'Live Scores', sub: 'Real-time match updates', path: '/live', color: 'text-green-400' },
                 { icon: Trophy, label: 'Leaderboard', sub: 'Tournament standings', path: '/leaderboard', color: 'text-yellow-400' },
+                { icon: Star, label: 'Player Cards', sub: 'FIFA-style player stats', path: '/players', color: 'text-purple-400' },
+                { icon: Award, label: 'Trophy Room', sub: 'All achievements', path: '/trophies', color: 'text-yellow-400' },
+                { icon: Target, label: 'Bracket', sub: 'Tournament bracket', path: '/bracket', color: 'text-red-400' },
                 { icon: MessageSquare, label: 'Support', sub: 'Contact us with questions', path: '/contact', color: 'text-green-400' },
                 { icon: Users, label: 'Join SSU', sub: 'Apply to join our club', path: '/join', color: 'text-purple-400' },
               ].map(({ icon: Icon, label, sub, path, color }, i) => (
