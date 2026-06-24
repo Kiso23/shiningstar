@@ -21,6 +21,8 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
 
   const [teamAId, setTeamAId] = useState(fixture?.team_a_id ?? '')
   const [teamBId, setTeamBId] = useState(fixture?.team_b_id ?? '')
+  const [teamALogo, setTeamALogo] = useState(fixture?.team_a_logo ?? '')
+  const [teamBLogo, setTeamBLogo] = useState(fixture?.team_b_logo ?? '')
   const [scheduledAt, setScheduledAt] = useState(
     fixture?.scheduled_at
       ? new Date(fixture.scheduled_at).toISOString().slice(0, 16)
@@ -48,11 +50,20 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
         venue,
         round,
         group: group || undefined,
+        team_a_logo: teamALogo || undefined,
+        team_b_logo: teamBLogo || undefined,
       }
       if (isEdit) {
-        await updateMatch(fixture.id, { scheduled_at: payload.scheduled_at, venue, round, group: group || undefined })
+        await updateMatch(fixture.id, { 
+          scheduled_at: payload.scheduled_at, 
+          venue, 
+          round, 
+          group: group || undefined,
+          team_a_logo: teamALogo || undefined,
+          team_b_logo: teamBLogo || undefined,
+        })
       } else {
-        await createMatch(payload)
+        await createMatch(payload as any)
       }
       onSaved()
     } catch (err: any) {
@@ -128,6 +139,52 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
                   <AlertCircle className="w-3.5 h-3.5" />
                   Team A and Team B must be different
                 </p>
+              )}
+            </div>
+
+            {/* Team A Logo */}
+            <div>
+              <label className="label">Team A Logo/Flag URL <span className="text-gray-600">(optional)</span></label>
+              <input
+                type="url"
+                value={teamALogo}
+                onChange={(e) => setTeamALogo(e.target.value)}
+                placeholder="e.g. https://example.com/team-logo.png"
+                className="input-field"
+              />
+              {teamALogo && (
+                <div className="mt-2 flex items-center gap-2">
+                  <img
+                    src={teamALogo}
+                    alt="Team A Logo"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <span className="text-xs text-gray-400">Preview</span>
+                </div>
+              )}
+            </div>
+
+            {/* Team B Logo */}
+            <div>
+              <label className="label">Team B Logo/Flag URL <span className="text-gray-600">(optional)</span></label>
+              <input
+                type="url"
+                value={teamBLogo}
+                onChange={(e) => setTeamBLogo(e.target.value)}
+                placeholder="e.g. https://example.com/team-logo.png"
+                className="input-field"
+              />
+              {teamBLogo && (
+                <div className="mt-2 flex items-center gap-2">
+                  <img
+                    src={teamBLogo}
+                    alt="Team B Logo"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <span className="text-xs text-gray-400">Preview</span>
+                </div>
               )}
             </div>
 

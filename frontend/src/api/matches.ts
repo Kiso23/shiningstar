@@ -7,6 +7,8 @@ export interface MatchCreate {
   venue: string
   round: string
   group?: string
+  team_a_logo?: string
+  team_b_logo?: string
 }
 
 export interface MatchUpdate {
@@ -14,6 +16,8 @@ export interface MatchUpdate {
   venue?: string
   round?: string
   group?: string
+  team_a_logo?: string
+  team_b_logo?: string
 }
 
 export interface ScoreUpdate {
