@@ -124,9 +124,21 @@ export default function FixturesPage() {
                       className="glass-card p-5"
                     >
                       <div className="flex items-center justify-between gap-4 mb-3">
-                        <div className="flex-1 text-right">
-                          <p className="text-white font-semibold text-lg">{match.team_a_name}</p>
+                        {/* Team A */}
+                        <div className="flex-1 flex flex-col items-end gap-2">
+                          <div className="flex items-center gap-2">
+                            <p className="text-white font-semibold text-lg">{match.team_a_name}</p>
+                            {match.team_a_logo && (
+                              <img
+                                src={match.team_a_logo}
+                                alt={match.team_a_name}
+                                className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
+                              />
+                            )}
+                          </div>
                         </div>
+                        
+                        {/* Score/VS */}
                         <div className="flex flex-col items-center gap-1 min-w-[80px]">
                           {match.status === 'live' && (
                             <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wide">
@@ -143,10 +155,23 @@ export default function FixturesPage() {
                             <span className="text-gray-600 text-sm">vs</span>
                           )}
                         </div>
-                        <div className="flex-1">
-                          <p className="text-white font-semibold text-lg">{match.team_b_name}</p>
+                        
+                        {/* Team B */}
+                        <div className="flex-1 flex flex-col items-start gap-2">
+                          <div className="flex items-center gap-2">
+                            {match.team_b_logo && (
+                              <img
+                                src={match.team_b_logo}
+                                alt={match.team_b_name}
+                                className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
+                              />
+                            )}
+                            <p className="text-white font-semibold text-lg">{match.team_b_name}</p>
+                          </div>
                         </div>
                       </div>
+                      
+                      {/* Match Details */}
                       <div className="flex items-center justify-center gap-4 text-gray-500 text-sm">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5" />

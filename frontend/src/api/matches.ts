@@ -28,6 +28,8 @@ export interface MatchResponse {
   team_b_id: string
   team_a_name: string
   team_b_name: string
+  team_a_logo?: string
+  team_b_logo?: string
   team_a_score: number | null
   team_b_score: number | null
   status: 'scheduled' | 'live' | 'completed'
