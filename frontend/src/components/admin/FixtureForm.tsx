@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Loader2, AlertCircle } from 'lucide-react'
+import { X, Loader2, AlertCircle, Upload } from 'lucide-react'
 import { createMatch, updateMatch, VALID_ROUNDS, type MatchResponse } from '../../api/matches'
 import { extractErrorMessage } from '../../api/errors'
 
@@ -23,6 +23,10 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
   const [teamBId, setTeamBId] = useState(fixture?.team_b_id ?? '')
   const [teamALogo, setTeamALogo] = useState(fixture?.team_a_logo ?? '')
   const [teamBLogo, setTeamBLogo] = useState(fixture?.team_b_logo ?? '')
+  const [teamALogoFile, setTeamALogoFile] = useState<File | null>(null)
+  const [teamBLogoFile, setTeamBLogoFile] = useState<File | null>(null)
+  const [teamALogoPreview, setTeamALogoPreview] = useState<string>('')
+  const [teamBLogoPreview, setTeamBLogoPreview] = useState<string>('')
   const [scheduledAt, setScheduledAt] = useState(
     fixture?.scheduled_at
       ? new Date(fixture.scheduled_at).toISOString().slice(0, 16)
@@ -36,6 +40,35 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
 
   const sameTeamError = teamAId && teamBId && teamAId === teamBId
 
+  const handleFileUpload = (file: File | null, isTeamA: boolean) => {
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a valid image file (JPEG, PNG, GIF, WebP, or SVG)')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image file must be less than 5MB')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string
+      if (isTeamA) {
+        setTeamALogoFile(file)
+        setTeamALogoPreview(dataUrl)
+      } else {
+        setTeamBLogoFile(file)
+        setTeamBLogoPreview(dataUrl)
+      }
+      setError(null)
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (sameTeamError) return
@@ -43,6 +76,10 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
     setSubmitting(true)
     setError(null)
     try {
+      // Use preview data URLs if files are uploaded, otherwise use URLs
+      const teamALogoToSend = teamALogoPreview || teamALogo || undefined
+      const teamBLogoToSend = teamBLogoPreview || teamBLogo || undefined
+
       const payload = {
         team_a_id: teamAId,
         team_b_id: teamBId,
@@ -50,8 +87,8 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
         venue,
         round,
         group: group || undefined,
-        team_a_logo: teamALogo || undefined,
-        team_b_logo: teamBLogo || undefined,
+        team_a_logo: teamALogoToSend,
+        team_b_logo: teamBLogoToSend,
       }
       if (isEdit) {
         await updateMatch(fixture.id, { 
@@ -59,8 +96,8 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
           venue, 
           round, 
           group: group || undefined,
-          team_a_logo: teamALogo || undefined,
-          team_b_logo: teamBLogo || undefined,
+          team_a_logo: teamALogoToSend,
+          team_b_logo: teamBLogoToSend,
         })
       } else {
         await createMatch(payload as any)
@@ -144,48 +181,94 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
 
             {/* Team A Logo */}
             <div>
-              <label className="label">Team A Logo/Flag URL <span className="text-gray-600">(optional)</span></label>
-              <input
-                type="url"
-                value={teamALogo}
-                onChange={(e) => setTeamALogo(e.target.value)}
-                placeholder="e.g. https://example.com/team-logo.png"
-                className="input-field"
-              />
-              {teamALogo && (
-                <div className="mt-2 flex items-center gap-2">
-                  <img
-                    src={teamALogo}
-                    alt="Team A Logo"
-                    className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                  />
-                  <span className="text-xs text-gray-400">Preview</span>
+              <label className="label">Team A Logo/Flag <span className="text-gray-600">(optional)</span></label>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-700 rounded-lg hover:border-orange-500/50 hover:bg-white/5 cursor-pointer transition-colors">
+                    <Upload className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">Upload Image</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                      onChange={(e) => handleFileUpload(e.target.files?.[0] || null, true)}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
-              )}
+                {teamALogoPreview && (
+                  <div className="flex items-center gap-2 p-2 bg-white/5 rounded-lg">
+                    <img
+                      src={teamALogoPreview}
+                      alt="Team A Logo"
+                      className="w-10 h-10 rounded object-cover border border-orange-500/40"
+                    />
+                    <span className="text-xs text-gray-400">File uploaded</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTeamALogoFile(null)
+                        setTeamALogoPreview('')
+                      }}
+                      className="ml-auto text-xs text-gray-500 hover:text-red-400 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+                <input
+                  type="url"
+                  value={teamALogo}
+                  onChange={(e) => setTeamALogo(e.target.value)}
+                  placeholder="Or paste image URL"
+                  className="input-field text-xs"
+                />
+              </div>
             </div>
 
             {/* Team B Logo */}
             <div>
-              <label className="label">Team B Logo/Flag URL <span className="text-gray-600">(optional)</span></label>
-              <input
-                type="url"
-                value={teamBLogo}
-                onChange={(e) => setTeamBLogo(e.target.value)}
-                placeholder="e.g. https://example.com/team-logo.png"
-                className="input-field"
-              />
-              {teamBLogo && (
-                <div className="mt-2 flex items-center gap-2">
-                  <img
-                    src={teamBLogo}
-                    alt="Team B Logo"
-                    className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                  />
-                  <span className="text-xs text-gray-400">Preview</span>
+              <label className="label">Team B Logo/Flag <span className="text-gray-600">(optional)</span></label>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-700 rounded-lg hover:border-orange-500/50 hover:bg-white/5 cursor-pointer transition-colors">
+                    <Upload className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">Upload Image</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                      onChange={(e) => handleFileUpload(e.target.files?.[0] || null, false)}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
-              )}
+                {teamBLogoPreview && (
+                  <div className="flex items-center gap-2 p-2 bg-white/5 rounded-lg">
+                    <img
+                      src={teamBLogoPreview}
+                      alt="Team B Logo"
+                      className="w-10 h-10 rounded object-cover border border-orange-500/40"
+                    />
+                    <span className="text-xs text-gray-400">File uploaded</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTeamBLogoFile(null)
+                        setTeamBLogoPreview('')
+                      }}
+                      className="ml-auto text-xs text-gray-500 hover:text-red-400 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+                <input
+                  type="url"
+                  value={teamBLogo}
+                  onChange={(e) => setTeamBLogo(e.target.value)}
+                  placeholder="Or paste image URL"
+                  className="input-field text-xs"
+                />
+              </div>
             </div>
 
             {/* Date/Time */}
