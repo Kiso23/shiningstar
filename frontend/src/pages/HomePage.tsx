@@ -6,6 +6,7 @@ import { getAllSettings } from '../api/settings'
 import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle, Radio, MessageSquare, Menu, X, Video, Star, Award, Target } from 'lucide-react'
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
+import NoticeBoard from '../components/shared/NoticeBoard'
 import Footer from '../components/Footer'
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
@@ -44,6 +45,17 @@ export default function HomePage() {
   const [showToast, setShowToast] = useState(false)
 
   const [settingsError, setSettingsError] = useState(false)
+
+  // Notice Board Data
+  const notices = [
+    {
+      id: 'club-flag',
+      title: '⚽ Important: Bring Your Club Flag',
+      message: 'All teams must bring their own club flag to the football match. The flag will be displayed during the match and team introductions. Please ensure it is in good condition and properly sized. Flags not meeting standards will not be displayed.',
+      type: 'warning' as const,
+      dismissible: true,
+    },
+  ]
 
   useEffect(() => {
     getAllSettings().then((s) => {
@@ -318,6 +330,13 @@ export default function HomePage() {
               <p className="text-green-100 text-xs font-medium uppercase tracking-wider">{label}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ══ NOTICE BOARD ══ */}
+      <section style={{ backgroundColor: bgMid }} className="py-8 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <NoticeBoard notices={notices} onDismiss={(id) => console.log('Dismissed notice:', id)} />
         </div>
       </section>
 
