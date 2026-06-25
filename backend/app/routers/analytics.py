@@ -42,6 +42,18 @@ class AnalyticsSummary(BaseModel):
     last_7_days: List[DailyStat]
 
 
+class TopScorerStat(BaseModel):
+    player_name: str
+    team_name: str
+    goals: int
+    assists: int
+
+
+class TopScorersResponse(BaseModel):
+    top_scorers: List[TopScorerStat]
+    top_assists: List[TopScorerStat]
+
+
 # ── Public: track a visit ─────────────────────────────────────────────────────
 
 @router.post("/track", status_code=204)
@@ -128,3 +140,52 @@ async def get_summary(
         by_page=by_page,
         last_7_days=last_7_days,
     )
+
+
+# ── Public: get top scorers and assists ───────────────────────────────────────
+
+@router.get("/top-scorers", response_model=TopScorersResponse)
+async def get_top_scorers(db: AsyncSession = Depends(get_db)):
+    """
+    Get top goal scorers and top assist providers from all match events.
+    Public endpoint — no admin auth required.
+    """
+    from app.models.match_event import MatchEvent
+    from app.models.match import Match
+    from app.models.team import Team
+
+    # Get top scorers
+    scorer_result = await db.execute(
+        select(
+            MatchEvent.player_name,
+            Team.team_name,
+            func.count().label("goals"),
+        )
+        .select_from(MatchEvent)
+        .join(Match, MatchEvent.match_id == Match.id)
+        .join(
+            Team,
+            (MatchEvent.team == "team_a") & (Match.team_a_id == Team.id)
+            | (MatchEvent.team == "team_b") & (Match.team_b_id == Team.id)
+        )
+        .where(MatchEvent.event_type == "goal")
+        .group_by(MatchEvent.player_name, Team.team_name)
+        .order_by(func.count().desc())
+        .limit(10)
+    )
+
+    top_scorers = [
+        TopScorerStat(
+            player_name=row.player_name,
+            team_name=row.team_name,
+            goals=row.goals,
+            assists=0,
+        )
+        for row in scorer_result
+    ]
+
+    # Get top assists (stored in player_replaced field for assists)
+    # For now, we'll show zero assists until assist feature is implemented
+    top_assists = []
+
+    return TopScorersResponse(top_scorers=top_scorers, top_assists=top_assists)

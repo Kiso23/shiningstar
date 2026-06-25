@@ -171,6 +171,7 @@ export default function HomePage() {
           {[
             { label: 'Fixtures', path: '/fixtures', icon: Calendar },
             { label: 'Leaderboard', path: '/leaderboard', icon: Trophy },
+            { label: 'Top Scorers', path: '/top-scorers', icon: Award },
             { label: 'Meeting', path: '/meeting', icon: Video },
             { label: 'Support', path: '/contact', icon: MessageSquare },
             { label: 'Join SSU', path: '/join', icon: Users },

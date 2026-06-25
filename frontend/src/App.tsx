@@ -16,6 +16,7 @@ import MeetingPage from './pages/MeetingPage'
 import PlayersPage from './pages/PlayersPage'
 import TrophyRoomPage from './pages/TrophyRoomPage'
 import BracketPage from './pages/BracketPage'
+import TopScorersPage from './pages/TopScorersPage'
 import ProtectedRoute from './components/shared/ProtectedRoute'
 import LogoWatermark from './components/shared/LogoWatermark'
 import SplashScreen from './components/shared/SplashScreen'
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="/players" element={<PlayersPage />} />
             <Route path="/trophies" element={<TrophyRoomPage />} />
             <Route path="/bracket" element={<BracketPage />} />
+            <Route path="/top-scorers" element={<TopScorersPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
             <Route
