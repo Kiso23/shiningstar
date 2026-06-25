@@ -60,7 +60,7 @@ export default function NewsBulletin() {
           <AnimatePresence>
             {articles.map((article, idx) => (
               <motion.button
-                key={article.id}
+                key={`${article.url}-${idx}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
