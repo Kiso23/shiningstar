@@ -44,12 +44,12 @@ export interface MatchResponse {
 }
 
 export const VALID_ROUNDS = [
-  'Round of 32',
-  'Round of 16',
+  'Round 1',
+  'Round 2',
+  'Round 3',
   'Quarter-Final',
   'Semi-Final',
   'Final',
-  'Third Place',
 ]
 
 export const getMatches = (params?: { round?: string; status?: string }) =>

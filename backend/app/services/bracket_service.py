@@ -19,14 +19,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.match import Match
 from app.models.team import Team
 
-ROUND_NAMES = {
-    32: "Round of 32",
-    16: "Round of 16",
-    8:  "Quarter-Final",
-    4:  "Semi-Final",
-    2:  "Final",
-}
-
 DEFAULT_VENUE = "Rongbong Ronghang Playground"
 # First match starts at 9 AM, each match 90 min apart
 FIRST_MATCH_TIME = datetime(2025, 6, 15, 9, 0, 0)
@@ -38,7 +30,18 @@ def _next_power_of_2(n: int) -> int:
 
 
 def _round_name(size: int) -> str:
-    return ROUND_NAMES.get(size, f"Round of {size}")
+    """Generate round name based on number of teams in that round."""
+    if size == 2:
+        return "Final"
+    elif size == 4:
+        return "Semi-Final"
+    elif size == 8:
+        return "Quarter-Final"
+    else:
+        # For larger rounds, calculate which round number this is
+        # Round 1: 32 teams, Round 2: 16 teams, Round 3: 8 teams, etc.
+        round_num = int(math.log2(size))
+        return f"Round {round_num - 1}"
 
 
 async def generate_bracket(
