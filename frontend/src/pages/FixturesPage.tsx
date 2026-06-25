@@ -125,17 +125,15 @@ export default function FixturesPage() {
                     >
                       <div className="flex items-center justify-between gap-4 mb-3">
                         {/* Team A */}
-                        <div className="flex-1 flex flex-col items-end gap-2">
-                          <div className="flex items-center gap-2">
-                            <p className="text-white font-semibold text-lg">{match.team_a_name}</p>
-                            {match.team_a_logo && (
-                              <img
-                                src={match.team_a_logo}
-                                alt={match.team_a_name}
-                                className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
-                              />
-                            )}
-                          </div>
+                        <div className="flex-1 flex flex-col items-center">
+                          {match.team_a_logo && (
+                            <img
+                              src={match.team_a_logo}
+                              alt={match.team_a_name}
+                              className="w-12 h-8 rounded object-cover border-2 border-orange-500/40 mb-1.5"
+                            />
+                          )}
+                          <p className="text-white font-semibold text-sm sm:text-base text-center">{match.team_a_name}</p>
                         </div>
                         
                         {/* Score/VS */}
@@ -157,17 +155,15 @@ export default function FixturesPage() {
                         </div>
                         
                         {/* Team B */}
-                        <div className="flex-1 flex flex-col items-start gap-2">
-                          <div className="flex items-center gap-2">
-                            {match.team_b_logo && (
-                              <img
-                                src={match.team_b_logo}
-                                alt={match.team_b_name}
-                                className="w-10 h-10 rounded-full object-cover border-2 border-orange-500/40"
-                              />
-                            )}
-                            <p className="text-white font-semibold text-lg">{match.team_b_name}</p>
-                          </div>
+                        <div className="flex-1 flex flex-col items-center">
+                          {match.team_b_logo && (
+                            <img
+                              src={match.team_b_logo}
+                              alt={match.team_b_name}
+                              className="w-12 h-8 rounded object-cover border-2 border-orange-500/40 mb-1.5"
+                            />
+                          )}
+                          <p className="text-white font-semibold text-sm sm:text-base text-center">{match.team_b_name}</p>
                         </div>
                       </div>
                       

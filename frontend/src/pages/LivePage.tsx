@@ -155,46 +155,44 @@ export default function LivePage() {
                   {/* Score display */}
                   <div className="flex items-center justify-between gap-4">
                     {/* Team A */}
-                    <div className="flex-1 flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-2">
-                        <p className="text-white font-bold text-xl sm:text-2xl leading-tight">
-                          {match.team_a_name}
-                        </p>
-                        {match.team_a_logo && (
-                          <img
-                            src={match.team_a_logo}
-                            alt={match.team_a_name}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-green-500/40"
-                          />
-                        )}
-                      </div>
+                    <div className="flex-1 flex flex-col items-center">
+                      {match.team_a_logo && (
+                        <img
+                          src={match.team_a_logo}
+                          alt={match.team_a_name}
+                          className="w-16 h-10 rounded object-cover border-2 border-green-500/40 mb-2"
+                        />
+                      )}
+                      <p className="text-white font-bold text-lg sm:text-xl leading-tight text-center">
+                        {match.team_a_name}
+                      </p>
                     </div>
 
                     {/* Score */}
-                    <div className="flex items-center gap-3 min-w-[100px] justify-center">
-                      <span className="text-4xl sm:text-5xl font-black text-white tabular-nums">
-                        {match.team_a_score ?? 0}
-                      </span>
-                      <span className="text-gray-600 text-2xl font-light">-</span>
-                      <span className="text-4xl sm:text-5xl font-black text-white tabular-nums">
-                        {match.team_b_score ?? 0}
-                      </span>
+                    <div className="flex flex-col items-center gap-2 min-w-[120px]">
+                      <div className="flex items-center gap-4">
+                        <span className="text-5xl sm:text-6xl font-black text-white tabular-nums">
+                          {match.team_a_score ?? 0}
+                        </span>
+                        <span className="text-3xl text-gray-600 font-light">-</span>
+                        <span className="text-5xl sm:text-6xl font-black text-white tabular-nums">
+                          {match.team_b_score ?? 0}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Team B */}
-                    <div className="flex-1 flex flex-col items-start gap-2">
-                      <div className="flex items-center gap-2">
-                        {match.team_b_logo && (
-                          <img
-                            src={match.team_b_logo}
-                            alt={match.team_b_name}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-green-500/40"
-                          />
-                        )}
-                        <p className="text-white font-bold text-xl sm:text-2xl leading-tight">
-                          {match.team_b_name}
-                        </p>
-                      </div>
+                    <div className="flex-1 flex flex-col items-center">
+                      {match.team_b_logo && (
+                        <img
+                          src={match.team_b_logo}
+                          alt={match.team_b_name}
+                          className="w-16 h-10 rounded object-cover border-2 border-green-500/40 mb-2"
+                        />
+                      )}
+                      <p className="text-white font-bold text-lg sm:text-xl leading-tight text-center">
+                        {match.team_b_name}
+                      </p>
                     </div>
                   </div>
 
