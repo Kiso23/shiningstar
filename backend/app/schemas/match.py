@@ -71,4 +71,4 @@ class MatchResponse(BaseModel):
     bracket_slot: Optional[int] = None
     next_match_id: Optional[uuid.UUID] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, exclude_none=False)
