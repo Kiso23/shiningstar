@@ -16,6 +16,7 @@ export interface TopScorersResponse {
  * Get top goal scorers and top assist providers for the tournament
  */
 export async function getTopScorers(): Promise<TopScorersResponse> {
-  const res = await client.get('/analytics/top-scorers')
+  // Add cache-busting query parameter to force fresh data
+  const res = await client.get('/analytics/top-scorers?t=' + Date.now())
   return res.data
 }

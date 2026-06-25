@@ -249,6 +249,7 @@ async def reset_stats(
     """Admin-only — reset all match events (goals, cards, etc.) and standings."""
     from app.models.match_event import MatchEvent
     from app.models.standing import Standing
+    from app.services.redis_cache import cache
     
     # Delete all match events
     await db.execute(delete(MatchEvent))
@@ -257,4 +258,15 @@ async def reset_stats(
     await db.execute(delete(Standing))
     
     await db.commit()
+    
+    # Clear Redis cache for analytics endpoints if cache is available
+    if cache:
+        try:
+            # Clear all analytics-related cache keys
+            await cache.delete("top_scorers")
+            await cache.delete("standings")
+        except Exception as e:
+            # Cache deletion failed but DB was cleared, so continue
+            print(f"Warning: Could not clear cache: {e}")
+    
     return ResetStatsResponse(message="Leaderboard and top scorers have been reset successfully.")

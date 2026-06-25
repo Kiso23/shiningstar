@@ -15,7 +15,7 @@ export interface StandingResponse {
 }
 
 export const getStandings = () =>
-  client.get<StandingResponse[]>('/standings').then((r) => r.data)
+  client.get<StandingResponse[]>('/standings?t=' + Date.now()).then((r) => r.data)
 
 export const clearStandings = () =>
   client.delete('/standings')
