@@ -20,3 +20,4 @@ reportlab==4.2.5
 razorpay==1.4.1
 redis==5.0.1
 slowapi==0.1.9
+aiohttp==3.9.1

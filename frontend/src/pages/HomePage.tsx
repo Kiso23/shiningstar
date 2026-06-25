@@ -7,6 +7,7 @@ import { Trophy, Calendar, MapPin, Users, ChevronRight, ArrowRight, CheckCircle,
 import ToastNotification from '../components/shared/ToastNotification'
 import MarqueeNotification from '../components/shared/MarqueeNotification'
 import NoticeBoard from '../components/shared/NoticeBoard'
+import NewsFeed from '../components/shared/NewsFeed'
 import Footer from '../components/Footer'
 // ── Color palette matched to stadium night video ──────────────────────────
 // Dark base:    #080c08  (near-black with green tint)
@@ -219,43 +220,49 @@ export default function HomePage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8 sm:pb-12 flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
 
-          {/* Left */}
-          <div className="flex-1 max-w-xl w-full text-center lg:text-left">
-            <motion.p initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-              className="text-green-400 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4">
-              ★ Welcome
-            </motion.p>
+          {/* Left: Hero + News */}
+          <div className="flex-1 max-w-xl w-full">
+            <div className="text-center lg:text-left mb-8">
+              <motion.p initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+                className="text-green-400 font-bold text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 sm:mb-4">
+                ★ Welcome
+              </motion.p>
 
-            <motion.h1 initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
-              className="text-4xl sm:text-6xl lg:text-7xl font-black leading-none mb-4 sm:mb-6 uppercase"
-              style={{ color: textMain }}>
-              {heroLine1}<br />{heroLine2}<br /><span className="text-green-500">{heroLine3}</span>
-            </motion.h1>
+              <motion.h1 initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
+                className="text-4xl sm:text-6xl lg:text-7xl font-black leading-none mb-4 sm:mb-6 uppercase"
+                style={{ color: textMain }}>
+                {heroLine1}<br />{heroLine2}<br /><span className="text-green-500">{heroLine3}</span>
+              </motion.h1>
 
-            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-              className="mb-4 sm:mb-6 px-4 py-3 border-l-4 border-green-500 rounded-r-xl text-left"
-              style={{ backgroundColor: 'rgba(34,197,94,0.1)' }}>
-              <p style={{ color: textMain }} className="font-bold text-sm leading-relaxed">{bannerLine1}</p>
-              <p className="text-green-400 font-semibold text-xs sm:text-sm">{bannerLine2}</p>
-            </motion.div>
+              <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
+                className="mb-4 sm:mb-6 px-4 py-3 border-l-4 border-green-500 rounded-r-xl text-left"
+                style={{ backgroundColor: 'rgba(34,197,94,0.1)' }}>
+                <p style={{ color: textMain }} className="font-bold text-sm leading-relaxed">{bannerLine1}</p>
+                <p className="text-green-400 font-semibold text-xs sm:text-sm">{bannerLine2}</p>
+              </motion.div>
 
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start">
+                <motion.button whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(34,197,94,0.5)' }} whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/register')}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
+                  Register Your Team <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/fixtures')}
+                  style={{ borderColor: border, color: textMain }}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 border font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base hover:border-green-500/50 hover:bg-white/5">
+                  View Fixtures
+                </motion.button>
+              </motion.div>
+            </div>
 
-
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start">
-              <motion.button whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(34,197,94,0.5)' }} whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/register')}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base">
-                Register Your Team <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-              </motion.button>
-              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/fixtures')}
-                style={{ borderColor: border, color: textMain }}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 border font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg transition-colors text-sm sm:text-base hover:border-green-500/50 hover:bg-white/5">
-                View Fixtures
-              </motion.button>
+            {/* News Section Below Hero */}
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
+              className="hidden lg:block">
+              <NewsFeed compact={true} maxItems={6} autoRefreshInterval={5 * 60 * 1000} />
             </motion.div>
           </div>
 
@@ -389,6 +396,29 @@ export default function HomePage() {
                 </motion.div>
               ))}
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══ FOOTBALL NEWS FEED ══ */}
+      <section style={{ backgroundColor: bg }} className="py-20 px-6 transition-colors duration-300">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
+            <p className="text-green-400 font-bold text-xs tracking-[0.3em] uppercase mb-2">Latest Updates</p>
+            <h2 style={{ color: textMain }} className="text-4xl font-black uppercase">Football News</h2>
+            <p style={{ color: textMute }} className="mt-3 text-sm">
+              Stay updated with the latest football news and updates from around the world.
+            </p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <NewsFeed 
+              title="Football News Feed"
+              autoRefreshInterval={30 * 60 * 1000}
+              maxItems={10}
+              showHeader={true}
+              compact={false}
+            />
           </motion.div>
         </div>
       </section>

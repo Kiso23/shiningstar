@@ -176,6 +176,7 @@ from app.routers import settings as settings_router  # noqa: E402
 from app.routers import password as password_router  # noqa: E402
 from app.routers import contact as contact_router  # noqa: E402
 from app.routers import player_recruitment as player_recruitment_router  # noqa: E402
+from app.routers import news as news_router  # noqa: E402
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(password_router.router, prefix="/api/v1")
 app.include_router(registrations.router, prefix="/api/v1")
@@ -187,6 +188,7 @@ app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(settings_router.router, prefix="/api/v1")
 app.include_router(contact_router.router, prefix="/api/v1")
 app.include_router(player_recruitment_router.router, prefix="/api/v1")
+app.include_router(news_router.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["health"])
