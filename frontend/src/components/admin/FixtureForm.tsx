@@ -123,10 +123,10 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="glass-card w-full max-w-lg p-6"
+          className="glass-card w-full max-w-lg p-6 max-h-[90vh] flex flex-col"
         >
           {/* Modal header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 shrink-0">
             <h2 className="text-white font-bold text-xl">
               {isEdit ? 'Edit Fixture' : 'Add Fixture'}
             </h2>
@@ -138,7 +138,7 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto pr-2">
             {/* Team A */}
             <div>
               <label className="label">Team A</label>
@@ -336,7 +336,7 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
             )}
 
             {/* Actions */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-2 shrink-0 border-t border-white/10 -mx-6 -mb-6 px-6 py-4">
               <button
                 type="button"
                 onClick={onClose}
