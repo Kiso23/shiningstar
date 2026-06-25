@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { login as apiLogin } from '../api/auth'
+import { login as apiLogin, logout as apiLogout } from '../api/auth'
 import { extractErrorMessage } from '../api/errors'
 
 export function useAdminAuth() {
@@ -23,9 +23,20 @@ export function useAdminAuth() {
     }
   }
 
-  function logout() {
-    localStorage.removeItem('admin_token')
-    window.location.href = '/admin/login'
+  async function logout() {
+    setLoading(true)
+    setError(null)
+    try {
+      // Call backend logout to blacklist token
+      await apiLogout()
+    } catch (err) {
+      console.error('Logout error:', err)
+      // Clear token locally even if backend call fails
+    } finally {
+      // Always clear local token and redirect
+      localStorage.removeItem('admin_token')
+      window.location.href = '/admin/login'
+    }
   }
 
   return { isAuthenticated, login, logout, loading, error }

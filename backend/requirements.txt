@@ -19,3 +19,4 @@ gunicorn==22.0.0
 reportlab==4.2.5
 razorpay==1.4.1
 redis==5.0.1
+slowapi==0.1.9

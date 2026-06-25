@@ -14,10 +14,11 @@ async def get_current_admin(
 ) -> Admin:
     """
     FastAPI dependency that validates the Bearer JWT and returns the Admin.
-    Raises 401 if token is missing/invalid/expired.
+    Raises 401 if token is missing/invalid/expired/blacklisted.
     Raises 403 if the token subject is not an admin.
     """
     from app.services.auth_service import decode_access_token
+    from app.services.token_blacklist import token_blacklist
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -25,8 +26,14 @@ async def get_current_admin(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+    token = credentials.credentials
+
+    # Check if token is blacklisted (logout)
+    if token_blacklist.is_token_blacklisted(token):
+        raise credentials_exception
+
     try:
-        payload = decode_access_token(credentials.credentials)
+        payload = decode_access_token(token)
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception

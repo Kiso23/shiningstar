@@ -1,8 +1,9 @@
 """
 Simple in-memory sliding window rate limiter.
-Used to protect the login endpoint from brute force attacks.
+Used to protect endpoints from abuse.
 
-Limits: 5 attempts per IP per 60 seconds.
+Login limit: 5 attempts per IP per 60 seconds.
+API limit: 100 requests per IP per 60 seconds.
 On Render with 2 workers, each worker has its own counter — acceptable for free tier.
 """
 import time
@@ -33,7 +34,7 @@ class SlidingWindowRateLimiter:
             retry_after = int(self.window_seconds - (now - window[0])) + 1
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail=f"Too many login attempts. Try again in {retry_after} seconds.",
+                detail=f"Too many requests. Try again in {retry_after} seconds.",
                 headers={"Retry-After": str(retry_after)},
             )
 
@@ -47,5 +48,13 @@ class SlidingWindowRateLimiter:
         return request.client.host if request.client else "unknown"
 
 
-# Global limiter: 5 login attempts per 60 seconds per IP
+# Global limiters
+# Login: 5 attempts per 60 seconds per IP
 login_limiter = SlidingWindowRateLimiter(max_requests=5, window_seconds=60)
+
+# API: 100 requests per 60 seconds per IP
+api_limiter = SlidingWindowRateLimiter(max_requests=100, window_seconds=60)
+
+# Registration: 10 per 60 seconds per IP
+registration_limiter = SlidingWindowRateLimiter(max_requests=10, window_seconds=60)
+

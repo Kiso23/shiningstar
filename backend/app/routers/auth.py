@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -7,9 +8,11 @@ from app.dependencies.db import get_db
 from app.models.admin import Admin
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.services.auth_service import verify_password, create_access_token
+from app.services.token_blacklist import token_blacklist
 from app.middleware.rate_limit import login_limiter
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+security = HTTPBearer()
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -32,6 +35,15 @@ async def login(request: Request, body: LoginRequest, db: AsyncSession = Depends
 
     access_token = create_access_token(data={"sub": admin.email})
     return TokenResponse(access_token=access_token)
+
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(credentials: HTTPAuthorizationCredentials = Depends(security), _admin: Admin = Depends(get_current_admin)):
+    """Admin logout — invalidates the current JWT token."""
+    token = credentials.credentials
+    # Blacklist the token (24 hour expiration)
+    token_blacklist.blacklist_token(token, expires_in_seconds=86400)
+    return {"message": "Successfully logged out"}
 
 
 @router.get("/me", response_model=dict)
