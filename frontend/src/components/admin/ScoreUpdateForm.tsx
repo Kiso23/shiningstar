@@ -346,4 +346,5 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         </button>
       )}
     </form>
+  )
 }
