@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import get_current_admin
@@ -233,3 +233,28 @@ async def update_upi_id(
 
     await db.commit()
     return UpiIdResponse(upi_id=body.upi_id)
+
+
+# ── Admin: reset leaderboard and top scorers ─────────────────────────────────
+
+class ResetStatsResponse(BaseModel):
+    message: str
+
+
+@router.post("/reset-stats", response_model=ResetStatsResponse)
+async def reset_stats(
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Admin-only — reset all match events (goals, cards, etc.) and standings."""
+    from app.models.match_event import MatchEvent
+    from app.models.standing import Standing
+    
+    # Delete all match events
+    await db.execute(delete(MatchEvent))
+    
+    # Delete all standings/leaderboard entries
+    await db.execute(delete(Standing))
+    
+    await db.commit()
+    return ResetStatsResponse(message="Leaderboard and top scorers have been reset successfully.")

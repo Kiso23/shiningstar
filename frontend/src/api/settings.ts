@@ -43,3 +43,8 @@ export async function updateHero(hero_line1: string, hero_line2: string, hero_li
   const res = await client.put('/settings/hero', { hero_line1, hero_line2, hero_line3 })
   return res.data
 }
+
+export async function resetLeaderboardAndScorers(): Promise<{ message: string }> {
+  const res = await client.post('/settings/reset-stats', {})
+  return res.data
+}

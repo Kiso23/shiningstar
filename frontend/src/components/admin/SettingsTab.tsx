@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Type } from 'lucide-react'
-import { getTournamentDate, updateTournamentDate, getAllSettings, updateBanner, updateHero } from '../../api/settings'
+import { Loader2, Save, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Type, Trash2 } from 'lucide-react'
+import { getTournamentDate, updateTournamentDate, getAllSettings, updateBanner, updateHero, resetLeaderboardAndScorers } from '../../api/settings'
 import { changePassword } from '../../api/password'
 
 // Reusable password field with eye toggle
@@ -58,6 +58,12 @@ export default function SettingsTab() {
   const [heroSaving, setHeroSaving] = useState(false)
   const [heroSaved, setHeroSaved] = useState(false)
   const [heroError, setHeroError] = useState<string | null>(null)
+
+  // Reset state
+  const [resetLoading, setResetLoading] = useState(false)
+  const [resetConfirm, setResetConfirm] = useState(false)
+  const [resetMessage, setResetMessage] = useState<string | null>(null)
+  const [resetError, setResetError] = useState<string | null>(null)
 
   useEffect(() => {
     getAllSettings()
@@ -143,6 +149,26 @@ export default function SettingsTab() {
       setHeroError(err?.response?.data?.detail || 'Failed to save hero title.')
     } finally {
       setHeroSaving(false)
+    }
+  }
+
+  const handleResetStats = async () => {
+    setResetLoading(true)
+    setResetError(null)
+    setResetMessage(null)
+    try {
+      const result = await resetLeaderboardAndScorers()
+      setResetMessage(result.message)
+      setResetConfirm(false)
+      // Refresh after a short delay so user sees the success message
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
+    } catch (err: any) {
+      console.error('Error resetting stats:', err)
+      setResetError(err?.response?.data?.detail || 'Failed to reset leaderboard and scores.')
+    } finally {
+      setResetLoading(false)
     }
   }
 
@@ -373,6 +399,72 @@ export default function SettingsTab() {
               : passSaved ? <><CheckCircle className="w-4 h-4" /> Password Changed!</>
               : <><Lock className="w-4 h-4" /> Change Password</>}
           </button>
+        </div>
+
+        {/* Reset Leaderboard & Top Scorers */}
+        <div className="glass-card p-6 space-y-4 border border-red-500/20 bg-red-500/5">
+          <div className="flex items-center gap-2">
+            <Trash2 className="w-4 h-4 text-red-400" />
+            <h3 className="text-white font-semibold">Reset Statistics</h3>
+          </div>
+          <p className="text-gray-500 text-sm">
+            Clear all match events (goals, cards), player performances, and leaderboard entries. This action cannot be undone.
+          </p>
+
+          {!resetConfirm ? (
+            <button
+              onClick={() => setResetConfirm(true)}
+              className="w-full py-2 px-4 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 hover:text-red-300 font-semibold transition-colors flex items-center justify-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" /> Reset Leaderboard & Top Scorers
+            </button>
+          ) : (
+            <div className="space-y-3 p-4 rounded-lg bg-red-900/20 border border-red-500/30">
+              <p className="text-red-300 font-semibold">Are you sure? This will delete:</p>
+              <ul className="text-red-300 text-sm space-y-1 ml-4">
+                <li>• All match events (goals, yellow cards, red cards)</li>
+                <li>• All player performances and statistics</li>
+                <li>• All leaderboard standings</li>
+              </ul>
+              <p className="text-red-400 text-sm font-semibold mt-3">This action cannot be undone.</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setResetConfirm(false)}
+                  className="flex-1 py-2 px-4 rounded-lg bg-gray-600/20 hover:bg-gray-600/30 text-gray-400 hover:text-gray-300 font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleResetStats}
+                  disabled={resetLoading}
+                  className="flex-1 py-2 px-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {resetLoading ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Resetting...</>
+                  ) : (
+                    <><Trash2 className="w-4 h-4" /> Yes, Reset</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {resetMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm"
+            >
+              <CheckCircle className="w-4 h-4 shrink-0" />
+              {resetMessage}
+            </motion.div>
+          )}
+
+          {resetError && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />{resetError}
+            </div>
+          )}
         </div>
         </>
       )}
