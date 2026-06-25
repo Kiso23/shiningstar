@@ -153,6 +153,7 @@ async def get_top_scorers(db: AsyncSession = Depends(get_db)):
     from app.models.match_event import MatchEvent
     from app.models.match import Match
     from app.models.team import Team
+    from sqlalchemy import or_
 
     # Get top scorers
     scorer_result = await db.execute(
@@ -165,8 +166,10 @@ async def get_top_scorers(db: AsyncSession = Depends(get_db)):
         .join(Match, MatchEvent.match_id == Match.id)
         .join(
             Team,
-            (MatchEvent.team == "team_a") & (Match.team_a_id == Team.id)
-            | (MatchEvent.team == "team_b") & (Match.team_b_id == Team.id)
+            or_(
+                (MatchEvent.team == "team_a") & (Match.team_a_id == Team.id),
+                (MatchEvent.team == "team_b") & (Match.team_b_id == Team.id)
+            )
         )
         .where(MatchEvent.event_type == "goal")
         .group_by(MatchEvent.player_name, Team.team_name)
