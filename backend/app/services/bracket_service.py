@@ -78,6 +78,7 @@ async def generate_bracket(
     # Round 1 matches
     current_round_matches: List[Match] = []
     round_size = bracket_size
+    round_matches_by_round: dict[str, List[Match]] = {}
 
     while round_size >= 2:
         round_name = _round_name(round_size)
@@ -91,16 +92,10 @@ async def generate_bracket(
                 team_b = padded[i * 2 + 1]
 
                 if team_a is None and team_b is None:
-                    # Both bye — skip
-                    round_matches.append(None)  # type: ignore
+                    # Both bye — skip (don't create match)
                     continue
-                elif team_a is None:
-                    # team_b gets a bye — they advance automatically, no match needed
-                    round_matches.append(None)  # type: ignore
-                    continue
-                elif team_b is None:
-                    # team_a gets a bye
-                    round_matches.append(None)  # type: ignore
+                elif team_a is None or team_b is None:
+                    # One team gets a bye — they advance automatically, no match needed
                     continue
 
                 m = Match(
@@ -131,6 +126,7 @@ async def generate_bracket(
             match_time += timedelta(minutes=MATCH_INTERVAL_MINUTES)
             slot_counter += 1
 
+        round_matches_by_round[round_name] = round_matches
         current_round_matches = round_matches
         round_size //= 2
 
@@ -138,30 +134,18 @@ async def generate_bracket(
     await db.flush()
 
     # Link matches: pair up current round → next round
-    # Re-build round lists for linking
-    await _link_bracket(db, all_matches, bracket_size)
+    await _link_bracket(db, round_matches_by_round)
 
     return all_matches
 
 
-async def _link_bracket(db: AsyncSession, all_matches: List[Match], bracket_size: int) -> None:
-    """Set next_match_id and next_match_slot on each match."""
-    # Group matches by round
-    rounds: dict[str, List[Match]] = {}
-    for m in all_matches:
-        rounds.setdefault(m.round, []).append(m)
-
-    round_order = []
-    size = bracket_size
-    while size >= 2:
-        name = _round_name(size)
-        if name in rounds:
-            round_order.append(name)
-        size //= 2
-
+async def _link_bracket(db: AsyncSession, round_matches_by_round: dict[str, List[Match]]) -> None:
+    """Set next_match_id and next_match_slot on each match using the round map."""
+    round_order = list(round_matches_by_round.keys())
+    
     for i in range(len(round_order) - 1):
-        current = rounds[round_order[i]]
-        next_round = rounds[round_order[i + 1]]
+        current = round_matches_by_round[round_order[i]]
+        next_round = round_matches_by_round[round_order[i + 1]]
 
         for j, match in enumerate(current):
             next_idx = j // 2
