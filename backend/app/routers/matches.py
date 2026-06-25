@@ -28,6 +28,8 @@ def _to_response(match: Match) -> MatchResponse:
         team_b_name=match.team_b.team_name if match.team_b else "TBD",
         team_a_score=match.team_a_score,
         team_b_score=match.team_b_score,
+        team_a_logo=match.team_a_logo,
+        team_b_logo=match.team_b_logo,
         status=match.status,
         round=match.round,
         group=match.group,
@@ -103,6 +105,8 @@ async def create_match(
         venue=data.venue,
         round=data.round,
         group=data.group,
+        team_a_logo=data.team_a_logo,
+        team_b_logo=data.team_b_logo,
     )
     db.add(match)
     await db.flush()  # get the ID without committing
@@ -137,6 +141,10 @@ async def update_match(
         match.round = data.round
     if data.group is not None:
         match.group = data.group
+    if data.team_a_logo is not None:
+        match.team_a_logo = data.team_a_logo
+    if data.team_b_logo is not None:
+        match.team_b_logo = data.team_b_logo
 
     await db.commit()
     await db.refresh(match)

@@ -28,6 +28,8 @@ class MatchCreate(BaseModel):
     venue: str = Field(..., min_length=1, max_length=200)
     round: str = Field(..., min_length=1, max_length=50)
     group: Optional[str] = Field(None, max_length=50)
+    team_a_logo: Optional[str] = None
+    team_b_logo: Optional[str] = None
 
     @model_validator(mode="after")
     def teams_must_differ(self) -> "MatchCreate":
@@ -41,6 +43,8 @@ class MatchUpdate(BaseModel):
     venue: Optional[str] = Field(None, min_length=1, max_length=200)
     round: Optional[str] = Field(None, min_length=1, max_length=50)
     group: Optional[str] = None
+    team_a_logo: Optional[str] = None
+    team_b_logo: Optional[str] = None
 
 
 class ScoreUpdate(BaseModel):
@@ -57,6 +61,8 @@ class MatchResponse(BaseModel):
     team_b_name: str
     team_a_score: Optional[int]
     team_b_score: Optional[int]
+    team_a_logo: Optional[str] = None
+    team_b_logo: Optional[str] = None
     status: str
     round: str
     group: Optional[str]
