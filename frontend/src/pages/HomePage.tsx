@@ -133,7 +133,7 @@ export default function HomePage() {
 
         {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center gap-1">
-          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Meeting', path: '/meeting' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
+          {[{ label: 'Fixtures', path: '/fixtures' }, { label: 'Leaderboard', path: '/leaderboard' }, { label: 'Top Scorers', path: '/top-scorers' }, { label: 'Meeting', path: '/meeting' }, { label: 'Support', path: '/contact' }, { label: 'Join SSU', path: '/join' }].map(({ label, path }) => (
             <button key={label} onClick={() => navigate(path)}
               style={{ color: textMute }}
               className="hover:text-green-400 text-sm font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5">
