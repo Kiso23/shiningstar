@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Newspaper, ExternalLink, AlertCircle, Loader2, Globe, MapPin } from 'lucide-react'
-import { getFootballNews, type NewsArticle } from '../../api/news'
+import { fetchFootballNews, type NewsItem } from '../../api/news'
 
 export default function NewsBulletin() {
-  const [articles, setArticles] = useState<NewsArticle[]>([])
+  const [articles, setArticles] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
@@ -20,8 +20,8 @@ export default function NewsBulletin() {
     try {
       setLoading(true)
       setError(null)
-      const data = await getFootballNews(8)
-      setArticles(data.articles)
+      const data = await fetchFootballNews()
+      setArticles(data.items)
     } catch (err) {
       console.error('Failed to fetch news:', err)
       setError('Unable to load football news')
@@ -86,7 +86,7 @@ export default function NewsBulletin() {
                       {article.source}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {new Date(article.published_at).toLocaleDateString()}
+                      {new Date(article.published_date).toLocaleDateString()}
                     </span>
                   </div>
 
