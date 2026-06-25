@@ -154,11 +154,23 @@ export default function LivePage() {
 
                   {/* Score display */}
                   <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1 text-right">
-                      <p className="text-white font-bold text-xl sm:text-2xl leading-tight">
-                        {match.team_a_name}
-                      </p>
+                    {/* Team A */}
+                    <div className="flex-1 flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-bold text-xl sm:text-2xl leading-tight">
+                          {match.team_a_name}
+                        </p>
+                        {match.team_a_logo && (
+                          <img
+                            src={match.team_a_logo}
+                            alt={match.team_a_name}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-green-500/40"
+                          />
+                        )}
+                      </div>
                     </div>
+
+                    {/* Score */}
                     <div className="flex items-center gap-3 min-w-[100px] justify-center">
                       <span className="text-4xl sm:text-5xl font-black text-white tabular-nums">
                         {match.team_a_score ?? 0}
@@ -168,10 +180,21 @@ export default function LivePage() {
                         {match.team_b_score ?? 0}
                       </span>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-white font-bold text-xl sm:text-2xl leading-tight">
-                        {match.team_b_name}
-                      </p>
+
+                    {/* Team B */}
+                    <div className="flex-1 flex flex-col items-start gap-2">
+                      <div className="flex items-center gap-2">
+                        {match.team_b_logo && (
+                          <img
+                            src={match.team_b_logo}
+                            alt={match.team_b_name}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-green-500/40"
+                          />
+                        )}
+                        <p className="text-white font-bold text-xl sm:text-2xl leading-tight">
+                          {match.team_b_name}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
