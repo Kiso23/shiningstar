@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, RefreshCw, AlertCircle, Radio } from 'lucide-react'
+import { ArrowLeft, RefreshCw, AlertCircle, Radio, Zap } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../api/matches'
+import { getMatchEvents, type MatchEventListResponse } from '../api/matchEvents'
 import PageLoader from '../components/shared/PageLoader'
 import { trackVisit } from '../api/analytics'
 
@@ -11,6 +12,7 @@ const AUTO_REFRESH_INTERVAL = 30_000 // 30 seconds
 export default function LivePage() {
   const navigate = useNavigate()
   const [matches, setMatches] = useState<MatchResponse[]>([])
+  const [matchEvents, setMatchEvents] = useState<Record<string, MatchEventListResponse>>({})
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,6 +25,18 @@ export default function LivePage() {
     try {
       const data = await getMatches({ status: 'live' })
       setMatches(data)
+      
+      // Fetch events for each match
+      const events: Record<string, MatchEventListResponse> = {}
+      for (const match of data) {
+        try {
+          events[match.id] = await getMatchEvents(match.id)
+        } catch {
+          // Continue even if event fetch fails for one match
+          console.error(`Failed to fetch events for match ${match.id}`)
+        }
+      }
+      setMatchEvents(events)
       setLastUpdated(new Date())
     } catch {
       setError('Failed to load live matches.')
@@ -200,6 +214,46 @@ export default function LivePage() {
                   <div className="mt-4 text-center text-gray-500 text-sm">
                     {match.round} · {match.venue}
                   </div>
+
+                  {/* Events Timeline */}
+                  {matchEvents[match.id] && matchEvents[match.id].events.length > 0 && (
+                    <div className="mt-6 pt-6 border-t border-white/10">
+                      <div className="mb-4">
+                        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                          <Zap className="w-4 h-4" />
+                          Match Events
+                        </h3>
+                      </div>
+                      <div className="space-y-2">
+                        {matchEvents[match.id].events
+                          .sort((a, b) => a.time_minute - b.time_minute)
+                          .map((event) => (
+                            <motion.div
+                              key={event.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-white/10"
+                            >
+                              <span className="text-lg">
+                                {event.event_type === 'goal' ? '⚽' : event.event_type === 'yellow_card' ? '🟨' : '🔴'}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white font-medium text-sm truncate">{event.player_name}</p>
+                                <p className="text-gray-500 text-xs">
+                                  {event.team === 'team_a' ? match.team_a_name : match.team_b_name}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-white font-bold text-sm">{event.time_minute}'</p>
+                                <p className="text-gray-500 text-xs">
+                                  {event.event_type === 'goal' ? 'Goal' : event.event_type === 'yellow_card' ? 'Yellow' : 'Red'}
+                                </p>
+                              </div>
+                            </motion.div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
