@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
-from sqlalchemy import func, select, cast, Date
+from sqlalchemy import func, select, cast, Date, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import get_current_admin
@@ -153,7 +153,6 @@ async def get_top_scorers(db: AsyncSession = Depends(get_db)):
     from app.models.match_event import MatchEvent
     from app.models.match import Match
     from app.models.team import Team
-    from sqlalchemy import or_
 
     # Get top scorers
     scorer_result = await db.execute(
