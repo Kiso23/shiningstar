@@ -1,4 +1,4 @@
-import { API_URL } from './config'
+import client from './client'
 
 export interface MatchEventResponse {
   id: string
@@ -37,11 +37,8 @@ export interface MatchEventCreate {
  * Get all events for a match with statistics
  */
 export async function getMatchEvents(matchId: string): Promise<MatchEventListResponse> {
-  const response = await fetch(`${API_URL}/matches/${matchId}/events`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch match events: ${response.statusText}`)
-  }
-  return response.json()
+  const response = await client.get(`/matches/${matchId}/events`)
+  return response.data
 }
 
 /**
@@ -51,18 +48,8 @@ export async function createMatchEvent(
   matchId: string,
   data: MatchEventCreate
 ): Promise<MatchEventResponse> {
-  const response = await fetch(`${API_URL}/matches/${matchId}/events`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify(data),
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to create match event: ${response.statusText}`)
-  }
-  return response.json()
+  const response = await client.post(`/matches/${matchId}/events`, data)
+  return response.data
 }
 
 /**
@@ -73,18 +60,8 @@ export async function updateMatchEvent(
   eventId: string,
   data: Partial<MatchEventCreate>
 ): Promise<MatchEventResponse> {
-  const response = await fetch(`${API_URL}/matches/${matchId}/events/${eventId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify(data),
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to update match event: ${response.statusText}`)
-  }
-  return response.json()
+  const response = await client.patch(`/matches/${matchId}/events/${eventId}`, data)
+  return response.data
 }
 
 /**
@@ -94,13 +71,5 @@ export async function deleteMatchEvent(
   matchId: string,
   eventId: string
 ): Promise<void> {
-  const response = await fetch(`${API_URL}/matches/${matchId}/events/${eventId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  })
-  if (!response.ok) {
-    throw new Error(`Failed to delete match event: ${response.statusText}`)
-  }
+  await client.delete(`/matches/${matchId}/events/${eventId}`)
 }
