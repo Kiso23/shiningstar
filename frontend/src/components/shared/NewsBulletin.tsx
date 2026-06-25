@@ -11,8 +11,8 @@ export default function NewsBulletin() {
 
   useEffect(() => {
     fetchNews()
-    // Refresh news every 5 minutes
-    const interval = setInterval(fetchNews, 5 * 60 * 1000)
+    // Refresh news every 1 hour (60 minutes)
+    const interval = setInterval(fetchNews, 60 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
