@@ -14,8 +14,8 @@ class Match(Base):
     team_b_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("teams.id"), index=True)
     team_a_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     team_b_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    team_a_logo: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    team_b_logo: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    team_a_logo: Mapped[Optional[str]] = mapped_column(Text, nullable=True, default=None)
+    team_b_logo: Mapped[Optional[str]] = mapped_column(Text, nullable=True, default=None)
     status: Mapped[str] = mapped_column(String(20), default="scheduled", index=True)
     # status values: "scheduled" | "live" | "completed"
     round: Mapped[str] = mapped_column(String(50))
