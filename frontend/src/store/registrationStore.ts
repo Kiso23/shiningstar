@@ -10,6 +10,7 @@ interface RegistrationState {
   setRegistrationId: (id: string) => void
   setTeamData: (data: TeamCreateData) => void
   setPlayerData: (players: PlayerData[]) => void
+  loadPendingData: (registrationId: string, step: number, teamData: TeamCreateData, playerData: PlayerData[]) => void
   reset: () => void
 }
 
@@ -22,5 +23,7 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
   setRegistrationId: (id) => set({ registrationId: id }),
   setTeamData: (data) => set({ teamData: data }),
   setPlayerData: (players) => set({ playerData: players }),
+  loadPendingData: (registrationId, step, teamData, playerData) =>
+    set({ registrationId, currentStep: step, teamData, playerData }),
   reset: () => set({ currentStep: 1, registrationId: null, teamData: null, playerData: [] }),
 }))

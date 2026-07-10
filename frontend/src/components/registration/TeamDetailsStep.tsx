@@ -47,6 +47,8 @@ export default function TeamDetailsStep({ onNext }: Props) {
       const team = await createTeam(data, logo || undefined)
       setTeamData(data)
       setRegistrationId(team.registration_id)
+      // Save email for resume functionality
+      localStorage.setItem('lastRegistrationEmail', data.contact_email)
       onNext()
     } catch (err: any) {
       setServerError(extractErrorMessage(err))

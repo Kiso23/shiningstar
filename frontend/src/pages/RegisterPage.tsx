@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, CheckCircle, XCircle, AlertTriangle, Check } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TeamDetailsStep from '../components/registration/TeamDetailsStep'
 import PlayerDetailsStep from '../components/registration/PlayerDetailsStep'
 import PaymentStep from '../components/registration/PaymentStep'
 import { useRegistrationStore } from '../store/registrationStore'
+import { getPendingRegistration } from '../api/registrations'
 
 const STEPS = [
   { label: 'Team Details', icon: '🏟️' },
@@ -13,6 +14,47 @@ const STEPS = [
   { label: 'Payment', icon: '💳' },
   { label: 'Confirm', icon: '✅' },
 ]
+
+// ── Resume Dialog ─────────────────────────────────────────────────────────
+function ResumeDialog({ onResume, onStart, teamName }: { onResume: () => void; onStart: () => void; teamName: string }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+        className="w-full max-w-md rounded-2xl shadow-2xl p-8"
+        style={{ background: 'linear-gradient(135deg, #0e1a0e 0%, #111f11 100%)', border: '1px solid rgba(249,115,22,0.2)' }}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-xl bg-orange-500/15">
+            <AlertTriangle className="w-5 h-5 text-orange-400" />
+          </div>
+          <h2 className="text-xl font-black text-white">Resume Registration?</h2>
+        </div>
+
+        <p className="text-gray-300 text-sm mb-6">
+          We found your pending registration for <span className="font-semibold text-orange-400">{teamName}</span>. Would you like to continue where you left off, or start a new registration?
+        </p>
+
+        <div className="flex gap-3">
+          <motion.button onClick={onStart}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/15 text-gray-400 hover:text-white hover:border-white/30 transition-all text-sm font-medium">
+            <XCircle className="w-4 h-4" /> Start New
+          </motion.button>
+          <motion.button onClick={onResume}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all bg-orange-500 hover:bg-orange-400 text-white shadow-lg shadow-orange-500/30">
+            <CheckCircle className="w-4 h-4" /> Resume
+          </motion.button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
 
 // ── Step Progress Bar ─────────────────────────────────────────────────────────
 function StepBar({ currentStep }: { currentStep: number }) {
@@ -173,14 +215,77 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { currentStep, registrationId, setStep } = useRegistrationStore()
+  const { currentStep, registrationId, setStep, loadPendingData, reset } = useRegistrationStore()
   const [showTerms, setShowTerms] = useState(true)
+  const [showResumeDialog, setShowResumeDialog] = useState(false)
+  const [pendingTeamName, setPendingTeamName] = useState<string | null>(null)
+  const [checkingPending, setCheckingPending] = useState(true)
+
+  // Check for pending registration on mount
+  useEffect(() => {
+    const checkPendingRegistration = async () => {
+      // Get email from localStorage or query params if available
+      const email = localStorage.getItem('lastRegistrationEmail')
+      if (!email) {
+        setCheckingPending(false)
+        return
+      }
+
+      try {
+        const pending = await getPendingRegistration(email)
+        if (pending) {
+          setPendingTeamName(pending.team_data.team_name)
+          // Don't load data yet, let user choose
+          setShowResumeDialog(true)
+        }
+      } catch (err) {
+        console.error('Failed to check pending registration:', err)
+      } finally {
+        setCheckingPending(false)
+      }
+    }
+
+    checkPendingRegistration()
+  }, [])
+
+  const handleResumeRegistration = async () => {
+    const email = localStorage.getItem('lastRegistrationEmail')
+    if (!email) return
+
+    try {
+      const pending = await getPendingRegistration(email)
+      if (pending) {
+        loadPendingData(pending.registration_id, pending.current_step, pending.team_data, pending.players)
+        setShowResumeDialog(false)
+        setShowTerms(false)
+      }
+    } catch (err) {
+      console.error('Failed to resume registration:', err)
+    }
+  }
+
+  const handleStartNew = () => {
+    reset()
+    setShowResumeDialog(false)
+    setShowTerms(true)
+  }
 
   const goNext = () => setStep(currentStep + 1)
   const goBack = () => setStep(currentStep - 1)
   const handleComplete = () => { if (registrationId) navigate(`/confirmation/${registrationId}`) }
 
   const stepLabels = ['Team Details', 'Player Roster', 'Payment', 'Confirmation']
+
+  if (checkingPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #080c08 0%, #0e1a0e 50%, #080c08 100%)' }}>
+        <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }} className="text-center">
+          <div className="w-12 h-12 rounded-full border-2 border-orange-500/30 border-t-orange-500 animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Checking your registration...</p>
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden"
@@ -198,6 +303,17 @@ export default function RegisterPage() {
         <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)' }} />
       </div>
+
+      {/* Resume Dialog */}
+      <AnimatePresence>
+        {showResumeDialog && pendingTeamName && (
+          <ResumeDialog
+            teamName={pendingTeamName}
+            onResume={handleResumeRegistration}
+            onStart={handleStartNew}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Terms Modal */}
       <AnimatePresence>

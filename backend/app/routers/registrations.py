@@ -3,7 +3,7 @@ import asyncio
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select
+from sqlalchemy import select, desc
 
 from app.dependencies.db import get_db
 from app.models.team import Team
@@ -119,6 +119,57 @@ async def get_registration_status(
         "registration_id": team.registration_id,
         "status": team.status,
         "team_name": team.team_name,
+    }
+
+
+@router.get("/resume/by-email")
+async def get_pending_registration_by_email(
+    email: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get pending registration by email to resume from where user left off."""
+    # Query for pending or payment_submitted registration
+    result = await db.execute(
+        select(Team)
+        .options(selectinload(Team.players))
+        .where(Team.contact_email == email)
+        .where(Team.status.in_(["pending", "payment_submitted"]))
+        .order_by(Team.created_at.desc())
+    )
+    team = result.scalar_one_or_none()
+
+    if team is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No pending registration found for this email"
+        )
+
+    # Determine which step user is on based on what data exists
+    step = 1  # Default to step 1
+    if team.players:
+        step = 3 if team.payment_proof or team.razorpay_payment else 2
+    
+    return {
+        "registration_id": team.registration_id,
+        "status": team.status,
+        "current_step": step,
+        "team_data": {
+            "team_name": team.team_name,
+            "manager_name": team.manager_name,
+            "contact_phone": team.contact_phone,
+            "contact_email": team.contact_email,
+            "player_count": team.player_count,
+            "address": team.address or "",
+        },
+        "players": [
+            {
+                "full_name": p.full_name,
+                "age": p.age,
+                "jersey_number": p.jersey_number,
+                "position": p.position,
+            }
+            for p in sorted(team.players, key=lambda x: x.position_index)
+        ] if team.players else [],
     }
 
 

@@ -29,6 +29,14 @@ export interface TeamResponse {
   created_at: string
 }
 
+export interface PendingRegistration {
+  registration_id: string
+  status: string
+  current_step: number
+  team_data: TeamCreateData
+  players: PlayerData[]
+}
+
 export async function createTeam(data: TeamCreateData, logo?: File): Promise<TeamResponse> {
   // Always send JSON — logo upload is handled separately if needed
   const res = await client.post('/registrations', data)
@@ -75,4 +83,21 @@ export async function getStatus(
   cache.set(cacheKey, res.data, CACHE_TTL.MEDIUM)
   
   return res.data
+}
+
+export async function getPendingRegistration(
+  email: string
+): Promise<PendingRegistration | null> {
+  try {
+    const res = await client.get('/registrations/resume/by-email', {
+      params: { email },
+    })
+    return res.data
+  } catch (err: any) {
+    // Return null if no pending registration found (404)
+    if (err.response?.status === 404) {
+      return null
+    }
+    throw err
+  }
 }
