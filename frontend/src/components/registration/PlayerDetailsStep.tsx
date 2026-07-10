@@ -226,7 +226,7 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-        <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
+        <div className="space-y-3">
 
           {/* Required players 1–11 */}
           {Array.from({ length: REQUIRED_PLAYERS }, (_, idx) =>
