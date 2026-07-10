@@ -21,7 +21,7 @@ from app.models.team import Team
 
 DEFAULT_VENUE = "Rongbong Ronghang Playground"
 # First match starts at 9 AM, each match 90 min apart
-FIRST_MATCH_TIME = datetime(2025, 6, 15, 9, 0, 0)
+FIRST_MATCH_TIME = datetime(2026, 6, 15, 9, 0, 0)
 MATCH_INTERVAL_MINUTES = 90
 
 

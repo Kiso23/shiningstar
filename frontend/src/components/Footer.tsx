@@ -85,7 +85,7 @@ export default function Footer() {
               Representing Hamren with pride. A community-driven football club committed to excellence and fair play.
             </p>
             <p style={{ color: textMute }} className="text-xs font-medium">
-              © 2025 SSU FC
+              © 2026 SSU FC
             </p>
           </motion.div>
 

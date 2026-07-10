@@ -14,7 +14,7 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-TOURNAMENT_NAME = "Shining Star United Football Tournament 2025"
+TOURNAMENT_NAME = "Shining Star United Football Tournament 2026"
 
 # ── Load club logo as base64 ───────────────────────────────────────────────────
 _LOGO_B64: str = ""
@@ -51,14 +51,14 @@ def _base_html(content: str) -> str:
             {_logo_html(90)}
             <h1 style="margin:0;color:#fff;font-size:20px;font-weight:800;">Shining Star United</h1>
             <p style="margin:4px 0 0;color:rgba(255,255,255,0.6);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
-              Hamren · Football Tournament 2025
+              Hamren · Football Tournament 2026
             </p>
           </td>
         </tr>
         <tr><td style="padding:36px 40px;">{content}</td></tr>
         <tr>
           <td style="padding:20px 40px;border-top:1px solid #2a2a2a;text-align:center;">
-            <p style="margin:0;color:#555;font-size:12px;">© 2025 Shining Star United · Hamren · All rights reserved</p>
+            <p style="margin:0;color:#555;font-size:12px;">© 2026 Shining Star United · Hamren · All rights reserved</p>
             <p style="margin:4px 0 0;color:#555;font-size:12px;">This is an automated email. Please do not reply.</p>
           </td>
         </tr>
@@ -185,7 +185,7 @@ Status          : Pending Review
 
 Our admin team will review your payment and approve within 24 hours.
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     await _send(to_email, subject, _base_html(html_content), text_content)
 
@@ -265,7 +265,7 @@ Hi {manager_name},
 Registration ID : {registration_id}
 Team Name       : {team_name}
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     # Generate and attach PDF for approved registrations
     pdf_bytes = None
@@ -325,7 +325,7 @@ Venue: Rongbong Ronghang Playground
 
 Fair play, discipline, and respect must be maintained as per AFA standards.
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
         await _send(to_email, rules_subject, rules_html, rules_text,
                     rules_pdf_bytes, "SSU_Champions_Trophy_Rules_Regulations.pdf")
 
@@ -403,7 +403,7 @@ Message:
 ---
 Please reply through the admin dashboard.
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     await _send(admin_email, f"📧 New Contact: {safe_subject}", _base_html(html_content), text_content)
 
@@ -444,7 +444,7 @@ Admin Reply:
 
 If you have further questions, please contact us again.
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     await _send(to_email, f"✅ Reply: {subject}", _base_html(html_content), text_content)
 
@@ -519,7 +519,7 @@ Experience  : {experience} years
 
 Please review the application in the admin dashboard.
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     await _send(admin_email, f"🆕 New Player Application: {player_name}", _base_html(html_content), text_content)
 
@@ -614,7 +614,7 @@ Hi {player_name},
 Position: {position}
 Status: {status.upper()}
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     await _send(to_email, subject, _base_html(html_content), text_content)
 
@@ -673,6 +673,6 @@ Current Status: {status.upper()}
 
 If you have any questions, please contact us.
 
-© 2025 Shining Star United"""
+© 2026 Shining Star United"""
 
     await _send(to_email, subject, _base_html(html_content), text_content)

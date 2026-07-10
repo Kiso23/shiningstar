@@ -67,7 +67,7 @@ export default function TrophyRoomPage() {
             { label: 'Total Trophies', value: '0', icon: Trophy },
             { label: 'Championships', value: '0', icon: Medal },
             { label: 'Awards', value: '0', icon: Award },
-            { label: 'Since', value: '2025', icon: Target },
+            { label: 'Since', value: '2026', icon: Target },
           ].map(({ label, value, icon: Icon }) => (
             <motion.div
               key={label}

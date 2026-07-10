@@ -399,7 +399,7 @@ async def test_full_match_lifecycle(client, auth_headers, two_teams):
     resp = await client.post("/api/v1/matches", json={
         "team_a_id": team_a_id,
         "team_b_id": team_b_id,
-        "scheduled_at": "2025-06-15T10:00:00",
+        "scheduled_at": "2026-06-15T10:00:00",
         "venue": "Rongbong Ronghang Playground",
         "round": "Quarter-Final",
     }, headers=auth_headers)
@@ -460,7 +460,7 @@ async def test_public_matches_endpoint_no_auth(client, auth_headers, two_teams):
     await client.post("/api/v1/matches", json={
         "team_a_id": team_a_id,
         "team_b_id": team_b_id,
-        "scheduled_at": "2025-06-15T10:00:00",
+        "scheduled_at": "2026-06-15T10:00:00",
         "venue": "Test Venue",
         "round": "Semi-Final",
     }, headers=auth_headers)
@@ -480,7 +480,7 @@ async def test_same_team_fixture_rejected(client, auth_headers, two_teams):
     resp = await client.post("/api/v1/matches", json={
         "team_a_id": team_a_id,
         "team_b_id": team_a_id,
-        "scheduled_at": "2025-06-15T10:00:00",
+        "scheduled_at": "2026-06-15T10:00:00",
         "venue": "Test Venue",
         "round": "Final",
     }, headers=auth_headers)
@@ -495,7 +495,7 @@ async def test_score_update_on_completed_match_rejected(client, auth_headers, tw
     resp = await client.post("/api/v1/matches", json={
         "team_a_id": team_a_id,
         "team_b_id": team_b_id,
-        "scheduled_at": "2025-06-15T10:00:00",
+        "scheduled_at": "2026-06-15T10:00:00",
         "venue": "Test Venue",
         "round": "Final",
     }, headers=auth_headers)
@@ -524,7 +524,7 @@ async def test_leaderboard_ordering(client, auth_headers, two_teams):
     resp = await client.post("/api/v1/matches", json={
         "team_a_id": team_a_id,
         "team_b_id": team_b_id,
-        "scheduled_at": "2025-06-15T10:00:00",
+        "scheduled_at": "2026-06-15T10:00:00",
         "venue": "Test Venue",
         "round": "Final",
     }, headers=auth_headers)

@@ -109,7 +109,7 @@ This is a test email to verify SMTP configuration is working correctly.
 
 If you received this email, the email service is functioning properly!
 
-© 2025 Shining Star United
+© 2026 Shining Star United
         """.strip()
         
         html = """
@@ -127,7 +127,7 @@ If you received this email, the email service is functioning properly!
     </p>
     <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
     <p style="color:#999;font-size:12px;margin:0;">
-      © 2025 Shining Star United · Hamren
+      © 2026 Shining Star United · Hamren
     </p>
   </div>
 </body>

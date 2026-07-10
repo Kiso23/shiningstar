@@ -161,7 +161,7 @@ export default function ConfirmationPage() {
           className="mt-6 flex items-center justify-center gap-2 text-gray-600 text-sm"
         >
           <Star className="w-3.5 h-3.5 text-orange-500" fill="currentColor" />
-          Shining Star United 2025
+          Shining Star United 2026
         </motion.div>
       </div>
     </div>
