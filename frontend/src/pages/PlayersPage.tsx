@@ -237,12 +237,15 @@ export default function PlayersPage() {
                         </div>
                         <p style={{ color: getStatColor(value) }} className="font-black">{value}</p>
                       </div>
-                      <div style={{ backgroundColor: 'rgba(0,0,0,0.3)', borderColor: border }} className="w-full h-2 rounded-full border overflow-hidden">
+                      <div style={{ backgroundColor: 'rgba(0,0,0,0.3)' }} className="w-full h-2 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${value}%` }}
                           transition={{ duration: 1, ease: 'easeOut' }}
-                          style={{ backgroundColor: getStatColor(value) }}
+                          style={{
+                            background: `linear-gradient(90deg, ${getStatColor(value)}, ${getStatColor(value)}99)`,
+                            boxShadow: `0 0 10px ${getStatColor(value)}80`
+                          }}
                           className="h-full rounded-full"
                         />
                       </div>
