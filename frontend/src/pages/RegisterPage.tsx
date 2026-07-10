@@ -206,37 +206,38 @@ export default function RegisterPage() {
 
       {/* Header */}
       <motion.header initial={{ y: -60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between px-6 py-4 border-b"
+        className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 border-b"
         style={{ borderBottomColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(8,12,8,0.8)', backdropFilter: 'blur(20px)' }}>
-        <motion.button whileHover={{ x: -3 }} onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+        <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.95 }} onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5">
           <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm">Back to Home</span>
+          <span className="text-sm font-medium">Back</span>
         </motion.button>
         <div className="flex items-center gap-2">
           <img src="/logo.svg" alt="SSU" className="w-8 h-8 rounded-full object-cover border border-orange-500/40" />
-          <span className="font-bold text-white text-sm hidden sm:block">Shining Star United</span>
+          <span className="font-bold text-white text-xs sm:text-sm hidden sm:inline">Shining Star United</span>
         </div>
+        <div className="w-20" />
       </motion.header>
 
       {/* Main */}
-      <main className="relative z-10 flex-1 flex items-start justify-center px-4 py-8">
-        <div className="w-full max-w-lg">
+      <main className="relative z-10 flex-1 flex items-start justify-center px-3 sm:px-4 py-6 sm:py-8">
+        <div className="w-full max-w-2xl">
 
           {/* Title */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="text-center mb-8">
+            className="text-center mb-8 px-2">
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
               Team <span style={{ background: 'linear-gradient(135deg, #f97316, #fb923c)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Registration</span>
             </h1>
-            <p className="text-gray-500 text-sm">
-              Step {currentStep} of 4 — <span className="text-orange-400">{stepLabels[currentStep - 1]}</span>
+            <p className="text-gray-400 text-xs sm:text-sm">
+              Step <span className="font-bold text-orange-400">{currentStep}</span> of <span className="font-bold">4</span> — <span className="text-orange-400 font-semibold">{stepLabels[currentStep - 1]}</span>
             </p>
           </motion.div>
 
           {/* Step bar */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="mb-8 px-2 py-5 rounded-2xl"
+            className="mb-8 px-3 py-5 rounded-2xl"
             style={{ backgroundColor: 'rgba(17,31,17,0.7)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)' }}>
             <StepBar currentStep={currentStep} />
           </motion.div>
@@ -249,7 +250,7 @@ export default function RegisterPage() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -40, scale: 0.97 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="rounded-2xl p-6 sm:p-8"
+              className="rounded-2xl p-5 sm:p-8"
               style={{ backgroundColor: 'rgba(17,31,17,0.85)', border: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(20px)', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}
             >
               {currentStep === 1 && <TeamDetailsStep key="step1" onNext={goNext} />}
