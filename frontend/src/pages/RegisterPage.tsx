@@ -186,13 +186,8 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col overflow-x-hidden"
       style={{ background: 'linear-gradient(135deg, #080c08 0%, #0e1a0e 50%, #080c08 100%)' }}>
 
-      {/* Terms Modal */}
-      <AnimatePresence>
-        {showTerms && <TermsModal onAccept={() => setShowTerms(false)} onDecline={() => navigate('/')} />}
-      </AnimatePresence>
-
       {/* Stadium video background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <video autoPlay muted loop playsInline className="absolute w-full h-full object-cover" style={{ opacity: 0.12 }}>
           <source src="/stadium.mp4" type="video/mp4" />
         </video>
@@ -204,9 +199,14 @@ export default function RegisterPage() {
           style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)' }} />
       </div>
 
+      {/* Terms Modal */}
+      <AnimatePresence>
+        {showTerms && <TermsModal onAccept={() => setShowTerms(false)} onDecline={() => navigate('/')} />}
+      </AnimatePresence>
+
       {/* Header */}
       <motion.header initial={{ y: -60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-        className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 border-b"
+        className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 border-b sticky top-0"
         style={{ borderBottomColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(8,12,8,0.8)', backdropFilter: 'blur(20px)' }}>
         <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.95 }} onClick={() => navigate('/')}
           className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5">
@@ -220,9 +220,9 @@ export default function RegisterPage() {
         <div className="w-20" />
       </motion.header>
 
-      {/* Main */}
-      <main className="relative z-10 flex-1 flex items-start justify-center px-3 sm:px-4 py-6 sm:py-8">
-        <div className="w-full max-w-2xl">
+      {/* Main Content - Scrolls naturally with page */}
+      <main className="relative z-10 flex-1 w-full">
+        <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
 
           {/* Title */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
@@ -242,7 +242,7 @@ export default function RegisterPage() {
             <StepBar currentStep={currentStep} />
           </motion.div>
 
-          {/* Step content */}
+          {/* Step content - No fixed height, scrolls naturally */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -250,7 +250,7 @@ export default function RegisterPage() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -40, scale: 0.97 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="rounded-2xl p-5 sm:p-8"
+              className="rounded-2xl p-5 sm:p-8 mb-6"
               style={{ backgroundColor: 'rgba(17,31,17,0.85)', border: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(20px)', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}
             >
               {currentStep === 1 && <TeamDetailsStep key="step1" onNext={goNext} />}
@@ -260,7 +260,7 @@ export default function RegisterPage() {
           </AnimatePresence>
 
           {/* Step dots indicator (mobile) */}
-          <div className="flex items-center justify-center gap-2 mt-6 sm:hidden">
+          <div className="flex items-center justify-center gap-2 mt-6 mb-8 sm:hidden">
             {STEPS.map((_, i) => (
               <motion.div key={i}
                 animate={{ width: i + 1 === currentStep ? 24 : 8, backgroundColor: i + 1 < currentStep ? '#22c55e' : i + 1 === currentStep ? '#f97316' : 'rgba(255,255,255,0.15)' }}
