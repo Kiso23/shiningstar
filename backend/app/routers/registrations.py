@@ -105,23 +105,6 @@ async def upload_payment(
     }
 
 
-@router.get("/{registration_id}/status")
-async def get_registration_status(
-    registration_id: str,
-    db: AsyncSession = Depends(get_db),
-):
-    """Get the current status of a registration."""
-    team = await registration_service.get_team_by_registration_id(db, registration_id)
-    if team is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
-
-    return {
-        "registration_id": team.registration_id,
-        "status": team.status,
-        "team_name": team.team_name,
-    }
-
-
 @router.get("/resume/by-email")
 async def get_pending_registration_by_email(
     email: str,
@@ -134,7 +117,7 @@ async def get_pending_registration_by_email(
         .options(selectinload(Team.players))
         .where(Team.contact_email == email)
         .where(Team.status.in_(["pending", "payment_submitted"]))
-        .order_by(Team.created_at.desc())
+        .order_by(desc(Team.created_at))
     )
     team = result.scalar_one_or_none()
 
@@ -170,6 +153,23 @@ async def get_pending_registration_by_email(
             }
             for p in sorted(team.players, key=lambda x: x.position_index)
         ] if team.players else [],
+    }
+
+
+@router.get("/{registration_id}/status")
+async def get_registration_status(
+    registration_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get the current status of a registration."""
+    team = await registration_service.get_team_by_registration_id(db, registration_id)
+    if team is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
+
+    return {
+        "registration_id": team.registration_id,
+        "status": team.status,
+        "team_name": team.team_name,
     }
 
 

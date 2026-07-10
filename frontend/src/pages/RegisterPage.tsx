@@ -224,7 +224,7 @@ export default function RegisterPage() {
   // Check for pending registration on mount
   useEffect(() => {
     const checkPendingRegistration = async () => {
-      // Get email from localStorage or query params if available
+      // Get email from localStorage
       const email = localStorage.getItem('lastRegistrationEmail')
       if (!email) {
         setCheckingPending(false)
@@ -235,8 +235,9 @@ export default function RegisterPage() {
         const pending = await getPendingRegistration(email)
         if (pending) {
           setPendingTeamName(pending.team_data.team_name)
-          // Don't load data yet, let user choose
+          // Show resume dialog instead of terms
           setShowResumeDialog(true)
+          setShowTerms(false)
         }
       } catch (err) {
         console.error('Failed to check pending registration:', err)
@@ -257,7 +258,6 @@ export default function RegisterPage() {
       if (pending) {
         loadPendingData(pending.registration_id, pending.current_step, pending.team_data, pending.players)
         setShowResumeDialog(false)
-        setShowTerms(false)
       }
     } catch (err) {
       console.error('Failed to resume registration:', err)
