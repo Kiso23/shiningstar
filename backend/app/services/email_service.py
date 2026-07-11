@@ -69,6 +69,35 @@ def _base_html(content: str) -> str:
 </html>"""
 
 
+def _send_via_brevo_with_payload(to: str, payload: dict) -> None:
+    """Send email via Brevo HTTP API with custom payload - allows multiple attachments."""
+    api_key = os.getenv("BREVO_API_KEY", "").strip()
+    if not api_key:
+        logger.warning("BREVO_API_KEY not set, skipping email to %s", to)
+        return
+
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        "https://api.brevo.com/v3/smtp/email",
+        data=data,
+        headers={
+            "accept": "application/json",
+            "api-key": api_key,
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            response.read()
+            logger.info("✅ Email sent via Brevo to %s with multiple attachments", to)
+    except urllib.error.URLError as e:
+        logger.error("❌ Email failed to %s (network error): %s", to, e)
+    except Exception as e:
+        logger.error("❌ Email failed to %s: %s", to, e)
+
+
 def _send_via_brevo(to: str, subject: str, html: str, text: str, attachment_bytes: bytes = None, attachment_name: str = None) -> None:
     """Send email via Brevo HTTP API - works on Render free tier."""
     api_key = os.getenv("BREVO_API_KEY", "").strip()  # strip newlines/spaces
@@ -215,7 +244,7 @@ async def send_status_update(
           <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
             <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
               <strong>✅ Payment Received & Verified</strong><br/>
-              Your registration fee of <strong style="color:#f97316;">₹801</strong> has been successfully received and verified. 
+              Your registration fee of <strong style="color:#f97316;">Rs 801</strong> has been successfully received and verified. 
               An invoice is attached to this email for your records.
             </p>
           </div>
@@ -225,7 +254,7 @@ async def send_status_update(
             </p>
           </div>
         """
-        text_status = "APPROVED — Congratulations! Your team has been approved for the tournament. Payment verified: ₹801 received."
+        text_status = "APPROVED — Congratulations! Your team has been approved for the tournament. Payment verified: Rs 801 received."
     else:
         subject = f"Registration Update — {team_name} | {TOURNAMENT_NAME}"
         status_badge = '<span style="background:#450a0a;color:#f87171;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Rejected</span>'
@@ -306,11 +335,37 @@ Team Name       : {team_name}
         except Exception as e:
             logger.warning("Could not generate PDF attachment: %s", e)
 
-    # Send registration PDF with invoice
-    if invoice_pdf_bytes:
-        await _send(to_email, subject, _base_html(html_content), text_content, invoice_pdf_bytes, f"Invoice_{registration_id}.pdf")
-    else:
+    # Send registration PDF with both player details and invoice
+    if pdf_bytes and invoice_pdf_bytes:
+        # Send with registration PDF (with players)
+        import base64
+        payload = {
+            "sender": {"name": "Shining Star United", "email": os.getenv("SMTP_FROM", "noreply@shiningstarunited.com")},
+            "to": [{"email": to_email}],
+            "subject": subject,
+            "htmlContent": _base_html(html_content),
+            "textContent": text_content,
+            "attachment": [
+                {
+                    "name": pdf_name,
+                    "content": base64.b64encode(pdf_bytes).decode("utf-8"),
+                },
+                {
+                    "name": f"Invoice_{registration_id}.pdf",
+                    "content": base64.b64encode(invoice_pdf_bytes).decode("utf-8"),
+                }
+            ]
+        }
+        # Send via Brevo with both attachments
+        loop = asyncio.get_event_loop()
+        try:
+            await loop.run_in_executor(None, partial(_send_via_brevo_with_payload, to_email, payload))
+        except Exception as exc:
+            logger.error("❌ Email failed to %s: %s", to_email, exc)
+    elif pdf_bytes:
         await _send(to_email, subject, _base_html(html_content), text_content, pdf_bytes, pdf_name)
+    else:
+        await _send(to_email, subject, _base_html(html_content), text_content)
 
     # Send rules PDF as a separate email if approved
     if new_status == "approved" and rules_pdf_bytes:

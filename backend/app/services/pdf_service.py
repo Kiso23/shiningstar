@@ -436,7 +436,7 @@ def generate_invoice_pdf(
 
     items_data = [
         ['Description', 'Quantity', 'Unit Price', 'Amount'],
-        ['Tournament Registration Fee', '1', '₹801', '₹801'],
+        ['Tournament Registration Fee', '1', 'Rs 801', 'Rs 801'],
     ]
 
     items_table = Table(
@@ -475,9 +475,9 @@ def generate_invoice_pdf(
 
     # ── Total ─────────────────────────────────────────────────────────────────
     total_data = [
-        ['', 'Subtotal:', '₹801'],
-        ['', 'Tax (0%):', '₹0'],
-        ['', 'Total:', '₹801'],
+        ['', 'Subtotal:', 'Rs 801'],
+        ['', 'Tax (0%):', 'Rs 0'],
+        ['', 'Total:', 'Rs 801'],
     ]
 
     total_table = Table(
@@ -530,7 +530,7 @@ def generate_invoice_pdf(
     notes_style = ParagraphStyle('notes', fontName='Helvetica', fontSize=9,
                                   textColor=GRAY, leading=12)
     story.append(Paragraph(
-        '<b>Notes:</b> This invoice confirms that your registration fee of ₹801 has been received and verified. '
+        '<b>Notes:</b> This invoice confirms that your registration fee of Rs 801 has been received and verified. '
         'Your team is now approved for participation in the SSU Champions Trophy. Please keep this invoice for your records.',
         notes_style
     ))
