@@ -9,7 +9,7 @@ import { extractErrorMessage } from '../../api/errors'
 import { useRegistrationStore } from '../../store/registrationStore'
 
 const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'] as const
-const REQUIRED_PLAYERS = 11 // First 11 are mandatory
+const REQUIRED_PLAYERS = 7 // First 7 are mandatory
 
 // Required player schema (all fields mandatory)
 const requiredPlayerSchema = z.object({
@@ -62,7 +62,7 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
         jersey_number: '' as any,
         position: '' as any,
       })),
-      optional_players: Array.from({ length: Math.max(optionalCount, 7) }, () => ({
+      optional_players: Array.from({ length: Math.max(optionalCount, 11) }, () => ({
         full_name: '',
         age: '' as any,
         jersey_number: '' as any,
@@ -219,9 +219,9 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
         <h2 className="text-2xl font-bold text-white mb-1">Player Roster</h2>
         <p className="text-gray-400 text-sm">
           <span className="text-orange-400 font-semibold flex items-center gap-1 inline-flex">
-            <Star className="w-3.5 h-3.5 fill-orange-400" /> First 11 players are required.
+            <Star className="w-3.5 h-3.5 fill-orange-400" /> First 7 players are required.
           </span>{' '}
-          Players 12–18 are optional.
+          Players 8–18 are optional.
         </p>
       </div>
 
@@ -236,12 +236,12 @@ export default function PlayerDetailsStep({ onNext, onBack }: Props) {
           {/* Divider */}
           <div className="flex items-center gap-3 py-2">
             <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs text-gray-500 font-medium">Optional Players (12–18)</span>
+            <span className="text-xs text-gray-500 font-medium">Optional Players (8–18)</span>
             <div className="flex-1 h-px bg-white/10" />
           </div>
 
-          {/* Optional players 12–18 */}
-          {Array.from({ length: 7 }, (_, idx) =>
+          {/* Optional players 8–18 */}
+          {Array.from({ length: 11 }, (_, idx) =>
             renderPlayerCard(REQUIRED_PLAYERS + idx, false, 'optional_players', idx)
           )}
         </div>

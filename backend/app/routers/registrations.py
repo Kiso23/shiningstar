@@ -57,8 +57,8 @@ async def submit_players(
     if team is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
 
-    # Allow 11 required players + up to 7 optional players (total 11-18)
-    min_players = 11
+    # Allow 7 required players + up to 11 optional players (total 7-18)
+    min_players = 7
     max_players = 18
     if len(players) < min_players or len(players) > max_players:
         raise HTTPException(

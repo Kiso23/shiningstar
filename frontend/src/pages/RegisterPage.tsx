@@ -144,7 +144,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
               'Registration is confirmed only after admin approval.',
             ]},
             { emoji: '⚽', title: 'Tournament Rules', color: 'orange', items: [
-              'Minimum 11 players, maximum 18 players per team.',
+              'Minimum 7 players, maximum 18 players per team.',
               'Only registered players are allowed to play.',
               'All players must be present at the venue on match day.',
               'The organiser\'s decision on all matters is final.',
