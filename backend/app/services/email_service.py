@@ -214,11 +214,18 @@ async def send_status_update(
           </p>
           <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
             <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
+              <strong>✅ Payment Received & Verified</strong><br/>
+              Your registration fee of <strong style="color:#f97316;">₹801</strong> has been successfully received and verified. 
+              An invoice is attached to this email for your records.
+            </p>
+          </div>
+          <div style="background:#1c2a1c;border:1px solid #2d4a2d;border-radius:12px;padding:16px;margin-bottom:24px;">
+            <p style="margin:0;color:#86efac;font-size:13px;line-height:1.6;">
               Please arrive at the venue on time. Bring this email and your Registration ID as proof. Good luck! ⚽
             </p>
           </div>
         """
-        text_status = "APPROVED — Congratulations! Your team has been approved for the tournament."
+        text_status = "APPROVED — Congratulations! Your team has been approved for the tournament. Payment verified: ₹801 received."
     else:
         subject = f"Registration Update — {team_name} | {TOURNAMENT_NAME}"
         status_badge = '<span style="background:#450a0a;color:#f87171;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;">Rejected</span>'
@@ -271,9 +278,10 @@ Team Name       : {team_name}
     pdf_bytes = None
     pdf_name = None
     rules_pdf_bytes = None
+    invoice_pdf_bytes = None
     if new_status == "approved" and players is not None:
         try:
-            from app.services.pdf_service import generate_registration_pdf, generate_rules_pdf
+            from app.services.pdf_service import generate_registration_pdf, generate_rules_pdf, generate_invoice_pdf
             from datetime import datetime as _dt
             pdf_bytes = generate_registration_pdf(
                 team_name=team_name,
@@ -288,11 +296,21 @@ Team Name       : {team_name}
             )
             pdf_name = f"{registration_id}_{team_name.replace(' ', '_')}.pdf"
             rules_pdf_bytes = generate_rules_pdf()
+            invoice_pdf_bytes = generate_invoice_pdf(
+                team_name=team_name,
+                registration_id=registration_id,
+                manager_name=manager_name,
+                contact_email=contact_email,
+                invoice_date=created_at or _dt.utcnow(),
+            )
         except Exception as e:
             logger.warning("Could not generate PDF attachment: %s", e)
 
-    # Send registration PDF
-    await _send(to_email, subject, _base_html(html_content), text_content, pdf_bytes, pdf_name)
+    # Send registration PDF with invoice
+    if invoice_pdf_bytes:
+        await _send(to_email, subject, _base_html(html_content), text_content, invoice_pdf_bytes, f"Invoice_{registration_id}.pdf")
+    else:
+        await _send(to_email, subject, _base_html(html_content), text_content, pdf_bytes, pdf_name)
 
     # Send rules PDF as a separate email if approved
     if new_status == "approved" and rules_pdf_bytes:

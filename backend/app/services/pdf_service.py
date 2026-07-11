@@ -325,3 +325,229 @@ def generate_rules_pdf() -> bytes:
 
     doc.build(story)
     return buffer.getvalue()
+
+
+# ── Invoice PDF ───────────────────────────────────────────────────────────────
+
+def generate_invoice_pdf(
+    team_name: str,
+    registration_id: str,
+    manager_name: str,
+    contact_email: str,
+    invoice_date: datetime,
+) -> bytes:
+    """Generate an invoice PDF for approved registration and return as bytes."""
+    buffer = io.BytesIO()
+    page_w, page_h = A4
+    margin = 20 * mm
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=margin,
+        rightMargin=margin,
+        topMargin=0,
+        bottomMargin=15 * mm,
+    )
+
+    story = []
+
+    # ── Orange header banner ──────────────────────────────────────────────────
+    header_data = [['SHINING STAR UNITED FC']]
+    header_table = Table(header_data, colWidths=[page_w - 2 * margin])
+    header_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), ORANGE),
+        ('TEXTCOLOR', (0, 0), (-1, -1), WHITE),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 16),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    story.append(header_table)
+
+    # ── Subtitle bar ──────────────────────────────────────────────────────────
+    sub_data = [['Tournament Registration Invoice']]
+    sub_table = Table(sub_data, colWidths=[page_w - 2 * margin])
+    sub_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), DARK),
+        ('TEXTCOLOR', (0, 0), (-1, -1), WHITE),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    story.append(sub_table)
+    story.append(Spacer(1, 8 * mm))
+
+    # ── Invoice details ───────────────────────────────────────────────────────
+    invoice_style = ParagraphStyle('invoice', fontName='Helvetica-Bold', fontSize=14, textColor=DARK)
+    story.append(Paragraph('INVOICE', invoice_style))
+    story.append(Spacer(1, 3 * mm))
+
+    date_str = invoice_date.strftime('%-d %B %Y') if hasattr(invoice_date, 'strftime') else str(invoice_date)
+    invoice_info = [
+        ['Invoice Date:', date_str],
+        ['Invoice ID:', registration_id],
+        ['Status:', 'APPROVED & PAID'],
+    ]
+
+    label_style = ParagraphStyle('label', fontName='Helvetica-Bold', fontSize=10, textColor=colors.HexColor('#505050'))
+    value_style = ParagraphStyle('value', fontName='Helvetica', fontSize=10, textColor=DARK)
+
+    for label, value in invoice_info:
+        row_data = [[Paragraph(label, label_style), Paragraph(value, value_style)]]
+        row_table = Table(row_data, colWidths=[45 * mm, page_w - 2 * margin - 45 * mm])
+        row_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        story.append(row_table)
+
+    story.append(Spacer(1, 6 * mm))
+
+    # ── Bill To ───────────────────────────────────────────────────────────────
+    section_style = ParagraphStyle('section', fontName='Helvetica-Bold', fontSize=11, textColor=DARK)
+    story.append(Paragraph('Bill To:', section_style))
+    story.append(Spacer(1, 2 * mm))
+
+    bill_to_info = [
+        ['Team Name:', team_name],
+        ['Manager:', manager_name],
+        ['Email:', contact_email],
+    ]
+
+    for label, value in bill_to_info:
+        row_data = [[Paragraph(label, label_style), Paragraph(value, value_style)]]
+        row_table = Table(row_data, colWidths=[45 * mm, page_w - 2 * margin - 45 * mm])
+        row_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        story.append(row_table)
+
+    story.append(Spacer(1, 6 * mm))
+
+    # ── Invoice items table ───────────────────────────────────────────────────
+    story.append(HRFlowable(width='100%', thickness=1, color=ORANGE))
+    story.append(Spacer(1, 4 * mm))
+
+    items_data = [
+        ['Description', 'Quantity', 'Unit Price', 'Amount'],
+        ['Tournament Registration Fee', '1', '₹801', '₹801'],
+    ]
+
+    items_table = Table(
+        items_data,
+        colWidths=[
+            (page_w - 2 * margin) * 0.45,
+            (page_w - 2 * margin) * 0.15,
+            (page_w - 2 * margin) * 0.2,
+            (page_w - 2 * margin) * 0.2,
+        ],
+    )
+
+    items_style = [
+        # Header row
+        ('BACKGROUND', (0, 0), (-1, 0), ORANGE),
+        ('TEXTCOLOR', (0, 0), (-1, 0), WHITE),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, 0), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        # Data row
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('TEXTCOLOR', (0, 1), (-1, -1), DARK),
+        ('ALIGN', (1, 1), (-1, -1), 'RIGHT'),
+        ('TOPPADDING', (0, 1), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e5e7eb')),
+        ('BACKGROUND', (0, 1), (-1, 1), LIGHT),
+    ]
+    items_table.setStyle(TableStyle(items_style))
+    story.append(items_table)
+
+    story.append(Spacer(1, 4 * mm))
+
+    # ── Total ─────────────────────────────────────────────────────────────────
+    total_data = [
+        ['', 'Subtotal:', '₹801'],
+        ['', 'Tax (0%):', '₹0'],
+        ['', 'Total:', '₹801'],
+    ]
+
+    total_table = Table(
+        total_data,
+        colWidths=[
+            (page_w - 2 * margin) * 0.45,
+            (page_w - 2 * margin) * 0.2,
+            (page_w - 2 * margin) * 0.35,
+        ],
+    )
+
+    total_style = [
+        ('FONTNAME', (0, 0), (-1, 1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, 1), 10),
+        ('TEXTCOLOR', (0, 0), (-1, 1), GRAY),
+        ('ALIGN', (1, 0), (-1, 1), 'RIGHT'),
+        ('TOPPADDING', (0, 0), (-1, 1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, 1), 3),
+        ('FONTNAME', (0, 2), (-1, 2), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 2), (-1, 2), 12),
+        ('TEXTCOLOR', (0, 2), (-1, 2), ORANGE),
+        ('TOPPADDING', (0, 2), (-1, 2), 6),
+        ('BOTTOMPADDING', (0, 2), (-1, 2), 6),
+        ('ALIGN', (1, 2), (-1, 2), 'RIGHT'),
+        ('GRID', (0, 2), (-1, 2), 1, ORANGE),
+    ]
+    total_table.setStyle(TableStyle(total_style))
+    story.append(total_table)
+
+    story.append(Spacer(1, 8 * mm))
+
+    # ── Payment status ────────────────────────────────────────────────────────
+    status_data = [['Payment Status: PAID (UPI) - Admin Approved']]
+    status_table = Table(status_data, colWidths=[page_w - 2 * margin])
+    status_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#1c2a1c')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#4ade80')),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('BORDER', (0, 0), (-1, -1), 1, colors.HexColor('#2d4a2d')),
+    ]))
+    story.append(status_table)
+
+    story.append(Spacer(1, 8 * mm))
+
+    # ── Notes ─────────────────────────────────────────────────────────────────
+    notes_style = ParagraphStyle('notes', fontName='Helvetica', fontSize=9,
+                                  textColor=GRAY, leading=12)
+    story.append(Paragraph(
+        '<b>Notes:</b> This invoice confirms that your registration fee of ₹801 has been received and verified. '
+        'Your team is now approved for participation in the SSU Champions Trophy. Please keep this invoice for your records.',
+        notes_style
+    ))
+
+    story.append(Spacer(1, 8 * mm))
+
+    # ── Footer ────────────────────────────────────────────────────────────────
+    story.append(HRFlowable(width='100%', thickness=1, color=ORANGE))
+    story.append(Spacer(1, 3 * mm))
+
+    footer_style = ParagraphStyle('footer', fontName='Helvetica-Oblique', fontSize=8,
+                                   textColor=GRAY, alignment=TA_CENTER)
+    story.append(Paragraph('Shining Star United FC — Tournament Registration System', footer_style))
+    story.append(Paragraph(
+        f'Generated: {datetime.utcnow().strftime("%d %B %Y, %H:%M UTC")}',
+        footer_style
+    ))
+
+    doc.build(story)
+    return buffer.getvalue()
