@@ -38,6 +38,9 @@ async def _run_migrations() -> None:
             "ALTER TABLE matches ALTER COLUMN team_b_id DROP NOT NULL",
             # Add address column to teams
             "ALTER TABLE teams ADD COLUMN IF NOT EXISTS address VARCHAR(300)",
+            # Add manual team name columns for non-registered teams
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS team_a_name VARCHAR(100)",
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS team_b_name VARCHAR(100)",
         ]:
             await conn.execute(__import__('sqlalchemy').text(sql))
     logger.info("Migrations complete.")
