@@ -25,6 +25,7 @@ const EVENT_TYPES = [
 export default function ScoreUpdateForm({ match, onUpdated }: Props) {
   const isCompleted = match.status === 'completed'
   const isLive = match.status === 'live'
+  const canAddEvents = isLive || isCompleted  // Allow adding events to live OR completed matches
 
   // Score form
   const [scoreA, setScoreA] = useState<string>(
@@ -55,10 +56,10 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
 
   // Load events when component mounts or match changes
   useEffect(() => {
-    if (isLive) {
+    if (canAddEvents) {
       fetchEvents()
     }
-  }, [match.id, isLive])
+  }, [match.id, canAddEvents])
 
   const fetchEvents = async () => {
     setLoadingEvents(true)
@@ -212,8 +213,8 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
-      {/* Events section - only show for live matches */}
-      {isLive && (
+      {/* Events section - show for live OR completed matches for editing */}
+      {canAddEvents && (
         <div className="space-y-2 pt-2 border-t border-white/10">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-gray-400">Match Events</p>
