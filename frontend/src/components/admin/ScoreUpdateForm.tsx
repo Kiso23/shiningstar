@@ -38,6 +38,10 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  // Validation flags
+  const canMarkCompleted = scoreA !== '' && scoreB !== ''
+  const isFormDisabled = isCompleted || (status === 'completed' && !canMarkCompleted)
+
   // Events
   const [events, setEvents] = useState<MatchEventResponse[]>([])
   const [loadingEvents, setLoadingEvents] = useState(false)
@@ -70,6 +74,15 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate: if marking as completed, both scores must be set
+    if (status === 'completed') {
+      if (scoreA === '' || scoreB === '') {
+        setError('Both scores must be set before marking match as completed')
+        return
+      }
+    }
+    
     setSubmitting(true)
     setError(null)
     setSaved(false)
@@ -180,10 +193,23 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
           disabled={isCompleted}
           className="input-field disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
+          {STATUS_OPTIONS.map((opt) => {
+            const isDisabled = opt.value === 'completed' && !canMarkCompleted
+            return (
+              <option 
+                key={opt.value} 
+                value={opt.value}
+                disabled={isDisabled}
+              >
+                {opt.label}
+                {isDisabled ? ' (set both scores first)' : ''}
+              </option>
+            )
+          })}
         </select>
+        {!canMarkCompleted && status === 'completed' && (
+          <p className="text-xs text-orange-400 mt-1">⚠️ Both scores must be set before completing</p>
+        )}
       </div>
 
       {/* Events section - only show for live matches */}
@@ -329,11 +355,11 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
       {!isCompleted && (
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || (status === 'completed' && !canMarkCompleted)}
           className={`w-full py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2
             ${saved
               ? 'bg-green-600/20 text-green-400 border border-green-600/30'
-              : 'btn-primary'
+              : 'btn-primary disabled:opacity-50 disabled:cursor-not-allowed'
             }`}
         >
           {submitting ? (
