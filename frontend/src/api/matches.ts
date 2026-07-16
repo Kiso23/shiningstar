@@ -1,8 +1,10 @@
 import client from './client'
 
 export interface MatchCreate {
-  team_a_id: string
-  team_b_id: string
+  team_a_id?: string | null
+  team_b_id?: string | null
+  team_a_name?: string | null
+  team_b_name?: string | null
   scheduled_at: string
   venue: string
   round: string

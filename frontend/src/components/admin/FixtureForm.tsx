@@ -19,14 +19,20 @@ interface Props {
 export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props) {
   const isEdit = !!fixture
 
+  // Determine if editing with registered or manual teams
+  const isManualFixture = fixture && !fixture.team_a_id && !fixture.team_b_id
+
   const [teamAId, setTeamAId] = useState(fixture?.team_a_id ?? '')
   const [teamBId, setTeamBId] = useState(fixture?.team_b_id ?? '')
+  const [teamAName, setTeamAName] = useState(fixture && !fixture.team_a_id ? fixture.team_a_name : '')
+  const [teamBName, setTeamBName] = useState(fixture && !fixture.team_b_id ? fixture.team_b_name : '')
   const [teamALogo, setTeamALogo] = useState(fixture?.team_a_logo ?? '')
   const [teamBLogo, setTeamBLogo] = useState(fixture?.team_b_logo ?? '')
   const [teamALogoFile, setTeamALogoFile] = useState<File | null>(null)
   const [teamBLogoFile, setTeamBLogoFile] = useState<File | null>(null)
   const [teamALogoPreview, setTeamALogoPreview] = useState<string>('')
   const [teamBLogoPreview, setTeamBLogoPreview] = useState<string>('')
+  const [useManualTeams, setUseManualTeams] = useState(isManualFixture ?? false)
   const [scheduledAt, setScheduledAt] = useState(
     fixture?.scheduled_at
       ? new Date(fixture.scheduled_at).toISOString().slice(0, 16)
@@ -38,7 +44,9 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const sameTeamError = teamAId && teamBId && teamAId === teamBId
+  const sameTeamError = 
+    (useManualTeams && teamAName && teamBName && teamAName.toLowerCase() === teamBName.toLowerCase()) ||
+    (!useManualTeams && teamAId && teamBId && teamAId === teamBId)
 
   const handleFileUpload = (file: File | null, isTeamA: boolean) => {
     if (!file) return
@@ -80,16 +88,32 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
       const teamALogoToSend = teamALogoPreview || teamALogo || undefined
       const teamBLogoToSend = teamBLogoPreview || teamBLogo || undefined
 
-      const payload = {
-        team_a_id: teamAId,
-        team_b_id: teamBId,
-        scheduled_at: new Date(scheduledAt).toISOString(),
-        venue,
-        round,
-        group: group || undefined,
-        team_a_logo: teamALogoToSend,
-        team_b_logo: teamBLogoToSend,
-      }
+      const payload = useManualTeams
+        ? {
+            team_a_id: null,
+            team_b_id: null,
+            team_a_name: teamAName.trim(),
+            team_b_name: teamBName.trim(),
+            scheduled_at: new Date(scheduledAt).toISOString(),
+            venue,
+            round,
+            group: group || undefined,
+            team_a_logo: teamALogoToSend,
+            team_b_logo: teamBLogoToSend,
+          }
+        : {
+            team_a_id: teamAId,
+            team_b_id: teamBId,
+            team_a_name: null,
+            team_b_name: null,
+            scheduled_at: new Date(scheduledAt).toISOString(),
+            venue,
+            round,
+            group: group || undefined,
+            team_a_logo: teamALogoToSend,
+            team_b_logo: teamBLogoToSend,
+          }
+
       if (isEdit) {
         await updateMatch(fixture.id, { 
           scheduled_at: payload.scheduled_at, 
@@ -139,38 +163,97 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto pr-2">
+            {/* Toggle between registered and manual teams */}
+            {!isEdit && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+                <input
+                  type="checkbox"
+                  id="useManualTeams"
+                  checked={useManualTeams}
+                  onChange={(e) => {
+                    setUseManualTeams(e.target.checked)
+                    if (e.target.checked) {
+                      setTeamAId('')
+                      setTeamBId('')
+                    } else {
+                      setTeamAName('')
+                      setTeamBName('')
+                    }
+                  }}
+                  className="w-4 h-4 rounded cursor-pointer"
+                />
+                <label htmlFor="useManualTeams" className="flex-1 text-sm text-gray-300 cursor-pointer">
+                  Add team manually (type team name)
+                </label>
+              </div>
+            )}
+
             {/* Team A */}
             <div>
               <label className="label">Team A</label>
-              <select
-                value={teamAId}
-                onChange={(e) => setTeamAId(e.target.value)}
-                required
-                disabled={isEdit}
-                className="input-field"
-              >
-                <option value="" disabled>Select Team A</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>{t.team_name}</option>
-                ))}
-              </select>
+              {useManualTeams ? (
+                <input
+                  type="text"
+                  value={teamAName}
+                  onChange={(e) => setTeamAName(e.target.value)}
+                  required
+                  placeholder="Type team name and press Enter or comma"
+                  className="input-field"
+                  onKeyDown={(e) => {
+                    if (e.key === ',' || e.key === 'Enter') {
+                      e.preventDefault()
+                      // Accept the current input
+                    }
+                  }}
+                />
+              ) : (
+                <select
+                  value={teamAId}
+                  onChange={(e) => setTeamAId(e.target.value)}
+                  required
+                  disabled={isEdit}
+                  className="input-field"
+                >
+                  <option value="" disabled>Select Team A</option>
+                  {teams.map((t) => (
+                    <option key={t.id} value={t.id}>{t.team_name}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* Team B */}
             <div>
               <label className="label">Team B</label>
-              <select
-                value={teamBId}
-                onChange={(e) => setTeamBId(e.target.value)}
-                required
-                disabled={isEdit}
-                className="input-field"
-              >
-                <option value="" disabled>Select Team B</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>{t.team_name}</option>
-                ))}
-              </select>
+              {useManualTeams ? (
+                <input
+                  type="text"
+                  value={teamBName}
+                  onChange={(e) => setTeamBName(e.target.value)}
+                  required
+                  placeholder="Type team name and press Enter or comma"
+                  className="input-field"
+                  onKeyDown={(e) => {
+                    if (e.key === ',' || e.key === 'Enter') {
+                      e.preventDefault()
+                      // Accept the current input
+                    }
+                  }}
+                />
+              ) : (
+                <select
+                  value={teamBId}
+                  onChange={(e) => setTeamBId(e.target.value)}
+                  required
+                  disabled={isEdit}
+                  className="input-field"
+                >
+                  <option value="" disabled>Select Team B</option>
+                  {teams.map((t) => (
+                    <option key={t.id} value={t.id}>{t.team_name}</option>
+                  ))}
+                </select>
+              )}
               {sameTeamError && (
                 <p className="error-text">
                   <AlertCircle className="w-3.5 h-3.5" />
