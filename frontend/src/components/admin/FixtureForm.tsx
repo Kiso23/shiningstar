@@ -33,11 +33,13 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
   const [teamALogoPreview, setTeamALogoPreview] = useState<string>('')
   const [teamBLogoPreview, setTeamBLogoPreview] = useState<string>('')
   const [useManualTeams, setUseManualTeams] = useState(isManualFixture ?? false)
-  const [scheduledAt, setScheduledAt] = useState(
-    fixture?.scheduled_at
-      ? new Date(fixture.scheduled_at).toISOString().slice(0, 16)
-      : ''
-  )
+  const [scheduledAt, setScheduledAt] = useState(() => {
+    if (!fixture?.scheduled_at) return ''
+    const date = new Date(fixture.scheduled_at)
+    // Convert UTC to local time for display in datetime-local input
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    return localDate.toISOString().slice(0, 16)
+  })
   const [venue, setVenue] = useState(fixture?.venue ?? '')
   const [round, setRound] = useState(fixture?.round ?? VALID_ROUNDS[0])
   const [group, setGroup] = useState(fixture?.group ?? '')
@@ -88,13 +90,17 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
       const teamALogoToSend = teamALogoPreview || teamALogo || undefined
       const teamBLogoToSend = teamBLogoPreview || teamBLogo || undefined
 
+      // Convert local datetime back to UTC ISO for API
+      const localDate = new Date(scheduledAt)
+      const utcDate = new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60000)
+
       const payload = useManualTeams
         ? {
             team_a_id: null,
             team_b_id: null,
             team_a_name: teamAName.trim(),
             team_b_name: teamBName.trim(),
-            scheduled_at: new Date(scheduledAt).toISOString(),
+            scheduled_at: utcDate.toISOString(),
             venue,
             round,
             group: group || undefined,
@@ -106,7 +112,7 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
             team_b_id: teamBId,
             team_a_name: null,
             team_b_name: null,
-            scheduled_at: new Date(scheduledAt).toISOString(),
+            scheduled_at: utcDate.toISOString(),
             venue,
             round,
             group: group || undefined,
@@ -115,8 +121,12 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
           }
 
       if (isEdit) {
+        // Convert local datetime back to UTC ISO for API
+        const localDate = new Date(scheduledAt)
+        const utcDate = new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60000)
+        
         await updateMatch(fixture.id, { 
-          scheduled_at: payload.scheduled_at, 
+          scheduled_at: utcDate.toISOString(), 
           venue, 
           round, 
           group: group || undefined,

@@ -180,6 +180,8 @@ export default function FixturesPage() {
                           {new Date(match.scheduled_at).toLocaleTimeString('en-IN', {
                             hour: '2-digit',
                             minute: '2-digit',
+                            second: undefined,
+                            hour12: true,
                           })}
                         </div>
                         <div className="flex items-center gap-1.5">
