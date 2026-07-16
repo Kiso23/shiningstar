@@ -7,11 +7,11 @@ import PageLoader from '../components/shared/PageLoader'
 import { trackVisit } from '../api/analytics'
 
 const ROUND_ORDER = [
-  'Round of 32',
-  'Round of 16',
+  'Round 1',
+  'Round 2',
+  'Round 3',
   'Quarter-Final',
   'Semi-Final',
-  'Third Place',
   'Final',
 ]
 
