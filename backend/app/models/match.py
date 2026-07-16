@@ -10,8 +10,12 @@ class Match(Base):
     __tablename__ = "matches"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    team_a_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("teams.id"), index=True)
-    team_b_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("teams.id"), index=True)
+    # Team references - nullable to allow manual teams
+    team_a_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("teams.id"), nullable=True, index=True)
+    team_b_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("teams.id"), nullable=True, index=True)
+    # Manual team names - used when team_id is null
+    team_a_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    team_b_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     team_a_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     team_b_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     team_a_logo: Mapped[Optional[str]] = mapped_column(Text, nullable=True, default=None)
@@ -37,5 +41,6 @@ class Match(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    team_a: Mapped["Team"] = relationship("Team", foreign_keys=[team_a_id])
-    team_b: Mapped["Team"] = relationship("Team", foreign_keys=[team_b_id])
+    team_a: Mapped[Optional["Team"]] = relationship("Team", foreign_keys=[team_a_id])
+    team_b: Mapped[Optional["Team"]] = relationship("Team", foreign_keys=[team_b_id])
+

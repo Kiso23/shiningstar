@@ -19,13 +19,17 @@ router = APIRouter(prefix="/matches", tags=["matches"])
 
 
 def _to_response(match: Match) -> MatchResponse:
-    """Convert a Match ORM object to MatchResponse, denormalizing team names."""
+    """Convert a Match ORM object to MatchResponse, using team IDs or manual names."""
+    # Get team name from registered team or manual entry
+    team_a_name = match.team_a.team_name if match.team_a else (match.team_a_name or "TBD")
+    team_b_name = match.team_b.team_name if match.team_b else (match.team_b_name or "TBD")
+    
     return MatchResponse(
         id=match.id,
         team_a_id=match.team_a_id,
         team_b_id=match.team_b_id,
-        team_a_name=match.team_a.team_name if match.team_a else "TBD",
-        team_b_name=match.team_b.team_name if match.team_b else "TBD",
+        team_a_name=team_a_name,
+        team_b_name=team_b_name,
         team_a_score=match.team_a_score,
         team_b_score=match.team_b_score,
         team_a_logo=match.team_a_logo,
@@ -88,19 +92,29 @@ async def create_match(
     db: AsyncSession = Depends(get_db),
     _admin: Admin = Depends(get_current_admin),
 ):
-    """Admin-only — create a new fixture."""
-    # Validate both teams exist
-    for team_id in (data.team_a_id, data.team_b_id):
-        result = await db.execute(select(Team).where(Team.id == team_id))
+    """Admin-only — create a new fixture with either registered teams or manual team names."""
+    # Validate registered teams if IDs provided
+    if data.team_a_id is not None:
+        result = await db.execute(select(Team).where(Team.id == data.team_a_id))
         if result.scalar_one_or_none() is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Team not found: {team_id}",
+                detail=f"Team A not found: {data.team_a_id}",
+            )
+    
+    if data.team_b_id is not None:
+        result = await db.execute(select(Team).where(Team.id == data.team_b_id))
+        if result.scalar_one_or_none() is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Team B not found: {data.team_b_id}",
             )
 
     match = Match(
         team_a_id=data.team_a_id,
         team_b_id=data.team_b_id,
+        team_a_name=data.team_a_name,
+        team_b_name=data.team_b_name,
         scheduled_at=data.scheduled_at.replace(tzinfo=None),
         venue=data.venue,
         round=data.round,
@@ -109,7 +123,7 @@ async def create_match(
         team_b_logo=data.team_b_logo,
     )
     db.add(match)
-    await db.flush()  # get the ID without committing
+    await db.flush()
 
     # Reload with relationships
     await db.refresh(match)

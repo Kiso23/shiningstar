@@ -22,8 +22,10 @@ class MatchStatus(str, Enum):
 
 
 class MatchCreate(BaseModel):
-    team_a_id: uuid.UUID
-    team_b_id: uuid.UUID
+    team_a_id: Optional[uuid.UUID] = None
+    team_b_id: Optional[uuid.UUID] = None
+    team_a_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    team_b_name: Optional[str] = Field(None, min_length=1, max_length=100)
     scheduled_at: datetime
     venue: str = Field(..., min_length=1, max_length=200)
     round: str = Field(..., min_length=1, max_length=50)
@@ -32,9 +34,21 @@ class MatchCreate(BaseModel):
     team_b_logo: Optional[str] = None
 
     @model_validator(mode="after")
-    def teams_must_differ(self) -> "MatchCreate":
-        if self.team_a_id == self.team_b_id:
-            raise ValueError("Team A and Team B must be different teams")
+    def validate_teams(self) -> "MatchCreate":
+        """Ensure both teams are either registered (IDs) or manual (names)"""
+        has_a_id = self.team_a_id is not None
+        has_a_name = self.team_a_name is not None
+        has_b_id = self.team_b_id is not None
+        has_b_name = self.team_b_name is not None
+        
+        # Check for mixed usage (both ID and name)
+        if (has_a_id and has_a_name) or (has_b_id and has_b_name):
+            raise ValueError("Cannot specify both ID and name for a team")
+        
+        # Both teams must be provided
+        if not ((has_a_id or has_a_name) and (has_b_id or has_b_name)):
+            raise ValueError("Both teams must be specified (either as IDs or names)")
+        
         return self
 
 
