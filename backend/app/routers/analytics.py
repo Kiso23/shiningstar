@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
-from sqlalchemy import func, select, cast, Date, or_
+from sqlalchemy import func, select, cast, Date, or_, case, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import get_current_admin
@@ -154,16 +154,23 @@ async def get_top_scorers(db: AsyncSession = Depends(get_db)):
     from app.models.match import Match
     from app.models.team import Team
 
-    # Get top scorers
+    # Get top scorers - includes both registered and manually entered teams
     scorer_result = await db.execute(
         select(
             MatchEvent.player_name,
-            Team.team_name,
+            func.coalesce(Team.team_name, func.cast(
+                case(
+                    (MatchEvent.team == "team_a", Match.team_a_name),
+                    (MatchEvent.team == "team_b", Match.team_b_name),
+                    else_="Unknown Team"
+                ),
+                String
+            )).label("team_name"),
             func.count().label("goals"),
         )
         .select_from(MatchEvent)
         .join(Match, MatchEvent.match_id == Match.id)
-        .join(
+        .outerjoin(
             Team,
             or_(
                 (MatchEvent.team == "team_a") & (Match.team_a_id == Team.id),
@@ -171,7 +178,14 @@ async def get_top_scorers(db: AsyncSession = Depends(get_db)):
             )
         )
         .where(MatchEvent.event_type == "goal")
-        .group_by(MatchEvent.player_name, Team.team_name)
+        .group_by(MatchEvent.player_name, func.coalesce(Team.team_name, func.cast(
+            case(
+                (MatchEvent.team == "team_a", Match.team_a_name),
+                (MatchEvent.team == "team_b", Match.team_b_name),
+                else_="Unknown Team"
+            ),
+            String
+        )))
         .order_by(func.count().desc())
         .limit(10)
     )
