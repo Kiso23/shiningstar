@@ -178,14 +178,13 @@ async def get_top_scorers(db: AsyncSession = Depends(get_db)):
             )
         )
         .where(MatchEvent.event_type == "goal")
-        .group_by(MatchEvent.player_name, func.coalesce(Team.team_name, func.cast(
-            case(
-                (MatchEvent.team == "team_a", Match.team_a_name),
-                (MatchEvent.team == "team_b", Match.team_b_name),
-                else_="Unknown Team"
-            ),
-            String
-        )))
+        .group_by(
+            MatchEvent.player_name,
+            Team.team_name,
+            Match.team_a_name,
+            Match.team_b_name,
+            MatchEvent.team
+        )
         .order_by(func.count().desc())
         .limit(10)
     )
