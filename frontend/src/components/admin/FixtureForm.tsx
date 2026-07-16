@@ -94,15 +94,25 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
       const teamALogoToSend = teamALogoPreview || teamALogo || undefined
       const teamBLogoToSend = teamBLogoPreview || teamBLogo || undefined
 
-      // The datetime-local value is already in user's local time
-      // Send it directly without timezone conversion
+      // The datetime-local value is in user's local time (IST +05:30)
+      // Convert it to UTC by subtracting the timezone offset, then send as ISO with Z
       const [datePart, timePart] = scheduledAt.split('T')
       const [year, month, day] = datePart.split('-')
       const [hours, minutes] = timePart.split(':')
       
-      // Create a simple ISO string without timezone offset
-      // This represents the time exactly as the user entered it
-      const naiveDateString = `${year}-${month}-${day}T${hours}:${minutes}:00`
+      // Create local date
+      const localDate = new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hours),
+        parseInt(minutes),
+        0
+      )
+      
+      // Convert to UTC by subtracting the timezone offset (IST is +5:30, so subtract)
+      const utcTime = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
+      const utcIsoString = utcTime.toISOString()
 
       const payload = useManualTeams
         ? {
@@ -110,7 +120,7 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
             team_b_id: null,
             team_a_name: teamAName.trim(),
             team_b_name: teamBName.trim(),
-            scheduled_at: naiveDateString,
+            scheduled_at: utcIsoString,
             venue,
             round,
             group: group || undefined,
@@ -122,7 +132,7 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
             team_b_id: teamBId,
             team_a_name: null,
             team_b_name: null,
-            scheduled_at: naiveDateString,
+            scheduled_at: utcIsoString,
             venue,
             round,
             group: group || undefined,
@@ -131,14 +141,25 @@ export default function FixtureForm({ onClose, onSaved, fixture, teams }: Props)
           }
 
       if (isEdit) {
-        // Send datetime as naive string (no timezone) - same format as creation
+        // Convert local time to UTC ISO
         const [datePart, timePart] = scheduledAt.split('T')
         const [year, month, day] = datePart.split('-')
         const [hours, minutes] = timePart.split(':')
-        const naiveDateString = `${year}-${month}-${day}T${hours}:${minutes}:00`
+        
+        const localDate = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          parseInt(hours),
+          parseInt(minutes),
+          0
+        )
+        
+        const utcTime = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
+        const utcIsoString = utcTime.toISOString()
         
         await updateMatch(fixture.id, { 
-          scheduled_at: naiveDateString, 
+          scheduled_at: utcIsoString, 
           venue, 
           round, 
           group: group || undefined,
