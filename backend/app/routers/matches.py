@@ -216,7 +216,9 @@ async def update_score(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Both scores must be set before marking a match as completed",
             )
-        await recalculate_standings(db, match.team_a_id, match.team_b_id)
+        # Only recalculate standings for registered teams (not manually entered teams)
+        if match.team_a_id is not None and match.team_b_id is not None:
+            await recalculate_standings(db, match.team_a_id, match.team_b_id)
         # Auto-advance winner in knockout bracket
         await advance_winner(db, match)
 
