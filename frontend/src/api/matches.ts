@@ -30,8 +30,8 @@ export interface ScoreUpdate {
 
 export interface MatchResponse {
   id: string
-  team_a_id: string
-  team_b_id: string
+  team_a_id: string | null
+  team_b_id: string | null
   team_a_name: string
   team_b_name: string
   team_a_logo?: string
@@ -43,6 +43,8 @@ export interface MatchResponse {
   group: string | null
   scheduled_at: string
   venue: string
+  bracket_slot?: number | null
+  next_match_id?: string | null
 }
 
 export const VALID_ROUNDS = [
