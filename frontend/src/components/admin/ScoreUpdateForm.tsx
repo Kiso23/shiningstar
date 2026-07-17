@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, AlertCircle, CheckCircle, Plus, X, Goal, AlertTriangle, Zap, Clock } from 'lucide-react'
+import { Loader2, AlertCircle, CheckCircle, Plus, X, Goal, AlertTriangle, Zap, Clock, Play } from 'lucide-react'
 import { updateScore, updateTimer, type MatchResponse, type ScoreUpdate, type TimerUpdate } from '../../api/matches'
 import { getMatchEvents, createMatchEvent, deleteMatchEvent, type MatchEventResponse } from '../../api/matchEvents'
 import { extractErrorMessage } from '../../api/errors'
@@ -54,20 +54,46 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
   const [addingEvent, setAddingEvent] = useState(false)
   const [eventError, setEventError] = useState<string | null>(null)
 
-  // Match timer control
+  // Match timer control - stopwatch
   const [elapsedMinutes, setElapsedMinutes] = useState(0)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const [showTimerAdjust, setShowTimerAdjust] = useState(false)
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [isExtraTime, setIsExtraTime] = useState(false)
-  const [isTimerPaused, setIsTimerPaused] = useState(false)
   const [submittingTimer, setSubmittingTimer] = useState(false)
+  const [timerStartTime, setTimerStartTime] = useState<number | null>(null)
 
   // Initialize from match data
   useEffect(() => {
     setElapsedMinutes(match.current_minute || 0)
     setIsExtraTime(match.is_extra_time || false)
-    setIsTimerPaused(match.is_paused || false)
+    if (match.status === 'live') {
+      setIsTimerRunning(!(match.is_paused || false))
+    }
   }, [match])
+
+  // Stopwatch timer - counts up automatically
+  useEffect(() => {
+    if (!isTimerRunning) return
+
+    const startTime = timerStartTime || Date.now() - (elapsedMinutes * 60 + elapsedSeconds) * 1000
+    setTimerStartTime(startTime)
+
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000)
+      const minutes = Math.floor(elapsed / 60)
+      const seconds = elapsed % 60
+
+      // Auto-switch to extra time at 45 minutes
+      if (minutes >= 45 && !isExtraTime) {
+        setIsExtraTime(true)
+      }
+
+      setElapsedMinutes(minutes)
+      setElapsedSeconds(seconds)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [isTimerRunning, timerStartTime, isExtraTime])
 
   // Load events when component mounts or match changes
   useEffect(() => {
@@ -152,7 +178,7 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
       await updateTimer(match.id, {
         current_minute: elapsedMinutes,
         is_extra_time: isExtraTime,
-        is_paused: isTimerPaused,
+        is_paused: !isTimerRunning,
       })
       onUpdated()
     } catch (err: any) {
@@ -160,6 +186,18 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
     } finally {
       setSubmittingTimer(false)
     }
+  }
+
+  const toggleTimer = () => {
+    setIsTimerRunning(!isTimerRunning)
+  }
+
+  const resetTimer = () => {
+    setElapsedMinutes(0)
+    setElapsedSeconds(0)
+    setIsExtraTime(false)
+    setIsTimerRunning(false)
+    setTimerStartTime(null)
   }
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -244,33 +282,64 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
-      {/* Match Timer Control - Professional Timer like big tournaments */}
-      {(isLive || status === 'live') && (
-        <div className="space-y-3 pt-3 border-t-2 border-green-500/30 bg-green-500/5 p-3 rounded-lg">
+      {/* Match Timer Control - Professional Stopwatch like big tournaments */}
+      {(
+        <div className="space-y-3 pt-3 border-t-2 border-blue-500/30 bg-blue-500/5 p-3 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-green-400" />
-              <label className="label text-sm font-bold text-green-400">Match Timer Control</label>
+              <Clock className="w-5 h-5 text-blue-400" />
+              <label className="label text-sm font-bold text-blue-400">Match Stopwatch</label>
             </div>
-            <span className="text-lg font-bold text-green-400 font-mono tabular-nums">
-              {String(elapsedMinutes).padStart(2, '0')}{isExtraTime ? `+${String(Math.max(0, elapsedMinutes - 45)).padStart(2, '0')}` : ''}
-            </span>
           </div>
 
-          {/* Time input */}
-          <div className="flex gap-2 items-center bg-white/5 p-3 rounded-lg border border-green-500/20">
-            <div className="flex-1 flex gap-1 items-center">
-              <input
-                type="number"
-                min="0"
-                max="120"
-                value={elapsedMinutes}
-                onChange={(e) => setElapsedMinutes(Math.max(0, Math.min(120, Number(e.target.value))))}
-                placeholder="Minutes"
-                className="input-field text-center text-2xl font-bold py-2 flex-1"
-              />
-              <span className="text-white font-bold text-xl">MIN</span>
+          {/* Large Stopwatch Display */}
+          <div className="flex items-center justify-center bg-gradient-to-b from-blue-900/40 to-blue-900/20 p-4 rounded-lg border-2 border-blue-500/50">
+            <div className="text-center">
+              <div className="text-6xl font-black text-blue-300 font-mono tabular-nums">
+                {String(elapsedMinutes).padStart(2, '0')}:{String(elapsedSeconds).padStart(2, '0')}
+              </div>
+              {isExtraTime && (
+                <div className="text-2xl font-bold text-yellow-400 mt-2">
+                  + {String(Math.max(0, elapsedMinutes - 45)).padStart(2, '0')}
+                </div>
+              )}
+              <div className="text-sm text-blue-300 mt-2 font-semibold">
+                {isTimerRunning ? '▶ RUNNING' : '⏸ PAUSED'}
+              </div>
             </div>
+          </div>
+
+          {/* Control Buttons */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={toggleTimer}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                isTimerRunning
+                  ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
+            >
+              {isTimerRunning ? (
+                <>
+                  <Zap className="w-4 h-4" />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4" />
+                  Start
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={resetTimer}
+              className="flex-1 py-2 rounded-lg text-sm font-semibold bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 transition-all"
+            >
+              <X className="w-4 h-4" />
+              Reset
+            </button>
           </div>
 
           {/* Extra Time Toggle */}
@@ -284,38 +353,60 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
             />
             <label htmlFor="extraTime" className="flex-1 cursor-pointer">
               <p className="text-white font-semibold text-sm">Extra Time</p>
-              <p className="text-gray-400 text-xs">Enables +X display for second half extra minutes</p>
+              <p className="text-gray-400 text-xs">Manually enable to show +X on website</p>
             </label>
           </div>
 
-          {/* Pause/Resume */}
-          <div className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-orange-500/20">
-            <input
-              type="checkbox"
-              id="pauseTimer"
-              checked={isTimerPaused}
-              onChange={(e) => setIsTimerPaused(e.target.checked)}
-              className="w-5 h-5 rounded cursor-pointer accent-orange-400"
-            />
-            <label htmlFor="pauseTimer" className="flex-1 cursor-pointer">
-              <p className="text-white font-semibold text-sm">{isTimerPaused ? '⏸ Timer Paused' : '▶ Timer Running'}</p>
-              <p className="text-gray-400 text-xs">Pause timer during injuries, VAR, or breaks</p>
-            </label>
-          </div>
+          {/* Manual Time Adjustment (optional) */}
+          <details className="group">
+            <summary className="cursor-pointer text-xs text-blue-400 hover:text-blue-300 font-semibold p-2 rounded hover:bg-white/5">
+              ⚙️ Manual Adjustment
+            </summary>
+            <div className="space-y-2 mt-2 p-2 bg-white/5 rounded-lg border border-blue-500/20">
+              <div className="flex gap-2 items-center">
+                <label className="text-xs text-white font-semibold w-16">Minutes:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="120"
+                  value={elapsedMinutes}
+                  onChange={(e) => {
+                    setElapsedMinutes(Math.max(0, Math.min(120, Number(e.target.value))))
+                    setTimerStartTime(null)
+                  }}
+                  className="input-field text-center text-lg font-bold py-1 flex-1"
+                />
+              </div>
+              <div className="flex gap-2 items-center">
+                <label className="text-xs text-white font-semibold w-16">Seconds:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={elapsedSeconds}
+                  onChange={(e) => {
+                    setElapsedSeconds(Math.max(0, Math.min(59, Number(e.target.value))))
+                    setTimerStartTime(null)
+                  }}
+                  className="input-field text-center text-lg font-bold py-1 flex-1"
+                />
+              </div>
+            </div>
+          </details>
 
-          {/* Save button */}
+          {/* Save to Server Button */}
           <button
             type="button"
             onClick={handleTimerSubmit}
             disabled={submittingTimer}
-            className="w-full py-2 rounded-lg text-sm font-semibold bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
           >
             {submittingTimer ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <CheckCircle className="w-4 h-4" />
             )}
-            Update Timer
+            Save Timer to Server
           </button>
         </div>
       )}

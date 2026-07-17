@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Clock, Play, Pause } from 'lucide-react'
+import { Clock, Pause, Zap } from 'lucide-react'
 
 interface MatchTimerProps {
   matchStartTime: string | null | undefined
@@ -18,38 +18,28 @@ export default function MatchTimer({
   isExtraTime = false,
   isPaused = false
 }: MatchTimerProps) {
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const [isRunning, setIsRunning] = useState(false)
+  const [displayMinute, setDisplayMinute] = useState(currentMinute)
+  const [displaySeconds, setDisplaySeconds] = useState(0)
 
   useEffect(() => {
-    setIsRunning(status === 'live' && !isPaused)
-  }, [status, isPaused])
+    setDisplayMinute(currentMinute)
+  }, [currentMinute])
 
   useEffect(() => {
-    if (!isRunning) return
+    if (status !== 'live' || isPaused) return
 
     const interval = setInterval(() => {
-      if (matchStartTime) {
-        const startTime = new Date(matchStartTime).getTime()
-        const now = Date.now()
-        const elapsed = Math.floor((now - startTime) / 1000)
-        setElapsedSeconds(Math.max(0, elapsed))
-      }
+      setDisplaySeconds((prev) => {
+        if (prev < 59) {
+          return prev + 1
+        }
+        setDisplayMinute((m) => m + 1)
+        return 0
+      })
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [isRunning, matchStartTime])
-
-  // Calculate display minute (use server's current_minute for sync)
-  const displayMinute = currentMinute || Math.floor(elapsedSeconds / 60)
-  const seconds = elapsedSeconds % 60
-  const extraTimeMinute = isExtraTime ? displayMinute - 45 : 0
-  
-  // Format display
-  const mainTime = `${String(displayMinute).padStart(2, '0')}`
-  const extraDisplay = isExtraTime ? `+${String(extraTimeMinute).padStart(2, '0')}` : ''
-
-  if (!matchStartTime && status !== 'scheduled') return null
+  }, [status, isPaused])
 
   if (status === 'scheduled') {
     return (
@@ -71,26 +61,34 @@ export default function MatchTimer({
 
   return (
     <div className="flex items-center justify-center gap-3">
-      {/* Timer display */}
-      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/20 border-2 border-green-500/50 animate-pulse">
-        <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-        <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-black text-green-400 font-mono tabular-nums">{mainTime}</span>
+      {/* Stopwatch Display */}
+      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-500/30 to-emerald-500/30 border-2 border-green-500/70 animate-pulse shadow-lg">
+        <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-5xl font-black text-green-300 font-mono tabular-nums">{String(displayMinute).padStart(2, '0')}</span>
+          <span className="text-2xl font-bold text-green-300 font-mono">:</span>
+          <span className="text-4xl font-black text-green-300 font-mono tabular-nums">{String(displaySeconds).padStart(2, '0')}</span>
           {isExtraTime && (
-            <span className="text-lg font-bold text-green-300">{extraDisplay}</span>
+            <span className="text-2xl font-bold text-yellow-400 ml-2">
+              +{String(Math.max(0, displayMinute - 45)).padStart(2, '0')}
+            </span>
           )}
-          <span className="text-xs text-green-400 font-bold ml-1">MIN</span>
         </div>
-        {isPaused && <Pause className="w-4 h-4 text-orange-400 ml-2" />}
-        {!isPaused && isRunning && <Play className="w-4 h-4 text-green-400 ml-2" />}
       </div>
 
-      {/* Status badge */}
-      <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30">
-        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-        <span className="text-xs font-bold text-green-400 uppercase tracking-wide">
-          {isPaused ? 'PAUSED' : 'LIVE'}
-        </span>
+      {/* Status Badge */}
+      <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-green-500/20 border border-green-500/40">
+        {isPaused ? (
+          <>
+            <Pause className="w-3 h-3 text-orange-400" />
+            <span className="text-xs font-bold text-orange-400 uppercase tracking-wide">Paused</span>
+          </>
+        ) : (
+          <>
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-xs font-bold text-green-400 uppercase tracking-wide">Live</span>
+          </>
+        )}
       </div>
     </div>
   )
