@@ -18,72 +18,69 @@ export default function MatchTimer({
   isExtraTime = false,
   isPaused = false
 }: MatchTimerProps) {
-  const [displayMinutes, setDisplayMinutes] = useState(currentMinute)
+  const [displayMinutes, setDisplayMinutes] = useState(0)
   const [displaySeconds, setDisplaySeconds] = useState(0)
   const [isCountingUp, setIsCountingUp] = useState(false)
-  const [lastBackendMinute, setLastBackendMinute] = useState(currentMinute)
-  const [isSynced, setIsSynced] = useState(true)
-  const [halfTimeMinutes, setHalfTimeMinutes] = useState(0)
-  const [fullTimeMinutes, setFullTimeMinutes] = useState(0)
+  const [lastSyncedMinute, setLastSyncedMinute] = useState(-1)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
 
-  // Calculate half time and full time based on what admin set
+  // When admin saves a new time, sync it once
   useEffect(() => {
-    if (currentMinute !== undefined && currentMinute !== lastBackendMinute) {
-      // Admin set a new time - this is the half time duration
-      setHalfTimeMinutes(currentMinute)
-      setFullTimeMinutes(currentMinute * 2)  // Full time is double half time
-      
-      setDisplayMinutes(currentMinute)
+    if (currentMinute !== undefined && currentMinute !== lastSyncedMinute) {
+      // Admin set a new time - start counting from 0
+      setDisplayMinutes(0)
       setDisplaySeconds(0)
-      setLastBackendMinute(currentMinute)
-      setIsSynced(true)
+      setElapsedSeconds(0)
+      setLastSyncedMinute(currentMinute)
     }
-  }, [currentMinute, lastBackendMinute])
+  }, [currentMinute, lastSyncedMinute])
 
-  // Auto-count seconds on live match
+  // Auto-count seconds on live match - count continuously regardless of admin time
   useEffect(() => {
-    if (status !== 'live' || isPaused || !isSynced) {
+    if (status !== 'live' || isPaused || lastSyncedMinute === -1) {
       setIsCountingUp(false)
       return
     }
 
     setIsCountingUp(true)
     const interval = setInterval(() => {
-      setDisplaySeconds((prev) => {
-        if (prev < 59) return prev + 1
-        // When seconds reach 60, increment minutes
-        setDisplayMinutes((m) => {
-          // Stop at half time
-          if (m === halfTimeMinutes - 1) return halfTimeMinutes
-          // Stop at full time
-          if (m === fullTimeMinutes - 1) return fullTimeMinutes
-          // After full time, continue for extra time
-          return m + 1
-        })
-        return 0
-      })
+      setElapsedSeconds((prev) => prev + 1)
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [status, isPaused, isSynced, halfTimeMinutes, fullTimeMinutes])
+  }, [status, isPaused, lastSyncedMinute])
 
-  const getPhaseInfo = (mins: number) => {
-    if (mins < halfTimeMinutes) {
-      return { label: `⚪ FIRST HALF (0-${halfTimeMinutes}')`, color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
+  // Convert elapsed seconds to display minutes and seconds
+  useEffect(() => {
+    const mins = Math.floor(elapsedSeconds / 60)
+    const secs = elapsedSeconds % 60
+    setDisplayMinutes(mins)
+    setDisplaySeconds(secs)
+  }, [elapsedSeconds])
+
+  const getPhaseInfo = (mins: number, adminSetMinutes: number) => {
+    const halfTime = adminSetMinutes
+    const fullTime = adminSetMinutes * 2
+
+    if (mins < halfTime) {
+      return { label: `⚪ FIRST HALF (0-${halfTime}')`, color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
     }
-    if (mins === halfTimeMinutes) {
-      return { label: `🟨 HALF TIME ⏸ (${halfTimeMinutes}')`, color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
+    if (mins === halfTime) {
+      return { label: `🟨 HALF TIME ⏸ (${halfTime}')`, color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
     }
-    if (mins > halfTimeMinutes && mins < fullTimeMinutes) {
-      return { label: `⚪ SECOND HALF (${halfTimeMinutes}-${fullTimeMinutes}')`, color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
+    if (mins > halfTime && mins < fullTime) {
+      return { label: `⚪ SECOND HALF (${halfTime}-${fullTime}')`, color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
     }
-    if (mins === fullTimeMinutes) {
-      return { label: `🔴 FULL TIME ⏸ (${fullTimeMinutes}')`, color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
+    if (mins === fullTime) {
+      return { label: `🔴 FULL TIME ⏸ (${fullTime}')`, color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
     }
-    return { label: `🟡 EXTRA TIME (${fullTimeMinutes}+')`, color: 'text-yellow-300', bgColor: 'bg-yellow-500/25', borderColor: 'border-yellow-500/60' }
+    return { label: `🟡 EXTRA TIME (${fullTime}+')`, color: 'text-yellow-300', bgColor: 'bg-yellow-500/25', borderColor: 'border-yellow-500/60' }
   }
 
-  const phase = getPhaseInfo(displayMinutes)
+  const adminSetMinutes = lastSyncedMinute > 0 ? lastSyncedMinute : 45
+  const phase = getPhaseInfo(displayMinutes, adminSetMinutes)
+  const halfTime = adminSetMinutes
+  const fullTime = adminSetMinutes * 2
 
   if (status === 'scheduled') {
     return (
@@ -122,13 +119,13 @@ export default function MatchTimer({
       </div>
 
       {/* Status Alert Badge - Mobile Optimized */}
-      {(displayMinutes === halfTimeMinutes || displayMinutes === fullTimeMinutes || displayMinutes > fullTimeMinutes) && (
+      {(displayMinutes === halfTime || displayMinutes === fullTime || displayMinutes > fullTime) && (
         <div className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 animate-pulse">
           <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
           <span className="text-xs sm:text-xs font-bold text-yellow-400 uppercase">
-            {displayMinutes === halfTimeMinutes && 'HALF TIME!'}
-            {displayMinutes === fullTimeMinutes && 'FULL TIME!'}
-            {displayMinutes > fullTimeMinutes && 'EXTRA TIME'}
+            {displayMinutes === halfTime && 'HALF TIME!'}
+            {displayMinutes === fullTime && 'FULL TIME!'}
+            {displayMinutes > fullTime && 'EXTRA TIME'}
           </span>
         </div>
       )}
