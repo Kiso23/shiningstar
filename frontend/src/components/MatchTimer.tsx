@@ -47,7 +47,13 @@ export default function MatchTimer({
       setDisplaySeconds((prev) => {
         if (prev < 59) return prev + 1
         // When seconds reach 60, increment minutes
-        setDisplayMinutes((m) => m + 1)
+        setDisplayMinutes((m) => {
+          // Stop counting at half time (45 min) and full time (90 min)
+          if (m === 44) return 45  // Reached half time
+          if (m === 89) return 90  // Reached full time
+          if (m >= 90) return m + 1  // Extra time keeps counting
+          return m + 1
+        })
         return 0
       })
     }, 1000)
@@ -57,9 +63,9 @@ export default function MatchTimer({
 
   const getPhaseInfo = (mins: number) => {
     if (mins < 45) return { label: '⚪ FIRST HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
-    if (mins === 45) return { label: '🟨 HALF TIME', color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
+    if (mins === 45) return { label: '🟨 HALF TIME ⏸', color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
     if (mins > 45 && mins < 90) return { label: '⚪ SECOND HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
-    if (mins === 90) return { label: '🔴 FULL TIME', color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
+    if (mins === 90) return { label: '🔴 FULL TIME ⏸', color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
     return { label: '🟡 EXTRA TIME', color: 'text-yellow-300', bgColor: 'bg-yellow-500/25', borderColor: 'border-yellow-500/60' }
   }
 
