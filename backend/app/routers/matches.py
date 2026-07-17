@@ -41,6 +41,11 @@ def _to_response(match: Match) -> MatchResponse:
         venue=match.venue,
         bracket_slot=match.bracket_slot,
         next_match_id=match.next_match_id,
+        match_start_time=match.match_start_time,
+        match_end_time=match.match_end_time,
+        current_minute=match.current_minute,
+        is_extra_time=match.is_extra_time,
+        is_paused=match.is_paused,
     )
 
 
