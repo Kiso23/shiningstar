@@ -40,6 +40,10 @@ class Match(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Match timing
+    match_start_time: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
+    match_end_time: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
 
     team_a: Mapped[Optional["Team"]] = relationship("Team", foreign_keys=[team_a_id])
     team_b: Mapped[Optional["Team"]] = relationship("Team", foreign_keys=[team_b_id])

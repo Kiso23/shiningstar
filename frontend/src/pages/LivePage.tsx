@@ -5,6 +5,7 @@ import { ArrowLeft, RefreshCw, AlertCircle, Radio, Zap } from 'lucide-react'
 import { getMatches, type MatchResponse } from '../api/matches'
 import { getMatchEvents, type MatchEventListResponse } from '../api/matchEvents'
 import PageLoader from '../components/shared/PageLoader'
+import MatchTimer from '../components/MatchTimer'
 import { trackVisit } from '../api/analytics'
 
 const AUTO_REFRESH_INTERVAL = 30_000 // 30 seconds
@@ -154,16 +155,13 @@ export default function LivePage() {
                   transition={{ delay: idx * 0.08 }}
                   className="glass-card p-6 border border-green-500/20"
                 >
-                  {/* Live badge */}
+                  {/* Live badge / Match Timer */}
                   <div className="flex items-center justify-center mb-4">
-                    <motion.span
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wide"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                      LIVE
-                    </motion.span>
+                    <MatchTimer 
+                      matchStartTime={match.match_start_time}
+                      status={match.status as 'scheduled' | 'live' | 'completed'}
+                      matchEndTime={match.match_end_time}
+                    />
                   </div>
 
                   {/* Score display */}

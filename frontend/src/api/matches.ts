@@ -45,6 +45,8 @@ export interface MatchResponse {
   venue: string
   bracket_slot?: number | null
   next_match_id?: string | null
+  match_start_time?: string | null
+  match_end_time?: string | null
 }
 
 export const VALID_ROUNDS = [

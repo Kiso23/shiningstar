@@ -207,7 +207,16 @@ async def update_score(
     if data.team_b_score is not None:
         match.team_b_score = data.team_b_score
     if data.status is not None:
+        previous_status = match.status
         match.status = data.status.value
+        
+        # Auto-set match_start_time when transitioning to 'live'
+        if previous_status != "live" and match.status == "live" and match.match_start_time is None:
+            match.match_start_time = datetime.utcnow()
+        
+        # Auto-set match_end_time when transitioning to 'completed'
+        if previous_status != "completed" and match.status == "completed" and match.match_end_time is None:
+            match.match_end_time = datetime.utcnow()
 
     # Recalculate standings when match is completed
     if match.status == "completed":

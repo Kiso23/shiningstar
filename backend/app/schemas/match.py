@@ -84,5 +84,7 @@ class MatchResponse(BaseModel):
     venue: str
     bracket_slot: Optional[int] = None
     next_match_id: Optional[uuid.UUID] = None
+    match_start_time: Optional[datetime] = None
+    match_end_time: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True, exclude_none=False)
