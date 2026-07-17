@@ -8,7 +8,7 @@ import PageLoader from '../components/shared/PageLoader'
 import MatchTimer from '../components/MatchTimer'
 import { trackVisit } from '../api/analytics'
 
-const AUTO_REFRESH_INTERVAL = 50 * 60 * 1000 // 50 minutes - checks for score updates without affecting timer
+const AUTO_REFRESH_INTERVAL = 0 // Disabled - manual refresh only
 
 export default function LivePage() {
   const navigate = useNavigate()
@@ -53,8 +53,9 @@ export default function LivePage() {
     fetchLiveMatches()
   }, [fetchLiveMatches])
 
-  // Auto-refresh every 50 minutes - checks for score updates without affecting timer
+  // Auto-refresh disabled - manual refresh only to prevent timer resets
   useEffect(() => {
+    if (AUTO_REFRESH_INTERVAL <= 0) return
     const interval = setInterval(() => {
       fetchLiveMatches()
     }, AUTO_REFRESH_INTERVAL)
@@ -141,7 +142,6 @@ export default function LivePage() {
             <Radio className="w-10 h-10 sm:w-12 sm:h-12 mb-3 opacity-30" />
             <p className="font-medium text-white text-sm sm:text-base">No live matches right now.</p>
             <p className="text-xs sm:text-sm mt-1">Check back during match day!</p>
-            <p className="text-xs mt-3 text-gray-600">Auto-refreshes every 5 seconds</p>
           </motion.div>
         ) : (
           <AnimatePresence mode="popLayout">
