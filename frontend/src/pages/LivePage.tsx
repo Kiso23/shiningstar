@@ -212,8 +212,37 @@ export default function LivePage() {
                   </div>
 
                   {/* Match info */}
-                  <div className="mt-2 sm:mt-4 text-center text-gray-500 text-xs sm:text-sm truncate">
+                  <div className="mt-2 sm:mt-4 text-center text-gray-500 text-xs sm:text-sm truncate border-b border-green-500/20 pb-3 sm:pb-4">
                     {match.round} · {match.venue}
+                  </div>
+
+                  {/* Control Buttons - For Display Only */}
+                  <div className="mt-3 sm:mt-4 space-y-2">
+                    <div className="flex gap-2 text-xs">
+                      <button className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded transition-all">
+                        ▶ Start
+                      </button>
+                      <button className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded transition-all">
+                        ⏸ Pause
+                      </button>
+                      <button className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded transition-all">
+                        ▶ Resume
+                      </button>
+                    </div>
+                    <div className="flex gap-2 text-xs">
+                      <button className="flex-1 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded transition-all">
+                        ⏱ Half Time
+                      </button>
+                      <button className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded transition-all">
+                        ▶ 2nd Half
+                      </button>
+                      <button className="flex-1 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded transition-all">
+                        + Added
+                      </button>
+                      <button className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition-all">
+                        🏁 Full
+                      </button>
+                    </div>
                   </div>
 
                   {/* Events Timeline */}
