@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
+from sqlalchemy import text
 
 from app.config import settings
 
@@ -61,6 +62,24 @@ async def create_tables() -> None:
         async with engine.begin() as conn:
             # Use checkfirst=True to avoid errors if tables already exist
             await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+            
+            # Add timer columns if they don't exist
+            try:
+                await conn.execute(
+                    text("""
+                        ALTER TABLE matches 
+                        ADD COLUMN IF NOT EXISTS match_start_time TIMESTAMP NULL,
+                        ADD COLUMN IF NOT EXISTS match_end_time TIMESTAMP NULL
+                    """)
+                )
+                import logging
+                logging.getLogger(__name__).info("Timer columns ensured in matches table")
+            except Exception as e:
+                # Columns might already exist - ignore
+                if "already exists" not in str(e):
+                    import logging
+                    logging.getLogger(__name__).warning(f"Could not add timer columns: {e}")
+            
     except Exception as e:
         # Neon PostgreSQL sometimes raises a duplicate type error on pooled connections
         # when tables already exist — this is safe to ignore
