@@ -36,7 +36,7 @@ export default function MatchTimer({
     return { label: '⚪ MATCH', color: 'text-gray-400', bgColor: 'bg-gray-500/20', borderColor: 'border-gray-500/50' }
   }
 
-  const statusInfo = getStatusInfo(currentMinute)
+  const statusInfo = getStatusInfo(currentMinute || 0)
 
   if (status === 'scheduled') {
     return (
@@ -56,37 +56,49 @@ export default function MatchTimer({
     )
   }
 
-  return (
-    <div className="flex items-center justify-center gap-3">
-      {/* Large Time Display with Status */}
-      <div className={`flex flex-col items-center justify-center ${statusInfo.bgColor} px-6 py-4 rounded-lg border-2 ${statusInfo.borderColor} shadow-lg`}>
-        <div className="text-5xl font-black text-white font-mono tabular-nums">
-          {String(currentMinute).padStart(2, '0')}
+  // For live matches, show timer
+  if (status === 'live') {
+    const displayMinute = currentMinute || 0
+    
+    return (
+      <div className="flex items-center justify-center gap-3 flex-wrap">
+        {/* Large Time Display with Status */}
+        <div className={`flex flex-col items-center justify-center ${statusInfo.bgColor} px-6 py-4 rounded-lg border-2 ${statusInfo.borderColor} shadow-lg`}>
+          <div className="text-5xl font-black text-white font-mono tabular-nums">
+            {String(displayMinute).padStart(2, '0')}
+          </div>
+          <div className={`text-xs font-bold mt-2 ${statusInfo.color} uppercase tracking-wider`}>
+            {statusInfo.label}
+          </div>
         </div>
-        <div className={`text-xs font-bold mt-2 ${statusInfo.color} uppercase tracking-wider`}>
-          {statusInfo.label}
-        </div>
-      </div>
 
-      {/* Status Badge */}
-      <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-500/20 border border-green-500/40">
-        {currentMinute === 45 ? (
-          <>
-            <AlertCircle className="w-4 h-4 text-yellow-400 animate-pulse" />
-            <span className="text-xs font-bold text-yellow-400 uppercase">HALF TIME</span>
-          </>
-        ) : currentMinute === 90 ? (
-          <>
-            <AlertCircle className="w-4 h-4 text-red-400 animate-pulse" />
-            <span className="text-xs font-bold text-red-400 uppercase">FULL TIME</span>
-          </>
-        ) : (
-          <>
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-bold text-green-400 uppercase">Live</span>
-          </>
-        )}
+        {/* Status Badge */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-500/20 border border-green-500/40">
+          {displayMinute === 45 ? (
+            <>
+              <AlertCircle className="w-4 h-4 text-yellow-400 animate-pulse" />
+              <span className="text-xs font-bold text-yellow-400 uppercase">HALF TIME</span>
+            </>
+          ) : displayMinute === 90 ? (
+            <>
+              <AlertCircle className="w-4 h-4 text-red-400 animate-pulse" />
+              <span className="text-xs font-bold text-red-400 uppercase">FULL TIME</span>
+            </>
+          ) : displayMinute > 90 ? (
+            <>
+              <AlertCircle className="w-4 h-4 text-yellow-400 animate-pulse" />
+              <span className="text-xs font-bold text-yellow-300 uppercase">EXTRA TIME</span>
+            </>
+          ) : (
+            <>
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs font-bold text-green-400 uppercase">Live</span>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+
+  return null
 }
