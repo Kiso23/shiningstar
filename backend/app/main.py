@@ -41,6 +41,8 @@ async def _run_migrations() -> None:
             # Add manual team name columns for non-registered teams
             "ALTER TABLE matches ADD COLUMN IF NOT EXISTS team_a_name VARCHAR(100)",
             "ALTER TABLE matches ADD COLUMN IF NOT EXISTS team_b_name VARCHAR(100)",
+            # Add timer columns for match timer display (minutes:seconds)
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS current_second INTEGER DEFAULT 0",
         ]:
             await conn.execute(__import__('sqlalchemy').text(sql))
     logger.info("Migrations complete.")
