@@ -217,35 +217,6 @@ export default function LivePage() {
                     {match.round} · {match.venue}
                   </div>
 
-                  {/* Control Buttons - For Display Only */}
-                  <div className="mt-3 sm:mt-4 space-y-2">
-                    <div className="flex gap-2 text-xs">
-                      <button className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded transition-all">
-                        ▶ Start
-                      </button>
-                      <button className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded transition-all">
-                        ⏸ Pause
-                      </button>
-                      <button className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded transition-all">
-                        ▶ Resume
-                      </button>
-                    </div>
-                    <div className="flex gap-2 text-xs">
-                      <button className="flex-1 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded transition-all">
-                        ⏱ Half Time
-                      </button>
-                      <button className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded transition-all">
-                        ▶ 2nd Half
-                      </button>
-                      <button className="flex-1 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded transition-all">
-                        + Added
-                      </button>
-                      <button className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition-all">
-                        🏁 Full
-                      </button>
-                    </div>
-                  </div>
-
                   {/* Events Timeline */}
                   {matchEvents[match.id] && matchEvents[match.id].events.length > 0 && (
                     <div className="mt-4 sm:mt-6 pt-3 sm:pt-6 border-t border-white/10">
