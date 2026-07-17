@@ -274,10 +274,10 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
-      {/* STOPWATCH TIMER - APPEARS WHEN LIVE - MOBILE OPTIMIZED */}
+      {/* STOPWATCH TIMER - APPEARS WHEN LIVE - WITH SCROLLABLE TIME LIST */}
       {status === 'live' && (
         <div className="bg-green-500/20 border-2 border-green-500 p-3 sm:p-4 rounded-lg space-y-2">
-          {/* Timer Header & Display */}
+          {/* Timer Display */}
           <div className="text-center">
             <p className="text-green-400 font-bold text-xs sm:text-sm">⏱️ LIVE STOPWATCH</p>
             <div className="text-4xl sm:text-5xl font-black text-green-300 font-mono mt-1 sm:mt-2 leading-tight">
@@ -286,19 +286,38 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
             <p className={`text-xs sm:text-sm font-bold mt-1 ${phase.color}`}>{phase.label}</p>
           </div>
 
-          {/* Control Buttons - Responsive */}
-          <div className="flex gap-2 mt-2 sm:mt-3">
+          {/* Time List - Scrollable */}
+          <div className="bg-black/30 rounded border border-green-500/30 max-h-32 overflow-y-auto p-2 text-center">
+            <div className="space-y-1 text-xs sm:text-sm font-mono">
+              {Array.from({ length: minutes * 60 + seconds + 1 }).map((_, i) => {
+                const m = Math.floor(i / 60)
+                const s = i % 60
+                const isCurrentTime = i === minutes * 60 + seconds
+                return (
+                  <div
+                    key={i}
+                    className={`py-0.5 ${isCurrentTime ? 'bg-green-500/50 text-green-300 font-bold' : 'text-gray-400'}`}
+                  >
+                    {String(m).padStart(2, '0')}:{String(s).padStart(2, '0')}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Control Buttons */}
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={handleStartStop}
-              className={`flex-1 py-2 sm:py-2 text-sm font-bold rounded transition-all ${isRunning ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+              className={`flex-1 py-2 text-sm font-bold rounded transition-all ${isRunning ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
             >
-              {isRunning ? '⏸ STOP' : '▶ START'}
+              {isRunning ? '⏸ PAUSE' : '▶ START'}
             </button>
             <button
               type="button"
               onClick={handleReset}
-              className="flex-1 py-2 sm:py-2 text-sm font-bold bg-red-600 hover:bg-red-700 text-white rounded transition-all"
+              className="flex-1 py-2 text-sm font-bold bg-red-600 hover:bg-red-700 text-white rounded transition-all"
             >
               🔄 RESET
             </button>
@@ -309,19 +328,19 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
             type="button"
             onClick={handleTimerSubmit}
             disabled={submittingTimer}
-            className="w-full py-2 sm:py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded transition-all disabled:opacity-50"
+            className="w-full py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded transition-all disabled:opacity-50"
           >
-            {submittingTimer ? '⏳ SAVING...' : '💾 SAVE'}
+            {submittingTimer ? '⏳ SAVING...' : '💾 SYNC TO WEBSITE'}
           </button>
 
-          {/* Set Time - Collapsible */}
+          {/* Set Time Manually */}
           <details className="text-xs border border-green-500/30 rounded">
-            <summary className="cursor-pointer font-bold text-green-400 p-2 hover:bg-green-500/10 rounded">
-              ⚙️ SET TIME
+            <summary className="cursor-pointer font-bold text-green-400 p-2 hover:bg-green-500/10">
+              ⚙️ SET TIME MANUALLY
             </summary>
-            <div className="space-y-1 mt-1 p-2 bg-black/20 rounded border-t border-green-500/30">
+            <div className="space-y-1 p-2 bg-black/20 border-t border-green-500/30">
               <div className="flex gap-2 items-center">
-                <label className="text-green-400 font-bold text-xs w-12">Min:</label>
+                <label className="text-green-400 font-bold w-12">Min:</label>
                 <input
                   type="number"
                   min="0"
@@ -332,7 +351,7 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
                 />
               </div>
               <div className="flex gap-2 items-center">
-                <label className="text-green-400 font-bold text-xs w-12">Sec:</label>
+                <label className="text-green-400 font-bold w-12">Sec:</label>
                 <input
                   type="number"
                   min="0"
@@ -345,9 +364,9 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
             </div>
           </details>
 
-          {/* Status Indicator - Mobile Friendly */}
+          {/* Status */}
           <div className="text-center text-xs text-green-400 font-semibold">
-            {isRunning ? '▶ RUNNING' : '⏸ STOPPED'}
+            {isRunning ? '▶ RUNNING' : '⏸ PAUSED'}
           </div>
         </div>
       )}

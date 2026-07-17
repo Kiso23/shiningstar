@@ -22,21 +22,21 @@ export default function MatchTimer({
   const [displaySeconds, setDisplaySeconds] = useState(0)
   const [isCountingUp, setIsCountingUp] = useState(false)
   const [matchDuration, setMatchDuration] = useState(45)
-  const [wasLive, setWasLive] = useState(false)
+  const [timerStarted, setTimerStarted] = useState(false)
 
-  // When match becomes live and admin set a duration
+  // ONLY sync when match first becomes live (not on every update)
   useEffect(() => {
-    if (status === 'live' && !wasLive && currentMinute !== undefined && currentMinute > 0) {
-      // Admin set the total match duration (30, 45, 60 min)
+    if (status === 'live' && !timerStarted && currentMinute !== undefined && currentMinute > 0) {
+      // Match just became live - set duration and start from 0
       setMatchDuration(currentMinute)
       setDisplaySeconds(0)
-      setWasLive(true)
+      setTimerStarted(true)
     }
-  }, [status, wasLive, currentMinute])
+  }, [status, timerStarted, currentMinute])
 
-  // Simple counter: just increment every second
+  // Simple counter: just increment every second (NEVER resets after started)
   useEffect(() => {
-    if (status !== 'live' || isPaused) {
+    if (status !== 'live' || isPaused || !timerStarted) {
       setIsCountingUp(false)
       return
     }
@@ -47,7 +47,7 @@ export default function MatchTimer({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [status, isPaused])
+  }, [status, isPaused, timerStarted])
 
   // Convert seconds to minutes and seconds
   const displayMinutes = Math.floor(displaySeconds / 60)
