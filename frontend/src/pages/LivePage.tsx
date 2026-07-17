@@ -8,7 +8,7 @@ import PageLoader from '../components/shared/PageLoader'
 import MatchTimer from '../components/MatchTimer'
 import { trackVisit } from '../api/analytics'
 
-const AUTO_REFRESH_INTERVAL = 30_000 // 30 seconds
+const AUTO_REFRESH_INTERVAL = 5_000 // 5 seconds for faster updates
 
 export default function LivePage() {
   const navigate = useNavigate()

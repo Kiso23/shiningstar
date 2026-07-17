@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Clock, AlertCircle } from 'lucide-react'
 
 interface MatchTimerProps {
@@ -17,26 +18,43 @@ export default function MatchTimer({
   isExtraTime = false,
   isPaused = false
 }: MatchTimerProps) {
-  const getStatusInfo = (minutes: number) => {
-    if (minutes < 45) {
-      return { label: '⚪ FIRST HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/20', borderColor: 'border-blue-500/50' }
+  const [displayMinutes, setDisplayMinutes] = useState(currentMinute)
+  const [displaySeconds, setDisplaySeconds] = useState(0)
+  const [isCountingUp, setIsCountingUp] = useState(false)
+
+  useEffect(() => {
+    setDisplayMinutes(currentMinute || 0)
+  }, [currentMinute])
+
+  // Auto-count seconds on live match
+  useEffect(() => {
+    if (status !== 'live' || isPaused) {
+      setIsCountingUp(false)
+      return
     }
-    if (minutes === 45) {
-      return { label: '🟨 HALF TIME', color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
-    }
-    if (minutes > 45 && minutes < 90) {
-      return { label: '⚪ SECOND HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/20', borderColor: 'border-blue-500/50' }
-    }
-    if (minutes === 90) {
-      return { label: '🔴 FULL TIME', color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
-    }
-    if (minutes > 90) {
-      return { label: '🟡 EXTRA TIME', color: 'text-yellow-300', bgColor: 'bg-yellow-500/20', borderColor: 'border-yellow-500/50' }
-    }
-    return { label: '⚪ MATCH', color: 'text-gray-400', bgColor: 'bg-gray-500/20', borderColor: 'border-gray-500/50' }
+
+    setIsCountingUp(true)
+    const interval = setInterval(() => {
+      setDisplaySeconds((prev) => {
+        if (prev < 59) return prev + 1
+        // When seconds reach 60, increment minutes
+        setDisplayMinutes((m) => m + 1)
+        return 0
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [status, isPaused])
+
+  const getPhaseInfo = (mins: number) => {
+    if (mins < 45) return { label: '⚪ FIRST HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
+    if (mins === 45) return { label: '🟨 HALF TIME', color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
+    if (mins > 45 && mins < 90) return { label: '⚪ SECOND HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
+    if (mins === 90) return { label: '🔴 FULL TIME', color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
+    return { label: '🟡 EXTRA TIME', color: 'text-yellow-300', bgColor: 'bg-yellow-500/25', borderColor: 'border-yellow-500/60' }
   }
 
-  const statusInfo = getStatusInfo(currentMinute || 0)
+  const phase = getPhaseInfo(displayMinutes)
 
   if (status === 'scheduled') {
     return (
@@ -56,49 +74,35 @@ export default function MatchTimer({
     )
   }
 
-  // For live matches, show timer
-  if (status === 'live') {
-    const displayMinute = currentMinute || 0
-    
-    return (
-      <div className="flex items-center justify-center gap-3 flex-wrap">
-        {/* Large Time Display with Status */}
-        <div className={`flex flex-col items-center justify-center ${statusInfo.bgColor} px-6 py-4 rounded-lg border-2 ${statusInfo.borderColor} shadow-lg`}>
-          <div className="text-5xl font-black text-white font-mono tabular-nums">
-            {String(displayMinute).padStart(2, '0')}
-          </div>
-          <div className={`text-xs font-bold mt-2 ${statusInfo.color} uppercase tracking-wider`}>
-            {statusInfo.label}
-          </div>
+  // Live match - show counting stopwatch
+  return (
+    <div className="flex items-center justify-center gap-4 flex-wrap">
+      {/* Stopwatch Display */}
+      <div className={`flex flex-col items-center justify-center ${phase.bgColor} px-8 py-5 rounded-lg border-2 ${phase.borderColor} shadow-lg min-w-fit`}>
+        <div className="text-6xl font-black text-white font-mono tabular-nums">
+          {String(displayMinutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')}
         </div>
-
-        {/* Status Badge */}
-        <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-500/20 border border-green-500/40">
-          {displayMinute === 45 ? (
-            <>
-              <AlertCircle className="w-4 h-4 text-yellow-400 animate-pulse" />
-              <span className="text-xs font-bold text-yellow-400 uppercase">HALF TIME</span>
-            </>
-          ) : displayMinute === 90 ? (
-            <>
-              <AlertCircle className="w-4 h-4 text-red-400 animate-pulse" />
-              <span className="text-xs font-bold text-red-400 uppercase">FULL TIME</span>
-            </>
-          ) : displayMinute > 90 ? (
-            <>
-              <AlertCircle className="w-4 h-4 text-yellow-400 animate-pulse" />
-              <span className="text-xs font-bold text-yellow-300 uppercase">EXTRA TIME</span>
-            </>
-          ) : (
-            <>
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-bold text-green-400 uppercase">Live</span>
-            </>
-          )}
+        <div className={`text-sm font-bold mt-2 ${phase.color} uppercase tracking-wider`}>
+          {phase.label}
         </div>
+        {isCountingUp && (
+          <div className="text-xs text-green-400 mt-1 font-semibold">
+            ▶ Live
+          </div>
+        )}
       </div>
-    )
-  }
 
-  return null
+      {/* Status Alert Badge */}
+      {(displayMinutes === 45 || displayMinutes === 90 || displayMinutes > 90) && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 animate-pulse">
+          <AlertCircle className="w-4 h-4 text-yellow-400" />
+          <span className="text-xs font-bold text-yellow-400 uppercase">
+            {displayMinutes === 45 && 'HALF TIME!'}
+            {displayMinutes === 90 && 'FULL TIME!'}
+            {displayMinutes > 90 && 'EXTRA TIME'}
+          </span>
+        </div>
+      )}
+    </div>
+  )
 }

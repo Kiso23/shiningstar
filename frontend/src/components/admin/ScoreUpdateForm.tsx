@@ -54,27 +54,41 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
   const [addingEvent, setAddingEvent] = useState(false)
   const [eventError, setEventError] = useState<string | null>(null)
 
-  // Match timer control - manual time setting
-  const [displayMinutes, setDisplayMinutes] = useState(0)
-  const [displaySeconds, setDisplaySeconds] = useState(0)
+  // Real stopwatch timer
+  const [timerSeconds, setTimerSeconds] = useState(0)
+  const [isRunning, setIsRunning] = useState(false)
   const [submittingTimer, setSubmittingTimer] = useState(false)
 
-  // Determine match status based on time
-  const getMatchStatus = (minutes: number) => {
-    if (minutes < 45) return { label: '⚪ FIRST HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/20' }
-    if (minutes === 45) return { label: '🟨 HALF TIME', color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' }
-    if (minutes > 45 && minutes < 90) return { label: '⚪ SECOND HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/20' }
-    if (minutes === 90) return { label: '🔴 FULL TIME', color: 'text-red-400', bgColor: 'bg-red-500/20' }
-    if (minutes > 90) return { label: '🟡 EXTRA TIME', color: 'text-yellow-300', bgColor: 'bg-yellow-500/20' }
-    return { label: 'MATCH', color: 'text-white', bgColor: 'bg-gray-500/20' }
+  // Calculate minutes and seconds
+  const minutes = Math.floor(timerSeconds / 60)
+  const seconds = timerSeconds % 60
+
+  // Get match status based on minutes
+  const getMatchPhase = (mins: number) => {
+    if (mins < 45) return { label: '⚪ FIRST HALF', color: 'text-blue-400' }
+    if (mins === 45) return { label: '🟨 HALF TIME', color: 'text-yellow-400' }
+    if (mins > 45 && mins < 90) return { label: '⚪ SECOND HALF', color: 'text-blue-400' }
+    if (mins === 90) return { label: '🔴 FULL TIME', color: 'text-red-400' }
+    return { label: '🟡 EXTRA TIME', color: 'text-yellow-300' }
   }
 
-  const currentStatus = getMatchStatus(displayMinutes)
+  const phase = getMatchPhase(minutes)
 
   // Initialize from match data
   useEffect(() => {
-    setDisplayMinutes(match.current_minute || 0)
+    setTimerSeconds((match.current_minute || 0) * 60)
   }, [match.id])
+
+  // Stopwatch - counts up every second
+  useEffect(() => {
+    if (!isRunning) return
+
+    const interval = setInterval(() => {
+      setTimerSeconds((prev) => prev + 1)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [isRunning])
 
   // Load events when component mounts or match changes
   useEffect(() => {
@@ -157,9 +171,9 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
     setSubmittingTimer(true)
     try {
       await updateTimer(match.id, {
-        current_minute: displayMinutes,
-        is_extra_time: displayMinutes >= 90,
-        is_paused: false,
+        current_minute: minutes,
+        is_extra_time: minutes >= 90,
+        is_paused: !isRunning,
       })
       onUpdated()
     } catch (err: any) {
@@ -167,6 +181,15 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
     } finally {
       setSubmittingTimer(false)
     }
+  }
+
+  const handleStartStop = () => {
+    setIsRunning(!isRunning)
+  }
+
+  const handleReset = () => {
+    setTimerSeconds(0)
+    setIsRunning(false)
   }
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -251,154 +274,111 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
-      {/* Match Timer Control - Manual Time Setting with Status Indicators */}
+      {/* Real Match Stopwatch */}
       {(
-        <div className="space-y-3 pt-3 border-t-2 border-indigo-500/30 bg-indigo-500/5 p-4 rounded-lg">
+        <div className="space-y-3 pt-3 border-t-2 border-green-500/30 bg-green-500/5 p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-5 h-5 text-indigo-400" />
-            <label className="label text-sm font-bold text-indigo-400">Match Time Control</label>
+            <Clock className="w-5 h-5 text-green-400" />
+            <label className="label text-sm font-bold text-green-400">Live Match Stopwatch</label>
           </div>
 
-          {/* Large Time Display with Status */}
-          <div className={`flex flex-col items-center justify-center ${currentStatus.bgColor} p-6 rounded-lg border-2 ${
-            displayMinutes === 45 ? 'border-yellow-500/80' :
-            displayMinutes === 90 ? 'border-red-500/80' :
-            displayMinutes > 90 ? 'border-yellow-400/80' :
-            'border-indigo-500/50'
-          }`}>
-            <div className="text-6xl font-black text-white font-mono tabular-nums">
-              {String(displayMinutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')}
+          {/* Large Stopwatch Display */}
+          <div className={`flex flex-col items-center justify-center ${
+            minutes === 45 ? 'bg-yellow-500/30 border-yellow-500/70' :
+            minutes === 90 ? 'bg-red-500/30 border-red-500/70' :
+            minutes > 90 ? 'bg-yellow-500/20 border-yellow-500/50' :
+            'bg-green-500/20 border-green-500/50'
+          } p-6 rounded-lg border-2`}>
+            <div className="text-7xl font-black text-white font-mono tabular-nums">
+              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
-            <div className={`text-lg font-bold mt-2 ${currentStatus.color}`}>
-              {currentStatus.label}
-            </div>
-          </div>
-
-          {/* Time Control - Plus/Minus Buttons */}
-          <div className="space-y-2">
-            <label className="text-xs text-indigo-300 font-semibold block">Set Minutes</label>
-            <div className="flex gap-2 items-center">
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(Math.max(0, displayMinutes - 5))}
-                className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-lg"
-                title="Decrease by 5 minutes"
-              >
-                −5
-              </button>
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(Math.max(0, displayMinutes - 1))}
-                className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded font-bold text-lg"
-                title="Decrease by 1 minute"
-              >
-                −1
-              </button>
-              <input
-                type="number"
-                min="0"
-                max="150"
-                value={displayMinutes}
-                onChange={(e) => setDisplayMinutes(Math.max(0, Math.min(150, Number(e.target.value))))}
-                className="flex-1 input-field text-center text-3xl font-black py-2"
-              />
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(Math.min(150, displayMinutes + 1))}
-                className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold text-lg"
-                title="Increase by 1 minute"
-              >
-                +1
-              </button>
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(Math.min(150, displayMinutes + 5))}
-                className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold text-lg"
-                title="Increase by 5 minutes"
-              >
-                +5
-              </button>
+            <div className={`text-lg font-bold mt-3 ${phase.color} uppercase tracking-wider`}>
+              {phase.label}
             </div>
           </div>
 
-          {/* Quick Time Presets */}
-          <div className="space-y-2">
-            <label className="text-xs text-indigo-300 font-semibold block">Quick Set</label>
-            <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(0)}
-                className="py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white text-sm font-bold"
-              >
-                0:00
-              </button>
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(45)}
-                className="py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold"
-              >
-                🟨 45
-              </button>
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(90)}
-                className="py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-bold"
-              >
-                🔴 90
-              </button>
-              <button
-                type="button"
-                onClick={() => setDisplayMinutes(120)}
-                className="py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold"
-              >
-                🟡 120
-              </button>
-            </div>
+          {/* Control Buttons */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleStartStop}
+              className={`flex-1 py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                isRunning
+                  ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
+            >
+              {isRunning ? (
+                <>
+                  <Zap className="w-4 h-4" />
+                  STOP
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4" />
+                  START
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex-1 py-3 rounded-lg text-sm font-semibold bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 transition-all"
+            >
+              <X className="w-4 h-4" />
+              RESET
+            </button>
           </div>
 
-          {/* Seconds Control */}
-          <div className="space-y-2">
-            <label className="text-xs text-indigo-300 font-semibold block">Set Seconds</label>
-            <div className="flex gap-2 items-center">
-              <button
-                type="button"
-                onClick={() => setDisplaySeconds(Math.max(0, displaySeconds - 10))}
-                className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-bold"
-              >
-                −10s
-              </button>
-              <input
-                type="number"
-                min="0"
-                max="59"
-                value={displaySeconds}
-                onChange={(e) => setDisplaySeconds(Math.max(0, Math.min(59, Number(e.target.value))))}
-                className="flex-1 input-field text-center text-xl font-bold py-1"
-              />
-              <button
-                type="button"
-                onClick={() => setDisplaySeconds(Math.min(59, displaySeconds + 10))}
-                className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-bold"
-              >
-                +10s
-              </button>
+          {/* Manual Time Adjustment (if needed) */}
+          <details className="group">
+            <summary className="cursor-pointer text-xs text-green-400 hover:text-green-300 font-semibold p-2 rounded hover:bg-white/5 select-none">
+              ⚙️ Set Time Manually
+            </summary>
+            <div className="space-y-2 mt-2 p-3 bg-white/5 rounded-lg border border-green-500/20">
+              <div className="flex gap-2 items-center">
+                <label className="text-xs text-white font-semibold w-12">Min:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="150"
+                  value={minutes}
+                  onChange={(e) => setTimerSeconds(Number(e.target.value) * 60 + seconds)}
+                  className="input-field text-center text-lg font-bold py-1 flex-1"
+                />
+              </div>
+              <div className="flex gap-2 items-center">
+                <label className="text-xs text-white font-semibold w-12">Sec:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={seconds}
+                  onChange={(e) => setTimerSeconds(minutes * 60 + Number(e.target.value))}
+                  className="input-field text-center text-lg font-bold py-1 flex-1"
+                />
+              </div>
             </div>
-          </div>
+          </details>
 
-          {/* Save to Server */}
+          {/* Save Timer State to Server */}
           <button
             type="button"
             onClick={handleTimerSubmit}
             disabled={submittingTimer}
-            className="w-full py-3 rounded-lg text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-2 rounded-lg text-sm font-semibold bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
           >
             {submittingTimer ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <CheckCircle className="w-4 h-4" />
             )}
-            Save Time {String(displayMinutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')} to Website
+            Sync Timer to Website
           </button>
+
+          <p className="text-xs text-gray-400 text-center">
+            {isRunning ? '▶ Timer running - counting up' : '⏸ Timer stopped'}
+          </p>
         </div>
       )}
 
