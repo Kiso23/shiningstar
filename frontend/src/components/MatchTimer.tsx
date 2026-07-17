@@ -76,13 +76,13 @@ export default function MatchTimer({
 
   // Live match - show counting stopwatch
   return (
-    <div className="flex items-center justify-center gap-4 flex-wrap">
+    <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
       {/* Stopwatch Display */}
-      <div className={`flex flex-col items-center justify-center ${phase.bgColor} px-8 py-5 rounded-lg border-2 ${phase.borderColor} shadow-lg min-w-fit`}>
-        <div className="text-6xl font-black text-white font-mono tabular-nums">
+      <div className={`flex flex-col items-center justify-center ${phase.bgColor} px-4 sm:px-8 py-3 sm:py-5 rounded-lg border-2 ${phase.borderColor} shadow-lg min-w-fit`}>
+        <div className="text-4xl sm:text-6xl font-black text-white font-mono tabular-nums leading-tight">
           {String(displayMinutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')}
         </div>
-        <div className={`text-sm font-bold mt-2 ${phase.color} uppercase tracking-wider`}>
+        <div className={`text-xs sm:text-sm font-bold mt-1 sm:mt-2 ${phase.color} uppercase tracking-wider`}>
           {phase.label}
         </div>
         {isCountingUp && (
@@ -92,11 +92,11 @@ export default function MatchTimer({
         )}
       </div>
 
-      {/* Status Alert Badge */}
+      {/* Status Alert Badge - Mobile Optimized */}
       {(displayMinutes === 45 || displayMinutes === 90 || displayMinutes > 90) && (
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 animate-pulse">
-          <AlertCircle className="w-4 h-4 text-yellow-400" />
-          <span className="text-xs font-bold text-yellow-400 uppercase">
+        <div className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 animate-pulse">
+          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+          <span className="text-xs sm:text-xs font-bold text-yellow-400 uppercase">
             {displayMinutes === 45 && 'HALF TIME!'}
             {displayMinutes === 90 && 'FULL TIME!'}
             {displayMinutes > 90 && 'EXTRA TIME'}

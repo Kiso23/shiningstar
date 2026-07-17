@@ -274,68 +274,81 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
-      {/* STOPWATCH TIMER - APPEARS WHEN LIVE */}
+      {/* STOPWATCH TIMER - APPEARS WHEN LIVE - MOBILE OPTIMIZED */}
       {status === 'live' && (
-        <div className="bg-green-500/20 border-2 border-green-500 p-4 rounded-lg space-y-2">
+        <div className="bg-green-500/20 border-2 border-green-500 p-3 sm:p-4 rounded-lg space-y-2">
+          {/* Timer Header & Display */}
           <div className="text-center">
-            <p className="text-green-400 font-bold text-sm">⏱️ LIVE STOPWATCH</p>
-            <div className="text-5xl font-black text-green-300 font-mono mt-2">
+            <p className="text-green-400 font-bold text-xs sm:text-sm">⏱️ LIVE STOPWATCH</p>
+            <div className="text-4xl sm:text-5xl font-black text-green-300 font-mono mt-1 sm:mt-2 leading-tight">
               {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
-            <p className={`text-sm font-bold mt-1 ${phase.color}`}>{phase.label}</p>
+            <p className={`text-xs sm:text-sm font-bold mt-1 ${phase.color}`}>{phase.label}</p>
           </div>
 
-          <div className="flex gap-2 mt-3">
+          {/* Control Buttons - Responsive */}
+          <div className="flex gap-2 mt-2 sm:mt-3">
             <button
               type="button"
               onClick={handleStartStop}
-              className={`flex-1 py-2 font-bold rounded ${isRunning ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'}`}
+              className={`flex-1 py-2 sm:py-2 text-sm font-bold rounded transition-all ${isRunning ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
             >
               {isRunning ? '⏸ STOP' : '▶ START'}
             </button>
             <button
               type="button"
               onClick={handleReset}
-              className="flex-1 py-2 font-bold bg-red-600 text-white rounded"
+              className="flex-1 py-2 sm:py-2 text-sm font-bold bg-red-600 hover:bg-red-700 text-white rounded transition-all"
             >
               🔄 RESET
             </button>
           </div>
 
+          {/* Save Button */}
           <button
             type="button"
             onClick={handleTimerSubmit}
             disabled={submittingTimer}
-            className="w-full py-2 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
+            className="w-full py-2 sm:py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded transition-all disabled:opacity-50"
           >
-            {submittingTimer ? '💾 SAVING...' : '💾 SAVE TIME'}
+            {submittingTimer ? '⏳ SAVING...' : '💾 SAVE'}
           </button>
 
-          <details className="text-xs">
-            <summary className="cursor-pointer font-bold text-green-400 p-1 hover:bg-green-500/10 rounded">
+          {/* Set Time - Collapsible */}
+          <details className="text-xs border border-green-500/30 rounded">
+            <summary className="cursor-pointer font-bold text-green-400 p-2 hover:bg-green-500/10 rounded">
               ⚙️ SET TIME
             </summary>
-            <div className="space-y-1 mt-1 p-2 bg-black/20 rounded">
-              <input
-                type="number"
-                min="0"
-                max="150"
-                value={minutes}
-                onChange={(e) => setTimerSeconds(Number(e.target.value) * 60 + seconds)}
-                placeholder="Min"
-                className="w-full bg-gray-800 text-white border border-green-500 rounded px-2 py-1"
-              />
-              <input
-                type="number"
-                min="0"
-                max="59"
-                value={seconds}
-                onChange={(e) => setTimerSeconds(minutes * 60 + Number(e.target.value))}
-                placeholder="Sec"
-                className="w-full bg-gray-800 text-white border border-green-500 rounded px-2 py-1"
-              />
+            <div className="space-y-1 mt-1 p-2 bg-black/20 rounded border-t border-green-500/30">
+              <div className="flex gap-2 items-center">
+                <label className="text-green-400 font-bold text-xs w-12">Min:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="150"
+                  value={minutes}
+                  onChange={(e) => setTimerSeconds(Number(e.target.value) * 60 + seconds)}
+                  className="flex-1 bg-gray-800 text-white border border-green-500 rounded px-2 py-1 text-xs"
+                />
+              </div>
+              <div className="flex gap-2 items-center">
+                <label className="text-green-400 font-bold text-xs w-12">Sec:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={seconds}
+                  onChange={(e) => setTimerSeconds(minutes * 60 + Number(e.target.value))}
+                  className="flex-1 bg-gray-800 text-white border border-green-500 rounded px-2 py-1 text-xs"
+                />
+              </div>
             </div>
           </details>
+
+          {/* Status Indicator - Mobile Friendly */}
+          <div className="text-center text-xs text-green-400 font-semibold">
+            {isRunning ? '▶ RUNNING' : '⏸ STOPPED'}
+          </div>
         </div>
       )}
 
