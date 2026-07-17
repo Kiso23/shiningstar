@@ -274,110 +274,89 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
-      {/* Real Match Stopwatch */}
-      {(
-        <div className="space-y-3 pt-3 border-t-2 border-green-500/30 bg-green-500/5 p-4 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
+      {/* Real Match Stopwatch - ONLY SHOW FOR LIVE MATCHES */}
+      {status === 'live' && (
+        <div className="space-y-3 pt-3 border-t-2 border-green-500/50 bg-green-500/10 p-4 rounded-lg">
+          <div className="flex items-center gap-2 mb-3">
             <Clock className="w-5 h-5 text-green-400" />
-            <label className="label text-sm font-bold text-green-400">Live Match Stopwatch</label>
+            <label className="label text-sm font-bold text-green-300">⏱️ LIVE STOPWATCH</label>
           </div>
 
-          {/* Large Stopwatch Display */}
-          <div className={`flex flex-col items-center justify-center ${
-            minutes === 45 ? 'bg-yellow-500/30 border-yellow-500/70' :
-            minutes === 90 ? 'bg-red-500/30 border-red-500/70' :
-            minutes > 90 ? 'bg-yellow-500/20 border-yellow-500/50' :
-            'bg-green-500/20 border-green-500/50'
-          } p-6 rounded-lg border-2`}>
-            <div className="text-7xl font-black text-white font-mono tabular-nums">
+          {/* Large Timer Display */}
+          <div className="bg-green-900/40 border-2 border-green-500 p-6 rounded-lg text-center">
+            <div className="text-7xl font-black text-green-300 font-mono">
               {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
-            <div className={`text-lg font-bold mt-3 ${phase.color} uppercase tracking-wider`}>
+            <div className="text-green-400 font-bold mt-2 text-lg">
               {phase.label}
             </div>
           </div>
 
-          {/* Control Buttons */}
+          {/* Control Buttons - START / STOP / RESET */}
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handleStartStop}
-              className={`flex-1 py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+              className={`flex-1 py-3 font-bold text-white rounded-lg transition-all ${
                 isRunning
-                  ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                  : 'bg-green-600 hover:bg-green-700 text-white'
+                  ? 'bg-orange-600 hover:bg-orange-700'
+                  : 'bg-green-600 hover:bg-green-700'
               }`}
             >
-              {isRunning ? (
-                <>
-                  <Zap className="w-4 h-4" />
-                  STOP
-                </>
-              ) : (
-                <>
-                  <Play className="w-4 h-4" />
-                  START
-                </>
-              )}
+              {isRunning ? '⏸ STOP' : '▶ START'}
             </button>
             <button
               type="button"
               onClick={handleReset}
-              className="flex-1 py-3 rounded-lg text-sm font-semibold bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 transition-all"
+              className="flex-1 py-3 font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all"
             >
-              <X className="w-4 h-4" />
-              RESET
+              🔄 RESET
             </button>
           </div>
 
-          {/* Manual Time Adjustment (if needed) */}
-          <details className="group">
-            <summary className="cursor-pointer text-xs text-green-400 hover:text-green-300 font-semibold p-2 rounded hover:bg-white/5 select-none">
-              ⚙️ Set Time Manually
+          {/* SET TIME MANUALLY */}
+          <details className="border border-green-500/30 rounded-lg">
+            <summary className="cursor-pointer font-bold text-green-400 p-3 hover:bg-green-500/10">
+              ⚙️ SET TIME MANUALLY
             </summary>
-            <div className="space-y-2 mt-2 p-3 bg-white/5 rounded-lg border border-green-500/20">
-              <div className="flex gap-2 items-center">
-                <label className="text-xs text-white font-semibold w-12">Min:</label>
+            <div className="space-y-2 p-3 bg-green-500/5 border-t border-green-500/30">
+              <div className="flex gap-2">
+                <label className="text-white font-bold w-16">Minutes:</label>
                 <input
                   type="number"
                   min="0"
                   max="150"
                   value={minutes}
                   onChange={(e) => setTimerSeconds(Number(e.target.value) * 60 + seconds)}
-                  className="input-field text-center text-lg font-bold py-1 flex-1"
+                  className="flex-1 bg-gray-800 text-white border border-green-500 rounded px-3 py-2 font-bold text-lg"
                 />
               </div>
-              <div className="flex gap-2 items-center">
-                <label className="text-xs text-white font-semibold w-12">Sec:</label>
+              <div className="flex gap-2">
+                <label className="text-white font-bold w-16">Seconds:</label>
                 <input
                   type="number"
                   min="0"
                   max="59"
                   value={seconds}
                   onChange={(e) => setTimerSeconds(minutes * 60 + Number(e.target.value))}
-                  className="input-field text-center text-lg font-bold py-1 flex-1"
+                  className="flex-1 bg-gray-800 text-white border border-green-500 rounded px-3 py-2 font-bold text-lg"
                 />
               </div>
             </div>
           </details>
 
-          {/* Save Timer State to Server */}
+          {/* SYNC BUTTON - MAIN ACTION */}
           <button
             type="button"
             onClick={handleTimerSubmit}
             disabled={submittingTimer}
-            className="w-full py-2 rounded-lg text-sm font-semibold bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3 font-bold text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all disabled:opacity-50"
           >
-            {submittingTimer ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <CheckCircle className="w-4 h-4" />
-            )}
-            Sync Timer to Website
+            {submittingTimer ? '⏳ SYNCING...' : '💾 SAVE TIME TO WEBSITE'}
           </button>
 
           <p className="text-xs text-gray-400 text-center">
-            {isRunning ? '▶ Timer running - counting up' : '⏸ Timer stopped'}
+            {isRunning ? '▶ Timer is RUNNING' : '⏸ Timer is STOPPED'}
           </p>
         </div>
       )}
