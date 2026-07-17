@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Clock, AlertCircle } from 'lucide-react'
 
 interface MatchTimerProps {
@@ -23,16 +23,19 @@ export default function MatchTimer({
   const [isCountingUp, setIsCountingUp] = useState(false)
   const [matchDuration, setMatchDuration] = useState(45)
   const [timerStarted, setTimerStarted] = useState(false)
+  const timerStartedRef = useRef(false)
 
-  // ONLY sync when match first becomes live (not on every update)
+  // ONLY sync when match first becomes live (not on every update from backend)
   useEffect(() => {
-    if (status === 'live' && !timerStarted && currentMinute !== undefined && currentMinute > 0) {
+    if (status === 'live' && !timerStartedRef.current && currentMinute !== undefined && currentMinute > 0) {
       // Match just became live - set duration and start from 0
+      // After this, IGNORE all future backend updates
       setMatchDuration(currentMinute)
       setDisplaySeconds(0)
       setTimerStarted(true)
+      timerStartedRef.current = true
     }
-  }, [status, timerStarted, currentMinute])
+  }, [status, currentMinute])
 
   // Simple counter: just increment every second (NEVER resets after started)
   useEffect(() => {
