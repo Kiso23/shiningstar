@@ -21,14 +21,23 @@ export default function MatchTimer({
   const [displayMinutes, setDisplayMinutes] = useState(currentMinute)
   const [displaySeconds, setDisplaySeconds] = useState(0)
   const [isCountingUp, setIsCountingUp] = useState(false)
+  const [lastBackendMinute, setLastBackendMinute] = useState(currentMinute)
+  const [isSynced, setIsSynced] = useState(true)
 
+  // Detect when backend time changes (admin saved new time)
   useEffect(() => {
-    setDisplayMinutes(currentMinute || 0)
-  }, [currentMinute])
+    if (currentMinute !== undefined && currentMinute !== lastBackendMinute) {
+      // Backend has a new time - sync once
+      setDisplayMinutes(currentMinute)
+      setDisplaySeconds(0)
+      setLastBackendMinute(currentMinute)
+      setIsSynced(true)
+    }
+  }, [currentMinute, lastBackendMinute])
 
-  // Auto-count seconds on live match
+  // Auto-count seconds on live match (only if we're counting, don't reset on refresh)
   useEffect(() => {
-    if (status !== 'live' || isPaused) {
+    if (status !== 'live' || isPaused || !isSynced) {
       setIsCountingUp(false)
       return
     }
@@ -44,7 +53,7 @@ export default function MatchTimer({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [status, isPaused])
+  }, [status, isPaused, isSynced])
 
   const getPhaseInfo = (mins: number) => {
     if (mins < 45) return { label: '⚪ FIRST HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
