@@ -8,7 +8,7 @@ import PageLoader from '../components/shared/PageLoader'
 import MatchTimer from '../components/MatchTimer'
 import { trackVisit } from '../api/analytics'
 
-const AUTO_REFRESH_INTERVAL = 5_000 // 5 seconds for faster updates
+const AUTO_REFRESH_INTERVAL = 0 // Disabled - timer counts manually, no auto-refresh
 
 export default function LivePage() {
   const navigate = useNavigate()
@@ -53,13 +53,13 @@ export default function LivePage() {
     fetchLiveMatches()
   }, [fetchLiveMatches])
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchLiveMatches()
-    }, AUTO_REFRESH_INTERVAL)
-    return () => clearInterval(interval)
-  }, [fetchLiveMatches])
+  // Auto-refresh disabled - user must manually refresh or timer resets
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     fetchLiveMatches()
+  //   }, AUTO_REFRESH_INTERVAL)
+  //   return () => clearInterval(interval)
+  // }, [fetchLiveMatches])
 
   return (
     <div className="min-h-screen bg-gray-950">

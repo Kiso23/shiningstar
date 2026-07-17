@@ -18,28 +18,37 @@ export default function MatchTimer({
   isExtraTime = false,
   isPaused = false
 }: MatchTimerProps) {
-  // displaySeconds counts from 0 upward continuously
+  // Track elapsed time - NEVER changes after timer starts
   const [displaySeconds, setDisplaySeconds] = useState(0)
   const [isCountingUp, setIsCountingUp] = useState(false)
   const [matchDuration, setMatchDuration] = useState(45)
-  const [timerStarted, setTimerStarted] = useState(false)
-  const timerStartedRef = useRef(false)
+  
+  // Use ref to prevent re-initialization on prop changes
+  const timerInitializedRef = useRef(false)
+  const statusRef = useRef(status)
 
-  // ONLY sync when match first becomes live (not on every update from backend)
+  // Initialize ONLY once when status changes to 'live' (and never again)
   useEffect(() => {
-    if (status === 'live' && !timerStartedRef.current && currentMinute !== undefined && currentMinute > 0) {
-      // Match just became live - set duration and start from 0
-      // After this, IGNORE all future backend updates
-      setMatchDuration(currentMinute)
+    statusRef.current = status
+    
+    if (status === 'live' && !timerInitializedRef.current) {
+      // First time status became 'live' - initialize and never touch it again
+      setMatchDuration(currentMinute || 45)
       setDisplaySeconds(0)
-      setTimerStarted(true)
-      timerStartedRef.current = true
+      timerInitializedRef.current = true
+    }
+    
+    if (status !== 'live') {
+      // Match no longer live - reset everything
+      timerInitializedRef.current = false
+      setDisplaySeconds(0)
+      setIsCountingUp(false)
     }
   }, [status, currentMinute])
 
-  // Simple counter: just increment every second (NEVER resets after started)
+  // Counter loop - ONLY increments, never resets
   useEffect(() => {
-    if (status !== 'live' || isPaused || !timerStarted) {
+    if (statusRef.current !== 'live' || isPaused) {
       setIsCountingUp(false)
       return
     }
@@ -50,15 +59,15 @@ export default function MatchTimer({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [status, isPaused, timerStarted])
+  }, [isPaused])
 
-  // Convert seconds to minutes and seconds
+  // Calculate display values
   const displayMinutes = Math.floor(displaySeconds / 60)
   const displaySecs = displaySeconds % 60
 
   const getPhaseInfo = (mins: number) => {
-    const totalTime = matchDuration
-    const halfTime = totalTime / 2
+    const halfTime = matchDuration / 2
+    const fullTime = matchDuration
 
     if (mins < halfTime) {
       return { 
@@ -78,16 +87,16 @@ export default function MatchTimer({
         isAtPhase: true 
       }
     }
-    if (mins > halfTime && mins < totalTime) {
+    if (mins > halfTime && mins < fullTime) {
       return { 
-        label: `⚪ SECOND HALF (${halfTime.toFixed(0)}-${totalTime}')`, 
+        label: `⚪ SECOND HALF (${halfTime.toFixed(0)}-${fullTime}')`, 
         color: 'text-blue-400', 
         bgColor: 'bg-blue-500/25', 
         borderColor: 'border-blue-500/60',
         isAtPhase: false 
       }
     }
-    if (mins === totalTime) {
+    if (mins === fullTime) {
       return { 
         label: `🔴 FULL TIME ⏸`, 
         color: 'text-red-400', 
@@ -101,7 +110,7 @@ export default function MatchTimer({
       color: 'text-yellow-300', 
       bgColor: 'bg-yellow-500/25', 
       borderColor: 'border-yellow-500/60',
-      isAtPhase: mins > totalTime 
+      isAtPhase: mins > fullTime 
     }
   }
 
