@@ -54,6 +54,11 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
   const [addingEvent, setAddingEvent] = useState(false)
   const [eventError, setEventError] = useState<string | null>(null)
 
+  // Match timer control
+  const [elapsedMinutes, setElapsedMinutes] = useState(0)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [showTimerAdjust, setShowTimerAdjust] = useState(false)
+
   // Load events when component mounts or match changes
   useEffect(() => {
     if (canAddEvents) {
@@ -212,6 +217,51 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
           <p className="text-xs text-orange-400 mt-1">⚠️ Both scores must be set before completing</p>
         )}
       </div>
+
+      {/* Match Timer Control - for live matches */}
+      {(isLive || status === 'live') && (
+        <div className="space-y-2 pt-3 border-t border-white/10">
+          <div className="flex items-center justify-between">
+            <label className="label">Match Time (MM:SS)</label>
+            <button
+              type="button"
+              onClick={() => setShowTimerAdjust(!showTimerAdjust)}
+              className="text-xs px-2 py-1 rounded bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition-colors"
+            >
+              {showTimerAdjust ? 'Hide' : 'Adjust'}
+            </button>
+          </div>
+          <div className="flex gap-2 items-center">
+            <div className="flex-1 flex gap-1">
+              <input
+                type="number"
+                min="0"
+                max="120"
+                value={elapsedMinutes}
+                onChange={(e) => setElapsedMinutes(Math.max(0, Math.min(120, Number(e.target.value))))}
+                disabled={!showTimerAdjust}
+                placeholder="MM"
+                className="input-field text-center text-xl font-bold py-2 flex-1 disabled:opacity-50"
+              />
+              <span className="text-gray-600 text-2xl font-bold pt-1">:</span>
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={String(elapsedSeconds).padStart(2, '0')}
+                onChange={(e) => setElapsedSeconds(Math.max(0, Math.min(59, Number(e.target.value))))}
+                disabled={!showTimerAdjust}
+                placeholder="SS"
+                className="input-field text-center text-xl font-bold py-2 flex-1 disabled:opacity-50"
+              />
+            </div>
+            <div className="text-3xl font-bold text-green-400 font-mono tabular-nums">
+              {String(elapsedMinutes).padStart(2, '0')}:{String(elapsedSeconds).padStart(2, '0')}
+            </div>
+          </div>
+          <p className="text-xs text-gray-500">Click "Adjust" to set/change the match elapsed time</p>
+        </div>
+      )}
 
       {/* Events section - show for live OR completed matches for editing */}
       {canAddEvents && (
