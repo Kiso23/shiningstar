@@ -6,6 +6,7 @@ interface MatchTimerProps {
   status: 'scheduled' | 'live' | 'completed'
   matchEndTime?: string | null
   currentMinute?: number
+  currentSecond?: number
   isExtraTime?: boolean
   isPaused?: boolean
 }
@@ -15,6 +16,7 @@ export default function MatchTimer({
   status, 
   matchEndTime,
   currentMinute = 0,
+  currentSecond = 0,
   isExtraTime = false,
   isPaused = false
 }: MatchTimerProps) {
@@ -32,9 +34,10 @@ export default function MatchTimer({
     statusRef.current = status
     
     if (status === 'live' && !timerInitializedRef.current) {
-      // First time status became 'live' - initialize and never touch it again
+      // First time status became 'live' - initialize with minute + second and never touch it again
       setMatchDuration(currentMinute || 45)
-      setDisplaySeconds(0)
+      // Convert minutes + seconds to total seconds
+      setDisplaySeconds((currentMinute || 0) * 60 + (currentSecond || 0))
       timerInitializedRef.current = true
     }
     
@@ -44,7 +47,7 @@ export default function MatchTimer({
       setDisplaySeconds(0)
       setIsCountingUp(false)
     }
-  }, [status, currentMinute])
+  }, [status, currentMinute, currentSecond])
 
   // Counter loop - ONLY increments, never resets
   useEffect(() => {

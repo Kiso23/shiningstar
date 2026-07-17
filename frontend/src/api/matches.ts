@@ -30,6 +30,7 @@ export interface ScoreUpdate {
 
 export interface TimerUpdate {
   current_minute?: number
+  current_second?: number
   is_extra_time?: boolean
   is_paused?: boolean
 }
@@ -54,6 +55,7 @@ export interface MatchResponse {
   match_start_time?: string | null
   match_end_time?: string | null
   current_minute?: number
+  current_second?: number
   is_extra_time?: boolean
   is_paused?: boolean
 }

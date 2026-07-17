@@ -68,7 +68,8 @@ class ScoreUpdate(BaseModel):
 
 
 class TimerUpdate(BaseModel):
-    current_minute: int = Field(..., ge=0, le=120)
+    current_minute: int = Field(..., ge=0, le=120)  # minutes
+    current_second: int = Field(default=0, ge=0, le=59)  # seconds
     is_extra_time: bool = False
     is_paused: bool = False
 
@@ -93,6 +94,7 @@ class MatchResponse(BaseModel):
     match_start_time: Optional[datetime] = None
     match_end_time: Optional[datetime] = None
     current_minute: int = 0
+    current_second: int = 0
     is_extra_time: bool = False
     is_paused: bool = False
 

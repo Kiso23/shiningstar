@@ -47,9 +47,11 @@ class Match(Base):
     
     # Timer display control (for admin)
     # current_minute: which minute to display (0-90 or 90-120 for extra time)
+    # current_second: which second to display (0-59)
     # is_extra_time: whether showing extra time (True = 90+, False = 0-45 or 45-90)
     # is_paused: whether timer is paused
     current_minute: Mapped[int] = mapped_column(Integer, default=0)
+    current_second: Mapped[int] = mapped_column(Integer, default=0)
     is_extra_time: Mapped[bool] = mapped_column(default=False)
     is_paused: Mapped[bool] = mapped_column(default=False)
 

@@ -44,6 +44,7 @@ def _to_response(match: Match) -> MatchResponse:
         match_start_time=match.match_start_time,
         match_end_time=match.match_end_time,
         current_minute=match.current_minute,
+        current_second=match.current_second,
         is_extra_time=match.is_extra_time,
         is_paused=match.is_paused,
     )
@@ -265,6 +266,7 @@ async def update_timer(
         )
     
     match.current_minute = data.current_minute
+    match.current_second = data.current_second
     match.is_extra_time = data.is_extra_time
     match.is_paused = data.is_paused
     

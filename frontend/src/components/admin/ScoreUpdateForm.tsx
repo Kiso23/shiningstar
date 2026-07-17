@@ -172,6 +172,7 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
     try {
       await updateTimer(match.id, {
         current_minute: minutes,
+        current_second: seconds,
         is_extra_time: minutes >= 90,
         is_paused: !isRunning,
       })

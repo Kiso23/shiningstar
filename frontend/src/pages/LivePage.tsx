@@ -162,6 +162,7 @@ export default function LivePage() {
                       status={match.status as 'scheduled' | 'live' | 'completed'}
                       matchEndTime={match.match_end_time}
                       currentMinute={match.current_minute}
+                      currentSecond={match.current_second}
                       isExtraTime={match.is_extra_time}
                       isPaused={match.is_paused}
                     />
