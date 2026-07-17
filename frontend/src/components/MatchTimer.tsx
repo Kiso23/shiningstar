@@ -21,14 +21,14 @@ export default function MatchTimer({
   // displaySeconds counts from 0 upward continuously
   const [displaySeconds, setDisplaySeconds] = useState(0)
   const [isCountingUp, setIsCountingUp] = useState(false)
-  const [halfTimeDuration, setHalfTimeDuration] = useState(45)
+  const [matchDuration, setMatchDuration] = useState(45)
   const [wasLive, setWasLive] = useState(false)
 
-  // When match becomes live and admin set a half-time duration
+  // When match becomes live and admin set a duration
   useEffect(() => {
     if (status === 'live' && !wasLive && currentMinute !== undefined && currentMinute > 0) {
-      // Admin set a half-time duration (20, 35, 40, etc)
-      setHalfTimeDuration(currentMinute)
+      // Admin set the total match duration (30, 45, 60 min)
+      setMatchDuration(currentMinute)
       setDisplaySeconds(0)
       setWasLive(true)
     }
@@ -54,12 +54,12 @@ export default function MatchTimer({
   const displaySecs = displaySeconds % 60
 
   const getPhaseInfo = (mins: number) => {
-    const halfTime = halfTimeDuration
-    const fullTime = halfTimeDuration * 2
+    const totalTime = matchDuration
+    const halfTime = totalTime / 2
 
     if (mins < halfTime) {
       return { 
-        label: `⚪ FIRST HALF (0-${halfTime}')`, 
+        label: `⚪ FIRST HALF (0-${halfTime.toFixed(0)}')`, 
         color: 'text-blue-400', 
         bgColor: 'bg-blue-500/25', 
         borderColor: 'border-blue-500/60',
@@ -75,16 +75,16 @@ export default function MatchTimer({
         isAtPhase: true 
       }
     }
-    if (mins > halfTime && mins < fullTime) {
+    if (mins > halfTime && mins < totalTime) {
       return { 
-        label: `⚪ SECOND HALF (${halfTime}-${fullTime}')`, 
+        label: `⚪ SECOND HALF (${halfTime.toFixed(0)}-${totalTime}')`, 
         color: 'text-blue-400', 
         bgColor: 'bg-blue-500/25', 
         borderColor: 'border-blue-500/60',
         isAtPhase: false 
       }
     }
-    if (mins === fullTime) {
+    if (mins === totalTime) {
       return { 
         label: `🔴 FULL TIME ⏸`, 
         color: 'text-red-400', 
@@ -98,7 +98,7 @@ export default function MatchTimer({
       color: 'text-yellow-300', 
       bgColor: 'bg-yellow-500/25', 
       borderColor: 'border-yellow-500/60',
-      isAtPhase: mins > fullTime 
+      isAtPhase: mins > totalTime 
     }
   }
 
@@ -145,9 +145,9 @@ export default function MatchTimer({
         <div className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 animate-pulse">
           <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
           <span className="text-xs sm:text-xs font-bold text-yellow-400 uppercase">
-            {displayMinutes === halfTimeDuration && 'HALF TIME!'}
-            {displayMinutes === halfTimeDuration * 2 && 'FULL TIME!'}
-            {displayMinutes > halfTimeDuration * 2 && 'EXTRA TIME'}
+            {displayMinutes === matchDuration / 2 && 'HALF TIME!'}
+            {displayMinutes === matchDuration && 'FULL TIME!'}
+            {displayMinutes > matchDuration && 'EXTRA TIME'}
           </span>
         </div>
       )}
