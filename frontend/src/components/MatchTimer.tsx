@@ -23,11 +23,16 @@ export default function MatchTimer({
   const [isCountingUp, setIsCountingUp] = useState(false)
   const [lastBackendMinute, setLastBackendMinute] = useState(currentMinute)
   const [isSynced, setIsSynced] = useState(true)
+  const [halfTimeMinutes, setHalfTimeMinutes] = useState(0)
+  const [fullTimeMinutes, setFullTimeMinutes] = useState(0)
 
-  // Detect when backend time changes (admin saved new time)
+  // Calculate half time and full time based on what admin set
   useEffect(() => {
     if (currentMinute !== undefined && currentMinute !== lastBackendMinute) {
-      // Backend has a new time - sync once
+      // Admin set a new time - this is the half time duration
+      setHalfTimeMinutes(currentMinute)
+      setFullTimeMinutes(currentMinute * 2)  // Full time is double half time
+      
       setDisplayMinutes(currentMinute)
       setDisplaySeconds(0)
       setLastBackendMinute(currentMinute)
@@ -35,7 +40,7 @@ export default function MatchTimer({
     }
   }, [currentMinute, lastBackendMinute])
 
-  // Auto-count seconds on live match (only if we're counting, don't reset on refresh)
+  // Auto-count seconds on live match
   useEffect(() => {
     if (status !== 'live' || isPaused || !isSynced) {
       setIsCountingUp(false)
@@ -48,10 +53,11 @@ export default function MatchTimer({
         if (prev < 59) return prev + 1
         // When seconds reach 60, increment minutes
         setDisplayMinutes((m) => {
-          // Stop counting at half time (45 min) and full time (90 min)
-          if (m === 44) return 45  // Reached half time
-          if (m === 89) return 90  // Reached full time
-          if (m >= 90) return m + 1  // Extra time keeps counting
+          // Stop at half time
+          if (m === halfTimeMinutes - 1) return halfTimeMinutes
+          // Stop at full time
+          if (m === fullTimeMinutes - 1) return fullTimeMinutes
+          // After full time, continue for extra time
           return m + 1
         })
         return 0
@@ -59,14 +65,22 @@ export default function MatchTimer({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [status, isPaused, isSynced])
+  }, [status, isPaused, isSynced, halfTimeMinutes, fullTimeMinutes])
 
   const getPhaseInfo = (mins: number) => {
-    if (mins < 45) return { label: '⚪ FIRST HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
-    if (mins === 45) return { label: '🟨 HALF TIME ⏸', color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
-    if (mins > 45 && mins < 90) return { label: '⚪ SECOND HALF', color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
-    if (mins === 90) return { label: '🔴 FULL TIME ⏸', color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
-    return { label: '🟡 EXTRA TIME', color: 'text-yellow-300', bgColor: 'bg-yellow-500/25', borderColor: 'border-yellow-500/60' }
+    if (mins < halfTimeMinutes) {
+      return { label: `⚪ FIRST HALF (0-${halfTimeMinutes}')`, color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
+    }
+    if (mins === halfTimeMinutes) {
+      return { label: `🟨 HALF TIME ⏸ (${halfTimeMinutes}')`, color: 'text-yellow-400', bgColor: 'bg-yellow-500/30', borderColor: 'border-yellow-500/70' }
+    }
+    if (mins > halfTimeMinutes && mins < fullTimeMinutes) {
+      return { label: `⚪ SECOND HALF (${halfTimeMinutes}-${fullTimeMinutes}')`, color: 'text-blue-400', bgColor: 'bg-blue-500/25', borderColor: 'border-blue-500/60' }
+    }
+    if (mins === fullTimeMinutes) {
+      return { label: `🔴 FULL TIME ⏸ (${fullTimeMinutes}')`, color: 'text-red-400', bgColor: 'bg-red-500/30', borderColor: 'border-red-500/70' }
+    }
+    return { label: `🟡 EXTRA TIME (${fullTimeMinutes}+')`, color: 'text-yellow-300', bgColor: 'bg-yellow-500/25', borderColor: 'border-yellow-500/60' }
   }
 
   const phase = getPhaseInfo(displayMinutes)
@@ -108,13 +122,13 @@ export default function MatchTimer({
       </div>
 
       {/* Status Alert Badge - Mobile Optimized */}
-      {(displayMinutes === 45 || displayMinutes === 90 || displayMinutes > 90) && (
+      {(displayMinutes === halfTimeMinutes || displayMinutes === fullTimeMinutes || displayMinutes > fullTimeMinutes) && (
         <div className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-yellow-500/20 border border-yellow-500/40 animate-pulse">
           <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
           <span className="text-xs sm:text-xs font-bold text-yellow-400 uppercase">
-            {displayMinutes === 45 && 'HALF TIME!'}
-            {displayMinutes === 90 && 'FULL TIME!'}
-            {displayMinutes > 90 && 'EXTRA TIME'}
+            {displayMinutes === halfTimeMinutes && 'HALF TIME!'}
+            {displayMinutes === fullTimeMinutes && 'FULL TIME!'}
+            {displayMinutes > fullTimeMinutes && 'EXTRA TIME'}
           </span>
         </div>
       )}
