@@ -161,6 +161,9 @@ export default function LivePage() {
                       matchStartTime={match.match_start_time}
                       status={match.status as 'scheduled' | 'live' | 'completed'}
                       matchEndTime={match.match_end_time}
+                      currentMinute={match.current_minute}
+                      isExtraTime={match.is_extra_time}
+                      isPaused={match.is_paused}
                     />
                   </div>
 

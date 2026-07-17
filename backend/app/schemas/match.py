@@ -67,6 +67,12 @@ class ScoreUpdate(BaseModel):
     status: Optional[MatchStatus] = None
 
 
+class TimerUpdate(BaseModel):
+    current_minute: int = Field(..., ge=0, le=120)
+    is_extra_time: bool = False
+    is_paused: bool = False
+
+
 class MatchResponse(BaseModel):
     id: uuid.UUID
     team_a_id: Optional[uuid.UUID]
@@ -86,5 +92,8 @@ class MatchResponse(BaseModel):
     next_match_id: Optional[uuid.UUID] = None
     match_start_time: Optional[datetime] = None
     match_end_time: Optional[datetime] = None
+    current_minute: int = 0
+    is_extra_time: bool = False
+    is_paused: bool = False
 
     model_config = ConfigDict(from_attributes=True, exclude_none=False)

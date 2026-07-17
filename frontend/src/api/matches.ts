@@ -28,6 +28,12 @@ export interface ScoreUpdate {
   status?: 'scheduled' | 'live' | 'completed'
 }
 
+export interface TimerUpdate {
+  current_minute?: number
+  is_extra_time?: boolean
+  is_paused?: boolean
+}
+
 export interface MatchResponse {
   id: string
   team_a_id: string | null
@@ -47,6 +53,9 @@ export interface MatchResponse {
   next_match_id?: string | null
   match_start_time?: string | null
   match_end_time?: string | null
+  current_minute?: number
+  is_extra_time?: boolean
+  is_paused?: boolean
 }
 
 export const VALID_ROUNDS = [
@@ -75,3 +84,6 @@ export const deleteMatch = (id: string) =>
 
 export const updateScore = (id: string, data: ScoreUpdate) =>
   client.patch<MatchResponse>(`/matches/${id}/score`, data).then((r) => r.data)
+
+export const updateTimer = (id: string, data: TimerUpdate) =>
+  client.patch<MatchResponse>(`/matches/${id}/timer`, data).then((r) => r.data)

@@ -69,7 +69,10 @@ async def create_tables() -> None:
                     text("""
                         ALTER TABLE matches 
                         ADD COLUMN IF NOT EXISTS match_start_time TIMESTAMP NULL,
-                        ADD COLUMN IF NOT EXISTS match_end_time TIMESTAMP NULL
+                        ADD COLUMN IF NOT EXISTS match_end_time TIMESTAMP NULL,
+                        ADD COLUMN IF NOT EXISTS current_minute INTEGER DEFAULT 0,
+                        ADD COLUMN IF NOT EXISTS is_extra_time BOOLEAN DEFAULT FALSE,
+                        ADD COLUMN IF NOT EXISTS is_paused BOOLEAN DEFAULT FALSE
                     """)
                 )
                 import logging

@@ -11,7 +11,7 @@ from app.dependencies.db import get_db
 from app.models.admin import Admin
 from app.models.match import Match
 from app.models.team import Team
-from app.schemas.match import MatchCreate, MatchUpdate, MatchResponse, ScoreUpdate
+from app.schemas.match import MatchCreate, MatchUpdate, MatchResponse, ScoreUpdate, TimerUpdate
 from app.services.standings_service import recalculate_standings
 from app.services.bracket_service import generate_bracket, advance_winner
 
@@ -233,6 +233,38 @@ async def update_score(
 
     await db.commit()
 
+    result = await db.execute(
+        select(Match)
+        .options(selectinload(Match.team_a), selectinload(Match.team_b))
+        .where(Match.id == match_id)
+    )
+    match = result.scalar_one()
+    return _to_response(match)
+
+
+@router.patch("/{match_id}/timer", response_model=MatchResponse)
+async def update_timer(
+    match_id: uuid.UUID,
+    data: TimerUpdate,
+    db: AsyncSession = Depends(get_db),
+    _admin: Admin = Depends(get_current_admin),
+):
+    """Admin-only — update match timer (current_minute, is_extra_time, is_paused)."""
+    match = await _get_match_with_teams(db, match_id)
+    
+    # Only allow timer updates for live matches
+    if match.status != "live":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Timer can only be updated for live matches",
+        )
+    
+    match.current_minute = data.current_minute
+    match.is_extra_time = data.is_extra_time
+    match.is_paused = data.is_paused
+    
+    await db.commit()
+    
     result = await db.execute(
         select(Match)
         .options(selectinload(Match.team_a), selectinload(Match.team_b))
