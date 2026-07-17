@@ -274,6 +274,71 @@ export default function ScoreUpdateForm({ match, onUpdated }: Props) {
         )}
       </div>
 
+      {/* STOPWATCH TIMER - APPEARS WHEN LIVE */}
+      {status === 'live' && (
+        <div className="bg-green-500/20 border-2 border-green-500 p-4 rounded-lg space-y-2">
+          <div className="text-center">
+            <p className="text-green-400 font-bold text-sm">⏱️ LIVE STOPWATCH</p>
+            <div className="text-5xl font-black text-green-300 font-mono mt-2">
+              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+            </div>
+            <p className={`text-sm font-bold mt-1 ${phase.color}`}>{phase.label}</p>
+          </div>
+
+          <div className="flex gap-2 mt-3">
+            <button
+              type="button"
+              onClick={handleStartStop}
+              className={`flex-1 py-2 font-bold rounded ${isRunning ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'}`}
+            >
+              {isRunning ? '⏸ STOP' : '▶ START'}
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex-1 py-2 font-bold bg-red-600 text-white rounded"
+            >
+              🔄 RESET
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleTimerSubmit}
+            disabled={submittingTimer}
+            className="w-full py-2 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
+          >
+            {submittingTimer ? '💾 SAVING...' : '💾 SAVE TIME'}
+          </button>
+
+          <details className="text-xs">
+            <summary className="cursor-pointer font-bold text-green-400 p-1 hover:bg-green-500/10 rounded">
+              ⚙️ SET TIME
+            </summary>
+            <div className="space-y-1 mt-1 p-2 bg-black/20 rounded">
+              <input
+                type="number"
+                min="0"
+                max="150"
+                value={minutes}
+                onChange={(e) => setTimerSeconds(Number(e.target.value) * 60 + seconds)}
+                placeholder="Min"
+                className="w-full bg-gray-800 text-white border border-green-500 rounded px-2 py-1"
+              />
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={seconds}
+                onChange={(e) => setTimerSeconds(minutes * 60 + Number(e.target.value))}
+                placeholder="Sec"
+                className="w-full bg-gray-800 text-white border border-green-500 rounded px-2 py-1"
+              />
+            </div>
+          </details>
+        </div>
+      )}
+
       {/* Real Match Stopwatch - ONLY SHOW FOR LIVE MATCHES */}
       {status === 'live' && (
         <div className="space-y-3 pt-3 border-t-2 border-green-500/50 bg-green-500/10 p-4 rounded-lg">
